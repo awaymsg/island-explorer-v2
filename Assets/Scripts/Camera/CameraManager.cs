@@ -4,85 +4,59 @@ using UnityEngine.InputSystem;
 public class CameraManager : MonoBehaviour
 {
     [Header("Movement Settings")]
-    public float moveSpeed = 10f;
-    public float zoomSpeed = 20f;
-    public float rotationSpeed = 100f;
-    public float minZoom = 2f;
-    public float maxZoom = 20f;
+    public float m_MoveSpeed = 10f;
+    public float m_ZoomSpeed = 20f;
+    public float m_MinZoom = 2f;
+    public float m_MaxZoom = 20f;
 
     // Input values
-    private static Vector2 moveInput;
-    private static float zoomInput;
-    private static Vector2 rotateInput;
-    private static bool isRotating;
-    private static bool isDragging = false;
-    private static Vector3 dragOrigin;
-    private static Vector3 dragDifference;
+    private static Vector2 m_MoveInput;
+    private static float m_ZoomInput;
+    private static bool m_bEnableMapMovement = false;
 
-    private Camera cam;
+    private Camera m_Cam;
 
     private void Start()
     {
-        cam = GetComponent<Camera>();
+        m_Cam = GetComponent<Camera>();
     }
 
     void Update()
     {
         HandleMovement();
         HandleZoom();
-        HandleDrag();
     }
 
-    // Input System Event Handlers
     public void OnMove(InputAction.CallbackContext context)
     {
-        moveInput = context.ReadValue<Vector2>();
+        m_MoveInput = context.ReadValue<Vector2>();
     }
 
     public void OnZoom(InputAction.CallbackContext context)
     {
-        zoomInput = context.ReadValue<float>();
+        m_ZoomInput = context.ReadValue<float>();
     }
 
-    public void OnClickDrag(InputAction.CallbackContext context)
+    public void OnEnableMapMovement(InputAction.CallbackContext context)
     {
-        if (context.started)
-        {
-            dragOrigin = GetMousePosition();
-        }
-
-        isDragging = context.started || context.performed;
+        m_bEnableMapMovement = context.started || context.performed;
     }
 
     private void HandleMovement()
     {
-        if (moveInput != Vector2.zero)
+        if (m_MoveInput != Vector2.zero && m_bEnableMapMovement)
         {
-            Vector3 movement = new Vector3(moveInput.x, moveInput.y, 0) * moveSpeed * Time.deltaTime;
+            Vector3 movement = new Vector3(m_MoveInput.x, m_MoveInput.y, 0) * m_MoveSpeed * Time.deltaTime;
             transform.Translate(movement, Space.World);
         }
     }
 
     private void HandleZoom()
     {
-        if (zoomInput != 0)
+        if (m_ZoomInput != 0)
         {
-            float zoomChange = -zoomInput * zoomSpeed;
-            cam.orthographicSize = Mathf.Clamp(cam.orthographicSize + zoomChange, minZoom, maxZoom);
+            float zoomChange = -m_ZoomInput * m_ZoomSpeed;
+            m_Cam.orthographicSize = Mathf.Clamp(m_Cam.orthographicSize + zoomChange, m_MinZoom, m_MaxZoom);
         }
-    }
-
-    private void HandleDrag()
-    {
-        if (isDragging)
-        {
-            dragDifference = GetMousePosition() - transform.position;
-            transform.position = dragOrigin - dragDifference;
-        }
-    }
-
-    private Vector3 GetMousePosition()
-    {
-        return cam.ScreenToWorldPoint((Vector3)Mouse.current.position.ReadValue());
     }
 }

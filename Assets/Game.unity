@@ -269,11 +269,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 44d0e465339a5384f86dc29d22c60185, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CameraManager
-  moveSpeed: 20
-  zoomSpeed: 2
-  rotationSpeed: 100
-  minZoom: 1
-  maxZoom: 30
+  m_MoveSpeed: 10
+  m_ZoomSpeed: 20
+  m_MinZoom: 2
+  m_MaxZoom: 20
 --- !u!1 &619394800
 GameObject:
   m_ObjectHideFlags: 0
@@ -563,19 +562,7 @@ MonoBehaviour:
   m_UIInputModule: {fileID: 0}
   m_DeviceLostEvent:
     m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 0}
-        m_TargetAssemblyTypeName: CameraManager, Assembly-CSharp
-        m_MethodName: 
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: OnMove
-          m_BoolArgument: 0
-        m_CallState: 2
+      m_Calls: []
   m_DeviceRegainedEvent:
     m_PersistentCalls:
       m_Calls: []
@@ -616,7 +603,19 @@ MonoBehaviour:
     m_ActionId: 1c9c8735-0fa3-4f98-80d5-4e1989a9afc0
     m_ActionName: 'Camera/Zoom[/Mouse/scroll/down,/Mouse/scroll/up]'
   - m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 519420033}
+        m_TargetAssemblyTypeName: CameraManager, Assembly-CSharp
+        m_MethodName: OnEnableMapMovement
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
     m_ActionId: 712afc1a-9fa0-4cf8-befe-bd5ef9c43cc3
     m_ActionName: 'Camera/RightClickDrag[/Mouse/rightButton]'
   m_NeverAutoSwitchControlSchemes: 0
