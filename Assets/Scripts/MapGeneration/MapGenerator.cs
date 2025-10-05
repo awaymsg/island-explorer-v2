@@ -1,27 +1,49 @@
 using System;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 
 public class MapGenerator : MonoBehaviour
 {
     [Header("TilemapRefs")]
-    public Tilemap m_TerrainMap;
+    [SerializeField]
+    private Tilemap m_TerrainMap;
 
     [Header("TilePalette")]
-    public TilePalette m_TerrainPalette;
+    [SerializeField]
+    private TilePalette m_TerrainPalette;
 
     [Header("MapSize")]
-    public Vector2Int m_MapSize;
+    [SerializeField]
+    private Vector2Int m_MapSize;
 
     [Header("Generation")]
-    public bool m_bUseRandomSeed = false;
-    public int m_RandomSeed = 0;
-    public float m_AmplitudeScalar = 1.0f;
-    public int m_Octaves = 0;
-    public float m_Persistence = 0f;
-    public float m_Lacunarity = 0f;
-    public float m_Scale = 0.1f;
-    public ElevationLevels m_ElevationLevels;
+    [SerializeField]
+    private bool m_bUseRandomSeed = false;
+    [SerializeField]
+    private int m_RandomSeed = 0;
+    [SerializeField]
+    private float m_GlobalAmplitudeScalar = 1.0f;
+    [SerializeField]
+    private float m_FalloffFactor = 1.0f;
+    [SerializeField]
+    private bool m_bUseFractalNoise = false;
+
+    [System.Serializable]
+    private struct WaveFunctions
+    {
+        public int m_Octaves;
+        public float m_Persistence;
+        public float m_Lacunarity;
+        public float m_Scale;
+        public float m_AmplitudeScalar;
+    }
+
+    [SerializeField]
+    private WaveFunctions[] m_WaveFunctions;
+
+    [SerializeField]
+    private ElevationLevels m_ElevationLevels;
 
     private static int[] m_Permutation;
     private static bool m_bIsInitialized = false;
@@ -75,16 +97,48 @@ public class MapGenerator : MonoBehaviour
         {
             for (int y = 0; y < m_MapSize.y; ++y)
             {
-                float noiseValue = Mathf.Abs(FractalNoise((float)x * m_Scale, (float)y * m_Scale, m_Octaves, m_Persistence, m_Lacunarity)) * 10f;
+                float noiseValue = 0f;
+
+                // generate initial wave
+                if (m_bUseFractalNoise && m_WaveFunctions.Count() > 0)
+                {
+                    noiseValue = Mathf.Abs(FractalNoise(
+                        x * m_WaveFunctions[0].m_Scale,
+                        y * m_WaveFunctions[0].m_Scale,
+                        m_WaveFunctions[0].m_Octaves,
+                        m_WaveFunctions[0].m_Persistence,
+                        m_WaveFunctions[0].m_Lacunarity)) * m_WaveFunctions[0].m_AmplitudeScalar * m_GlobalAmplitudeScalar;
+                }
+                else
+                {
+                    noiseValue = Mathf.Abs(Noise(x, y)) * m_GlobalAmplitudeScalar;
+                }
+
+                // add wave functions
+                int startingIndex = m_bUseFractalNoise ? 1 : 0;
+                if (m_WaveFunctions.Count() > startingIndex)
+                {
+                    int arrayCount = m_WaveFunctions.Count();
+
+                    for (int i = startingIndex; i < arrayCount; ++i)
+                    {
+                        noiseValue += Mathf.Abs(FractalNoise(
+                            x * m_WaveFunctions[i].m_Scale,
+                            y * m_WaveFunctions[i].m_Scale,
+                            m_WaveFunctions[i].m_Octaves,
+                            m_WaveFunctions[i].m_Persistence,
+                            m_WaveFunctions[i].m_Lacunarity)) * m_WaveFunctions[i].m_AmplitudeScalar;
+                    }
+                }
 
                 // calculate distance from center (normalized 0-1)
                 float distance = Vector2.Distance(new Vector2(x, y), center) / maxDistance;
 
                 // create falloff - 1 in center, 0 at edges, to keep moutains in the middle
-                float falloff = 1f - Mathf.Pow(distance, 1.5f);
+                float falloff = 1f - Mathf.Pow(distance, m_FalloffFactor);
 
                 // apply weighting - stronger noise in center and ensure the middle is never water
-                float weightedNoise = noiseValue * m_AmplitudeScalar * falloff + (falloff * m_ElevationLevels.m_WaterLevel);
+                float weightedNoise = noiseValue * m_GlobalAmplitudeScalar * falloff + (falloff * m_ElevationLevels.m_WaterLevel);
 
                 terrainTiles[x, y] = new TerrainTile(new Vector2Int(x, y), weightedNoise, /*bExplored*/ false, m_TerrainPalette.GetBiomeType(weightedNoise), m_TerrainPalette.GetTile(weightedNoise));
             }

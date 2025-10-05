@@ -4,10 +4,17 @@ using UnityEngine.Tilemaps;
 [CreateAssetMenu(fileName = "TilePalette", menuName = "Scriptable Objects/TilePalette")]
 public class TilePalette : ScriptableObject
 {
-    public TileBase[] m_MountainTiles = new TileBase[8];
-    public TileBase[] m_ForestTiles = new TileBase[8];
-    public TileBase[] m_PlainsTiles = new TileBase[8];
-    public TileBase[] m_WaterTiles = new TileBase[8];
+    // todo: make this more data driven
+    [SerializeField]
+    private TileBase[] m_MountainTiles;
+    [SerializeField]
+    private TileBase[] m_ForestTiles;
+    [SerializeField]
+    private TileBase[] m_GrasslandTiles;
+    [SerializeField]
+    private TileBase[] m_BeachTiles;
+    [SerializeField]
+    private TileBase[] m_WaterTiles;
 
     private ElevationLevels m_ELevationLevels;
 
@@ -19,7 +26,11 @@ public class TilePalette : ScriptableObject
         }
         else if (elevation < m_ELevationLevels.m_PlainsLevel)
         {
-            return m_PlainsTiles[0];
+            return m_BeachTiles[0];
+        }
+        else if (elevation < m_ELevationLevels.m_GrasslandLevel)
+        {
+            return m_GrasslandTiles[0];
         }
         else if (elevation < m_ELevationLevels.m_ForestLevel)
         {
@@ -38,6 +49,10 @@ public class TilePalette : ScriptableObject
         else if (elevation < m_ELevationLevels.m_PlainsLevel)
         {
             return EBiomeType.Plains;
+        }
+        else if (elevation < m_ELevationLevels.m_GrasslandLevel)
+        {
+            return EBiomeType.Grasslands;
         }
         else if (elevation < m_ELevationLevels.m_ForestLevel)
         {

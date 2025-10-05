@@ -44,6 +44,7 @@ public enum EBiomeType : UInt16
 {
     Mountain,
     Forest,
+    Grasslands,
     Plains,
     Water
 }
@@ -53,6 +54,7 @@ public struct ElevationLevels
 {
     public float m_MountainLevel;
     public float m_ForestLevel;
+    public float m_GrasslandLevel;
     public float m_PlainsLevel;
     public float m_WaterLevel;
 }

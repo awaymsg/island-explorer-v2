@@ -14,37 +14,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::TilePalette
   m_MountainTiles:
   - {fileID: 11400000, guid: c0998d70281df87469f6d4bcf1eb6d0e, type: 2}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
   m_ForestTiles:
+  - {fileID: 11400000, guid: f9fee0744d9a00d418417e9187751146, type: 2}
+  m_GrasslandTiles:
   - {fileID: 11400000, guid: bae9fc44eef0f5f439b9e7b44ffd31fa, type: 2}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  m_PlainsTiles:
+  m_BeachTiles:
   - {fileID: 11400000, guid: 8f4d51dd3aea14e4681e8267f8b16df6, type: 2}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
   m_WaterTiles:
   - {fileID: 11400000, guid: 0d9d4d3ef1a1d0d46aaa0ae3b0796901, type: 2}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
