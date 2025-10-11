@@ -14,18 +14,13 @@ public class MapGenerator : MonoBehaviour
     private Tilemap m_TerrainMap;
 
     [Header("Tile mappings")]
-    [SerializeField]
+    [SerializeField, Tooltip("This maps strings to tiles for json file")]
     private TileMapping[] m_TileMappings;
-    [SerializeField]
+    [SerializeField, Tooltip("This maps biomes to strings for json file")]
     private EnumMapping[] m_EnumMappings;
 
-    [Tooltip("Tile placement rules json file")]
-    [SerializeField]
+    [SerializeField, Tooltip("Tile placement rules json file")]
     private TextAsset rulesJson;
-
-    [Header("Rulebook")]
-    [SerializeField]
-    private List<TileRule> m_TileRules = new List<TileRule>();
 
     [Header("Default Tiles")]
     [SerializeField, Tooltip("Default tiles for no rules")]
@@ -69,15 +64,24 @@ public class MapGenerator : MonoBehaviour
     private static bool m_bIsPermutionTableInitialized = false;
     private static bool m_bIsBiomeTypesInitialized = false;
 
-    // Gradient vectors for 2D noise
+    // gradient vectors for 2D noise
     private static Vector2[] m_Gradients2D = {
         new Vector2(1, 1), new Vector2(-1, 1), new Vector2(1, -1), new Vector2(-1, -1),
         new Vector2(1, 0), new Vector2(-1, 0), new Vector2(0, 1), new Vector2(0, -1)
     };
 
+    private static List<TileRule> m_TileRules = new List<TileRule>();
     private static Dictionary<string, TileBase> m_TileBook;
-
     private static TerrainTile[,] m_TerrainTiles;
+
+    // quick lookup
+    private static readonly Matrix4x4[] RotationTable = new Matrix4x4[]
+    {
+        Matrix4x4.identity, // 0 degrees
+        Matrix4x4.TRS(Vector3.zero, Quaternion.Euler(0, 0, -90f), Vector3.one),
+        Matrix4x4.TRS(Vector3.zero, Quaternion.Euler(0, 0, -180f), Vector3.one),
+        Matrix4x4.TRS(Vector3.zero, Quaternion.Euler(0, 0, -270f), Vector3.one)
+    };
 
     void Start()
     {
@@ -156,6 +160,7 @@ public class MapGenerator : MonoBehaviour
                 RuleResult result = GetTile(currentBiome, x, y);
                 TileBase tile;
 
+                // if result is "empty", just place the base biome tile for now- rules may not yet be set up
                 if (result.Result == "Empty" || string.IsNullOrEmpty(result.Result))
                 {
                     tile = Array.Find<DefaultTile>(m_DefaultTiles, p => p.BiomeType == currentBiome).Tile;
@@ -171,11 +176,10 @@ public class MapGenerator : MonoBehaviour
                     continue;
                 }
 
-                Matrix4x4 rotation = Matrix4x4.TRS(Vector3.zero, Quaternion.Euler(0, 0, 360 - result.Rotations * 90), Vector3.one);
                 Vector3Int position = new Vector3Int(x, y, 0);
 
                 m_TerrainMap.SetTile(position, tile);
-                m_TerrainMap.SetTransformMatrix(position, rotation);
+                m_TerrainMap.SetTransformMatrix(position, RotationTable[result.Rotations]);
             }
         }
 
@@ -267,7 +271,7 @@ public class MapGenerator : MonoBehaviour
         for (int i = 255; i > 0; i--)
         {
             int j = UnityEngine.Random.Range(0, i + 1);
-            // Swap
+            // swap
             int temp = basePerm[i];
             basePerm[i] = basePerm[j];
             basePerm[j] = temp;
@@ -435,6 +439,7 @@ public class MapGenerator : MonoBehaviour
             return new RuleResult("Empty", 0);
         }
 
+        // get strings to check rules
         string self = GetBiomeString(biomeType);
         string west = GetNeighborBiome(x - 1, y);
         string northwest = GetNeighborBiome(x - 1, y + 1);
