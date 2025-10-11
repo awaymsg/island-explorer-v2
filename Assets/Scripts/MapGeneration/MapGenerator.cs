@@ -376,7 +376,7 @@ public class MapGenerator : MonoBehaviour
 
     private EBiomeType GetBiomeType(float elevation)
     {
-        // switch statement might be cleaner
+        // todo: make this data driven
         if (elevation < m_ElevationLevels.DeepWaterLevel)
         {
             return EBiomeType.DeepWater;
