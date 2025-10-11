@@ -1,7 +1,11 @@
 using System;
+using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.Tilemaps;
+using static Unity.Collections.Unicode;
+using static UnityEngine.EventSystems.EventTrigger;
 
 public class MapGenerator : MonoBehaviour
 {
@@ -9,9 +13,23 @@ public class MapGenerator : MonoBehaviour
     [SerializeField]
     private Tilemap m_TerrainMap;
 
-    [Header("TilePalette")]
+    [Header("Tile mappings")]
     [SerializeField]
-    private TilePalette m_TerrainPalette;
+    private TileMapping[] m_TileMappings;
+    [SerializeField]
+    private EnumMapping[] m_EnumMappings;
+
+    [Tooltip("Tile placement rules json file")]
+    [SerializeField]
+    private TextAsset rulesJson;
+
+    [Header("Rulebook")]
+    [SerializeField]
+    private List<TileRule> m_TileRules = new List<TileRule>();
+
+    [Header("Default Tiles")]
+    [SerializeField, Tooltip("Default tiles for no rules")]
+    private DefaultTile[] m_DefaultTiles;
 
     [Header("MapSize")]
     [SerializeField]
@@ -22,14 +40,14 @@ public class MapGenerator : MonoBehaviour
     private bool m_bUseRandomSeed = false;
     [SerializeField]
     private int m_RandomSeed = 0;
-    [SerializeField]
+    [SerializeField, Tooltip("Global scalar for noise amplitude")]
     private float m_GlobalAmplitudeScalar = 1.0f;
-    [SerializeField]
+    [SerializeField, Tooltip("Fall off factor, the lower the number, the faster the noise amplitude falloff from the center.")]
     private float m_FalloffFactor = 1.0f;
     [SerializeField]
     private bool m_bUseFractalNoise = false;
 
-    [System.Serializable]
+    [System.Serializable, Tooltip("Required for Fractal Noise! If fractal noise is selected, the first WaveFunction will be used for fractal noise. Otherwise each will be applied as layers")]
     private struct WaveFunctions
     {
         public int m_Octaves;
@@ -42,11 +60,14 @@ public class MapGenerator : MonoBehaviour
     [SerializeField]
     private WaveFunctions[] m_WaveFunctions;
 
-    [SerializeField]
+    [SerializeField, Tooltip("Maximum threshold for each biome type")]
     private ElevationLevels m_ElevationLevels;
 
     private static int[] m_Permutation;
-    private static bool m_bIsInitialized = false;
+
+    private static bool m_bIsTileBookInitialized = false;
+    private static bool m_bIsPermutionTableInitialized = false;
+    private static bool m_bIsBiomeTypesInitialized = false;
 
     // Gradient vectors for 2D noise
     private static Vector2[] m_Gradients2D = {
@@ -54,9 +75,67 @@ public class MapGenerator : MonoBehaviour
         new Vector2(1, 0), new Vector2(-1, 0), new Vector2(0, 1), new Vector2(0, -1)
     };
 
+    private static Dictionary<string, TileBase> m_TileBook;
+
+    private static TerrainTile[,] m_TerrainTiles;
+
     void Start()
     {
+        LoadRulesFromJson();
+        InitializeTileBook();
+
         GenerateMap();
+    }
+
+    private void LoadRulesFromJson()
+    {
+        if (rulesJson != null)
+        {
+            RuleCollection collection = JsonUtility.FromJson<RuleCollection>(rulesJson.text);
+            m_TileRules = collection.Rules;
+        }
+    }
+
+    public RuleResult GetRule(string self, string west, string northwest, string north, string northeast, string east, string southeast, string south, string southwest)
+    {
+        foreach (var rule in m_TileRules)
+        {
+            if (MatchesRule(self, west, northwest, north, northeast, east, southeast, south, southwest, rule))
+            {
+                return new RuleResult(rule.Result, rule.Rotations);
+            }
+        }
+        return new RuleResult("Empty", 0);
+    }
+
+    private bool MatchesRule(string self, string west, string northwest, string north, string northeast, string east, string southeast, string south, string southwest, TileRule rule)
+    {
+        return self == rule.SelfBiome &&
+               Matches(west, rule.West) &&
+               Matches(northwest, rule.NorthWest) &&
+               Matches(north, rule.North) &&
+               Matches(northeast, rule.NorthEast) &&
+               Matches(east, rule.East) &&
+               Matches(southeast, rule.SouthEast) &&
+               Matches(south, rule.South) &&
+               Matches(southwest, rule.SouthWest);
+    }
+
+    private bool Matches(string actual, string[] allowed)
+    {
+        return allowed.Contains("*") || allowed.Contains(actual);
+    }
+
+    public void InitializeTileBook()
+    {
+        m_TileBook = new Dictionary<string, TileBase>();
+
+        foreach (TileMapping tilemapping in m_TileMappings)
+        {
+            m_TileBook[tilemapping.Name] = tilemapping.Tile;
+        }
+
+        m_bIsTileBookInitialized = true;
     }
 
     public TerrainTile[,] GenerateMap()
@@ -66,28 +145,46 @@ public class MapGenerator : MonoBehaviour
             UnityEngine.Random.InitState(m_RandomSeed);
         }
 
-        InitializeTilePalette();
-
         InitializePermutationTable();
-        TerrainTile[,] terrainTiles = GenerateHeightMap();
+        GenerateHeightMap();
 
-        // consider using SetTiles
         for (int x = 0; x < m_MapSize.x; ++x)
         {
             for (int y = 0; y < m_MapSize.y; ++y)
             {
-                float elevation = terrainTiles[x, y].GetElevation();
-                TileBase tile = terrainTiles[x, y].GetTile();
-                m_TerrainMap.SetTile(new Vector3Int(x, y, 0), tile);
+                EBiomeType currentBiome = m_TerrainTiles[x, y].GetBiomeType();
+                RuleResult result = GetTile(currentBiome, x, y);
+                TileBase tile;
+
+                if (result.Result == "Empty" || string.IsNullOrEmpty(result.Result))
+                {
+                    tile = Array.Find<DefaultTile>(m_DefaultTiles, p => p.BiomeType == currentBiome).Tile;
+                }
+                else
+                {
+                    tile = m_TileBook[result.Result];
+                }
+
+                if (tile == null)
+                {
+                    Debug.Log("GenerateMap - null tile!");
+                    continue;
+                }
+
+                Matrix4x4 rotation = Matrix4x4.TRS(Vector3.zero, Quaternion.Euler(0, 0, 360 - result.Rotations * 90), Vector3.one);
+                Vector3Int position = new Vector3Int(x, y, 0);
+
+                m_TerrainMap.SetTile(position, tile);
+                m_TerrainMap.SetTransformMatrix(position, rotation);
             }
         }
 
-        return terrainTiles;
+        return m_TerrainTiles;
     }
 
-    private TerrainTile[,] GenerateHeightMap()
+    private void GenerateHeightMap()
     {
-        TerrainTile[,] terrainTiles = new TerrainTile[m_MapSize.x, m_MapSize.y];
+        m_TerrainTiles = new TerrainTile[m_MapSize.x, m_MapSize.y];
 
         Vector2Int center = GetCenterPoint();
         float maxDistance = center.magnitude;
@@ -138,23 +235,20 @@ public class MapGenerator : MonoBehaviour
                 float falloff = 1f - Mathf.Pow(distance, m_FalloffFactor);
 
                 // apply weighting - stronger noise in center and ensure the middle is never water
-                float weightedNoise = noiseValue * m_GlobalAmplitudeScalar * falloff + (falloff * m_ElevationLevels.m_WaterLevel);
+                float weightedNoise = noiseValue * m_GlobalAmplitudeScalar * falloff + (falloff * m_ElevationLevels.WaterLevel);
 
-                terrainTiles[x, y] = new TerrainTile(new Vector2Int(x, y), weightedNoise, /*bExplored*/ false, m_TerrainPalette.GetBiomeType(weightedNoise), m_TerrainPalette.GetTile(weightedNoise));
+                EBiomeType biomeType = GetBiomeType(weightedNoise);
+
+                m_TerrainTiles[x, y] = new TerrainTile(new Vector2Int(x, y), weightedNoise, /*bExplored*/ false, GetBiomeType(weightedNoise));
             }
         }
 
-        return terrainTiles;
+        m_bIsBiomeTypesInitialized = true;
     }
 
     private Vector2Int GetCenterPoint()
     {
         return new Vector2Int((int)(m_MapSize.x * 0.5f), (int)(m_MapSize.y * 0.5f));
-    }
-
-    private void InitializeTilePalette()
-    {
-        m_TerrainPalette.SetLevels(m_ElevationLevels);
     }
 
     private static void InitializePermutationTable()
@@ -186,7 +280,7 @@ public class MapGenerator : MonoBehaviour
             m_Permutation[i + 256] = basePerm[i];
         }
 
-        m_bIsInitialized = true;
+        m_bIsPermutionTableInitialized = true;
     }
 
     // smooth interpolation curve
@@ -219,7 +313,7 @@ public class MapGenerator : MonoBehaviour
 
     private static float Noise(float x, float y)
     {
-        if (!m_bIsInitialized)
+        if (!m_bIsPermutionTableInitialized)
         {
             Debug.Log("MapGenerator::Noise - error: permutation table not initialized!");
             return 0f;
@@ -253,7 +347,7 @@ public class MapGenerator : MonoBehaviour
 
     private static float FractalNoise(float x, float y, int octaves, float persistence, float lacunarity)
     {
-        if (!m_bIsInitialized)
+        if (!m_bIsPermutionTableInitialized)
         {
             Debug.Log("MapGenerator::FractalNoise - error: permutation table not initialized!");
             return 0f;
@@ -274,5 +368,83 @@ public class MapGenerator : MonoBehaviour
         }
 
         return total / maxValue;
+    }
+
+    private EBiomeType GetBiomeType(float elevation)
+    {
+        // switch statement might be cleaner
+        if (elevation < m_ElevationLevels.DeepWaterLevel)
+        {
+            return EBiomeType.DeepWater;
+        }
+        if (elevation < m_ElevationLevels.WaterLevel)
+        {
+            return EBiomeType.Water;
+        }
+        else if (elevation < m_ElevationLevels.BeachLevel)
+        {
+            return EBiomeType.Beach;
+        }
+        else if (elevation < m_ElevationLevels.GrasslandLevel)
+        {
+            return EBiomeType.Grasslands;
+        }
+        else if (elevation < m_ElevationLevels.ForestLevel)
+        {
+            return EBiomeType.Forest;
+        }
+        else if (elevation < m_ElevationLevels.MountainLevel)
+        {
+            return EBiomeType.Mountain;
+        }
+
+        return EBiomeType.Invalid;
+    }
+
+    private string GetBiomeString(EBiomeType biomeType)
+    {
+        EnumMapping mapping = Array.Find<EnumMapping>(m_EnumMappings, p => p.BiomeType == biomeType);
+
+        if (string.IsNullOrEmpty(mapping.Name))
+        {
+            return "Empty";
+        }
+
+        return mapping.Name;
+    }
+
+    private string GetNeighborBiome(int x, int y)
+    {
+        int clampedX = Mathf.Clamp(x, 0, m_MapSize.x - 1);
+        int clampedY = Mathf.Clamp(y, 0, m_MapSize.y - 1);
+
+        return GetBiomeString(m_TerrainTiles[clampedX, clampedY].GetBiomeType());
+    }
+
+    private RuleResult GetTile(EBiomeType biomeType, int x, int y)
+    {
+        if (!m_bIsBiomeTypesInitialized)
+        {
+            Debug.Log("GetTile - BiomeTypes have not been initialized!");
+            return new RuleResult("Empty", 0);
+        }
+
+        if (!m_bIsTileBookInitialized)
+        {
+            Debug.Log("GetTile - TileBook has not been initialized!");
+            return new RuleResult("Empty", 0);
+        }
+
+        string self = GetBiomeString(biomeType);
+        string west = GetNeighborBiome(x - 1, y);
+        string northwest = GetNeighborBiome(x - 1, y + 1);
+        string north = GetNeighborBiome(x, y + 1);
+        string northeast = GetNeighborBiome(x + 1, y + 1);
+        string east = GetNeighborBiome(x + 1, y);
+        string southeast = GetNeighborBiome(x + 1, y - 1);
+        string south = GetNeighborBiome(x, y - 1);
+        string southwest = GetNeighborBiome(x - 1, y - 1);
+
+        return GetRule(self, west, northwest, north, northeast, east, southeast, south, southwest);
     }
 }

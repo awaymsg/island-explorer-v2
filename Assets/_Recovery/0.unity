@@ -383,7 +383,7 @@ Transform:
   m_GameObject: {fileID: 854178934}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: 0.5, y: 0.5, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -683,59 +683,91 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MapGenerator
   m_TerrainMap: {fileID: 970083614}
-  m_TileMappings:
-  - Tile: {fileID: 11400000, guid: fc10b3d3810b3504e87ddcb8be55771c, type: 2}
-    Name: deepwater_pure
-  - Tile: {fileID: 11400000, guid: 1f97bea1d9a38d945a3d6cee28a5493f, type: 2}
-    Name: deepwater_1water
-  - Tile: {fileID: 11400000, guid: 3979ab0e38cc418449b55d0fa7a46d5e, type: 2}
-    Name: deepwater_2water
-  - Tile: {fileID: 11400000, guid: dda0bfedadf5a8445be62d5c85535405, type: 2}
-    Name: deepwater_3water
-  - Tile: {fileID: 11400000, guid: d171cddfe182d3c4b9f4d72f27c2ae41, type: 2}
-    Name: deepwater_4water
-  - Tile: {fileID: 11400000, guid: 7a91d7c2a8c42b8429043b78f7c06086, type: 2}
-    Name: deepwater_cornerwater
-  - Tile: {fileID: 11400000, guid: 47091accd11d9284e9005faa78fd2636, type: 2}
-    Name: water_pure
-  - Tile: {fileID: 11400000, guid: a15f8eac785832c40bfa909a69c27dab, type: 2}
-    Name: water_1beach
-  - Tile: {fileID: 11400000, guid: 06219ed4c0d1a5a47979cc72e9c13d0a, type: 2}
-    Name: water_cornerbeach
-  - Tile: {fileID: 11400000, guid: c3cff1d6d757cab4a93e42cef162c8a4, type: 2}
-    Name: water_2beach
-  - Tile: {fileID: 11400000, guid: 3ea1172f3043db348b9f0b489f6386df, type: 2}
-    Name: water_3beach
-  - Tile: {fileID: 11400000, guid: 68a548e8307e58b40a39eda8ec74b0d1, type: 2}
-    Name: water_4beach
-  m_EnumMappings:
-  - BiomeType: 1
-    Name: deepwater
-  - BiomeType: 2
-    Name: water
-  - BiomeType: 3
-    Name: beach
-  - BiomeType: 4
-    Name: grass
-  - BiomeType: 5
-    Name: forest
-  - BiomeType: 6
-    Name: mountain
-  rulesJson: {fileID: 4900000, guid: a4a482493502de14fa8b200adcc04666, type: 3}
-  m_TileRules: []
-  m_DefaultTiles:
-  - BiomeType: 1
-    Tile: {fileID: 11400000, guid: fc10b3d3810b3504e87ddcb8be55771c, type: 2}
-  - BiomeType: 2
-    Tile: {fileID: 11400000, guid: 47091accd11d9284e9005faa78fd2636, type: 2}
-  - BiomeType: 3
-    Tile: {fileID: 11400000, guid: 65632bc25cbdda348968c5af18776bee, type: 2}
-  - BiomeType: 4
-    Tile: {fileID: 11400000, guid: 0cd687f8bb8f7e14b8b41b03469e6ba3, type: 2}
-  - BiomeType: 5
-    Tile: {fileID: 11400000, guid: c76b5e6da04f8944a82da6ac94102a86, type: 2}
-  - BiomeType: 6
-    Tile: {fileID: 11400000, guid: f76d7ae811bba074e8290df8e18fb662, type: 2}
+  m_BiomePalettes:
+  - m_Biome: 5
+    m_ConnectingBiome: 4
+    m_FullTile: {fileID: 11400000, guid: b58d3ed6c70f1bd4c8d45eccf9898f99, type: 2}
+    m_SideConnect: {fileID: 11400000, guid: 244c6fae2ebc2c0489ddc4b52b28919d, type: 2}
+    m_CornerConnect: {fileID: 11400000, guid: 7fce910fa31ccba4b80063e2d2ace2b2, type: 2}
+    m_CornerConnectOther: {fileID: 11400000, guid: d12af226e135dc24e8c597fecddd12af, type: 2}
+    m_CornerConnectDouble: {fileID: 11400000, guid: 07340815fa27847468bd3c2424d606a7, type: 2}
+  - m_Biome: 4
+    m_ConnectingBiome: 5
+    m_FullTile: {fileID: 11400000, guid: 31c9cbf081134ba419c5a5f6242dc463, type: 2}
+    m_SideConnect: {fileID: 11400000, guid: adde2756b96391f47940ce222671d769, type: 2}
+    m_CornerConnect: {fileID: 11400000, guid: dfb279835f8637241a3aed4efb40dd4c, type: 2}
+    m_CornerConnectOther: {fileID: 11400000, guid: c6f92a1382fd30a4d94380a0e91a4983, type: 2}
+    m_CornerConnectDouble: {fileID: 11400000, guid: 07340815fa27847468bd3c2424d606a7, type: 2}
+  - m_Biome: 4
+    m_ConnectingBiome: 3
+    m_FullTile: {fileID: 11400000, guid: 31c9cbf081134ba419c5a5f6242dc463, type: 2}
+    m_SideConnect: {fileID: 11400000, guid: ff105b1eada39af4783243f3f7b5525d, type: 2}
+    m_CornerConnect: {fileID: 11400000, guid: 75578cf70b89deb48ad844e75e5ac8ea, type: 2}
+    m_CornerConnectOther: {fileID: 11400000, guid: 1052ff5d2ba832042ab0a42e0a6c15b5, type: 2}
+    m_CornerConnectDouble: {fileID: 11400000, guid: 862f2ef47f3fb4045aecb51132e622e7, type: 2}
+  - m_Biome: 3
+    m_ConnectingBiome: 4
+    m_FullTile: {fileID: 11400000, guid: 195dc0c3944728c4b861bc831e3a156b, type: 2}
+    m_SideConnect: {fileID: 11400000, guid: 4026fe7692ffdd44d9ec7f1ef20c67eb, type: 2}
+    m_CornerConnect: {fileID: 11400000, guid: 6e5cd6bd69eeb4c45b8f211ec41d33fd, type: 2}
+    m_CornerConnectOther: {fileID: 11400000, guid: 7e307fa02bbbb6249baaa580cd0e48ba, type: 2}
+    m_CornerConnectDouble: {fileID: 11400000, guid: bf8ef4fca425fbc4299c2b5af5a03179, type: 2}
+  - m_Biome: 4
+    m_ConnectingBiome: 2
+    m_FullTile: {fileID: 11400000, guid: 31c9cbf081134ba419c5a5f6242dc463, type: 2}
+    m_SideConnect: {fileID: 11400000, guid: 818c71bf17924eb4dbb5c7a9c1d44f31, type: 2}
+    m_CornerConnect: {fileID: 11400000, guid: d665a9cbb41e8d84d8a95979dd856d99, type: 2}
+    m_CornerConnectOther: {fileID: 11400000, guid: d715e5bd160a69644bc44b9e96bcff31, type: 2}
+    m_CornerConnectDouble: {fileID: 11400000, guid: 67b2fb9a37b5aa54aa9e2194c50c225e, type: 2}
+  - m_Biome: 2
+    m_ConnectingBiome: 4
+    m_FullTile: {fileID: 11400000, guid: 539335899c30a224585b328888e6052d, type: 2}
+    m_SideConnect: {fileID: 11400000, guid: 818c71bf17924eb4dbb5c7a9c1d44f31, type: 2}
+    m_CornerConnect: {fileID: 11400000, guid: d715e5bd160a69644bc44b9e96bcff31, type: 2}
+    m_CornerConnectOther: {fileID: 11400000, guid: d715e5bd160a69644bc44b9e96bcff31, type: 2}
+    m_CornerConnectDouble: {fileID: 11400000, guid: 67b2fb9a37b5aa54aa9e2194c50c225e, type: 2}
+  - m_Biome: 2
+    m_ConnectingBiome: 1
+    m_FullTile: {fileID: 11400000, guid: 539335899c30a224585b328888e6052d, type: 2}
+    m_SideConnect: {fileID: 11400000, guid: efdb71ac66e955c4f9c1d7660e61360a, type: 2}
+    m_CornerConnect: {fileID: 11400000, guid: 875aaff49c98e5440b81d07f2277bdd8, type: 2}
+    m_CornerConnectOther: {fileID: 11400000, guid: fd9d128adbc5a6e4791eb952be1335a5, type: 2}
+    m_CornerConnectDouble: {fileID: 11400000, guid: 33547efdf42c6054ea7d8e2b2541f243, type: 2}
+  - m_Biome: 1
+    m_ConnectingBiome: 2
+    m_FullTile: {fileID: 11400000, guid: 3957b338044d3da4d84dc196ad92cb1d, type: 2}
+    m_SideConnect: {fileID: 11400000, guid: efdb71ac66e955c4f9c1d7660e61360a, type: 2}
+    m_CornerConnect: {fileID: 11400000, guid: 875aaff49c98e5440b81d07f2277bdd8, type: 2}
+    m_CornerConnectOther: {fileID: 11400000, guid: fd9d128adbc5a6e4791eb952be1335a5, type: 2}
+    m_CornerConnectDouble: {fileID: 11400000, guid: 33547efdf42c6054ea7d8e2b2541f243, type: 2}
+  - m_Biome: 1
+    m_ConnectingBiome: 3
+    m_FullTile: {fileID: 11400000, guid: 3957b338044d3da4d84dc196ad92cb1d, type: 2}
+    m_SideConnect: {fileID: 11400000, guid: e1a2a61ad7b8ae44daebfb677de3fc97, type: 2}
+    m_CornerConnect: {fileID: 11400000, guid: b9ecdeea73e52b549859f0cc58f8270f, type: 2}
+    m_CornerConnectOther: {fileID: 11400000, guid: cceac95bbdb9e9044ac380cecc1e1ee9, type: 2}
+    m_CornerConnectDouble: {fileID: 11400000, guid: 15971df6310c1004baa82b6ab2b7d46a, type: 2}
+  - m_Biome: 3
+    m_ConnectingBiome: 1
+    m_FullTile: {fileID: 11400000, guid: 195dc0c3944728c4b861bc831e3a156b, type: 2}
+    m_SideConnect: {fileID: 11400000, guid: e1a2a61ad7b8ae44daebfb677de3fc97, type: 2}
+    m_CornerConnect: {fileID: 11400000, guid: b9ecdeea73e52b549859f0cc58f8270f, type: 2}
+    m_CornerConnectOther: {fileID: 11400000, guid: cceac95bbdb9e9044ac380cecc1e1ee9, type: 2}
+    m_CornerConnectDouble: {fileID: 11400000, guid: 15971df6310c1004baa82b6ab2b7d46a, type: 2}
+  - m_Biome: 1
+    m_ConnectingBiome: 0
+    m_FullTile: {fileID: 11400000, guid: 3957b338044d3da4d84dc196ad92cb1d, type: 2}
+    m_SideConnect: {fileID: 11400000, guid: a030a69eb5f22424882169c5e695224c, type: 2}
+    m_CornerConnect: {fileID: 11400000, guid: d4a7fd71c91567e4796c601ef0a5f33b, type: 2}
+    m_CornerConnectOther: {fileID: 11400000, guid: b3936c81b1f3e394791a50052fa6c97b, type: 2}
+    m_CornerConnectDouble: {fileID: 11400000, guid: eb1331239eca49e4d96d901d8145be4d, type: 2}
+  - m_Biome: 0
+    m_ConnectingBiome: 1
+    m_FullTile: {fileID: 11400000, guid: 74ac5656e8bc8a6419eb73efffefee51, type: 2}
+    m_SideConnect: {fileID: 11400000, guid: a030a69eb5f22424882169c5e695224c, type: 2}
+    m_CornerConnect: {fileID: 11400000, guid: d4a7fd71c91567e4796c601ef0a5f33b, type: 2}
+    m_CornerConnectOther: {fileID: 11400000, guid: b3936c81b1f3e394791a50052fa6c97b, type: 2}
+    m_CornerConnectDouble: {fileID: 11400000, guid: eb1331239eca49e4d96d901d8145be4d, type: 2}
   m_MapSize: {x: 50, y: 50}
   m_bUseRandomSeed: 1
   m_RandomSeed: 15
@@ -764,12 +796,62 @@ MonoBehaviour:
     m_Scale: 0.1
     m_AmplitudeScalar: 1
   m_ElevationLevels:
-    MountainLevel: 100
-    ForestLevel: 50
-    GrasslandLevel: 40
-    BeachLevel: 30
-    WaterLevel: 20
-    DeepWaterLevel: 10
+  - m_BiomeType: 5
+    m_MaxElevation: 10
+  - m_BiomeType: 4
+    m_MaxElevation: 20
+  - m_BiomeType: 3
+    m_MaxElevation: 30
+  - m_BiomeType: 2
+    m_MaxElevation: 40
+  - m_BiomeType: 1
+    m_MaxElevation: 50
+  - m_BiomeType: 0
+    m_MaxElevation: 100
+--- !u!1 &1362222255
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1362222257}
+  - component: {fileID: 1362222256}
+  m_Layer: 0
+  m_Name: WorldGrid
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!156049354 &1362222256
+Grid:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1362222255}
+  m_Enabled: 1
+  m_CellSize: {x: 1, y: 1, z: 0}
+  m_CellGap: {x: 0, y: 0, z: 0}
+  m_CellLayout: 0
+  m_CellSwizzle: 0
+--- !u!4 &1362222257
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1362222255}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
@@ -777,5 +859,6 @@ SceneRoots:
   - {fileID: 519420032}
   - {fileID: 619394802}
   - {fileID: 854178935}
+  - {fileID: 1362222257}
   - {fileID: 1135005451}
   - {fileID: 995836896}

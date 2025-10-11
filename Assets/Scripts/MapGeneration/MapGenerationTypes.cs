@@ -1,60 +1,123 @@
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 
 public struct TerrainTile
 {
-    private Vector2Int m_Position;
-    private float m_Elevation;
-    private bool m_bExplored;
-    private EBiomeType m_BiomeType;
-    private TileBase m_Tile;
+    private Vector2Int Position;
+    private float Elevation;
+    private bool bExplored;
+    private EBiomeType BiomeType;
 
-    public TerrainTile(Vector2Int position, float elevation, bool bExplored, EBiomeType biomeType, TileBase tile)
+    public TerrainTile(Vector2Int position, float elevation, bool _bExplored, EBiomeType biomeType)
     {
-        m_Position = position;
-        m_Elevation = elevation;
-        m_bExplored = bExplored;
-        m_BiomeType = biomeType;
-        m_Tile = tile;
+        Position = position;
+        Elevation = elevation;
+        bExplored = _bExplored;
+        BiomeType = biomeType;
     }
 
     public float GetElevation()
     {
-        return m_Elevation;
+        return Elevation;
     }
 
     public bool IsExplored()
     {
-        return m_bExplored;
+        return bExplored;
     }
 
     public EBiomeType GetBiomeType()
     {
-        return m_BiomeType;
-    }
-
-    public TileBase GetTile()
-    {
-        return m_Tile;
+        return BiomeType;
     }
 }
 
+[System.Serializable]
 public enum EBiomeType : UInt16
 {
-    Mountain,
-    Forest,
+    Invalid,
+    DeepWater,
+    Water,
+    Beach,
     Grasslands,
-    Plains,
-    Water
+    Forest,
+    Mountain
 }
 
 [System.Serializable]
 public struct ElevationLevels
 {
-    public float m_MountainLevel;
-    public float m_ForestLevel;
-    public float m_GrasslandLevel;
-    public float m_PlainsLevel;
-    public float m_WaterLevel;
+    public float MountainLevel;
+    public float ForestLevel;
+    public float GrasslandLevel;
+    public float BeachLevel;
+    public float WaterLevel;
+    public float DeepWaterLevel;
+}
+
+[System.Serializable]
+public class TileRule
+{
+    public string Name;
+    public string SelfBiome;
+    public string[] West = new string[] { "*" }; // * means any
+    public string[] NorthWest = new string[] { "*" };
+    public string[] North = new string[] { "*" };
+    public string[] NorthEast = new string[] { "*" };
+    public string[] East = new string[] { "*" };
+    public string[] SouthEast = new string[] { "*" };
+    public string[] South = new string[] { "*" };
+    public string[] SouthWest = new string[] { "*" };
+    public int Rotations;
+    public string Result;
+
+    /*
+    [Tooltip("REQUIRES 5 ELEMENTS, first element is self biome, neighbors will be west north east south")]
+    public EBiomeType[] Rule;
+    [Tooltip("Number of rotations to do on the tile")]
+    public int Rotations;
+    [Tooltip("The tile")]
+    public TileBase Tile;
+    */
+}
+
+[System.Serializable]
+public class RuleCollection
+{
+    public List<TileRule> Rules = new List<TileRule>();
+}
+
+[System.Serializable]
+public struct DefaultTile
+{
+    public EBiomeType BiomeType;
+    public TileBase Tile;
+}
+
+[System.Serializable]
+public struct TileMapping
+{
+    public TileBase Tile;
+    public string Name;
+}
+
+[System.Serializable]
+public struct EnumMapping
+{
+    public EBiomeType BiomeType;
+    public string Name;
+}
+
+public struct RuleResult
+{
+    public RuleResult(string result, int rotations)
+    {
+        Result = result;
+        Rotations = rotations;
+    }
+
+    public string Result;
+    public int Rotations;
 }
