@@ -545,6 +545,35 @@
 			"SouthWest": ["*"],
 			"Rotations": 1,
 			"Result": "beach_cornergrass"
+		},
+		{
+			"Name": "beach-east-south-grass",
+			"SelfBiome": "beach",
+			"West": ["beach", "water"],
+			"NorthWest": ["*"],
+			"North": ["beach", "water"],
+			"NorthEast": ["*"],
+			"East": ["grass"],
+			"SouthEast": ["*"],
+			"South": ["grass"],
+			"SouthWest": ["*"],
+			"Rotations": 2,
+			"Result": "beach_cornergrass" 
+		},
+		{
+			"Name": "beach-south-west-grass",
+			"SelfBiome": "beach",
+			"West": ["grass"],
+			"NorthWest": ["*"],
+			"North": ["beach", "water"],
+			"NorthEast": ["*"],
+			"East": ["beach", "water"],
+			"SouthEast": ["*"],
+			"South": ["grass"],
+			"SouthWest": ["*"],
+			"Rotations": 3,
+			"Result": "beach_cornergrass" 
 		}
+	
 	]
 }
