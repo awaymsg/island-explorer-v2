@@ -447,6 +447,76 @@
 			"SouthWest": ["*"],
 			"Rotations": 0,
 			"Result": "water_4beach"
+		},
+		{
+			"Name": "beach_all-sides_beach",
+			"SelfBiome": "beach",
+			"West": ["beach"],
+			"NorthWest": ["*"],
+			"North": ["beach"],
+			"NorthEast": ["*"],
+			"East": ["beach"],
+			"SouthEast": ["*"],
+			"South": ["beach"],
+			"SouthWest": ["*"],
+			"Rotations": 0,
+			"Result": "beach_pure"
+		},
+		{
+			"Name": "beach-west-grass",
+			"SelfBiome": "beach",
+			"West": ["grass"],
+			"NorthWest": ["*"],
+			"North": ["beach", "water"],
+			"NorthEast": ["*"],
+			"East": ["beach", "water"],
+			"SouthEast": ["*"],
+			"South": ["beach", "water"],
+			"SouthWest": ["*"],
+			"Rotations": 0,
+			"Result": "beach_1grass"
+		},
+		{
+			"Name": "beach-north-grass",
+			"SelfBiome": "beach",
+			"West": ["beach", "water"],
+			"NorthWest": ["*"],
+			"North": ["grass"],
+			"NorthEast": ["*"],
+			"East": ["beach", "water"],
+			"SouthEast": ["*"],
+			"South": ["beach", "water"],
+			"SouthWest": ["*"],
+			"Rotations": 1,
+			"Result": "beach_1grass"
+		},
+		{
+			"Name": "beach-east-grass",
+			"SelfBiome": "beach",
+			"West": ["beach", "water"],
+			"NorthWest": ["*"],
+			"North": ["beach", "water"],
+			"NorthEast": ["*"],
+			"East": ["grass"],
+			"SouthEast": ["*"],
+			"South": ["beach", "water"],
+			"SouthWest": ["*"],
+			"Rotations": 2,
+			"Result": "beach_1grass"
+		},
+		{
+			"Name": "beach-south-grass",
+			"SelfBiome": "beach",
+			"West": ["beach", "water"],
+			"NorthWest": ["*"],
+			"North": ["beach", "water"],
+			"NorthEast": ["*"],
+			"East": ["beach", "water"],
+			"SouthEast": ["*"],
+			"South": ["grass"],
+			"SouthWest": ["*"],
+			"Rotations": 3,
+			"Result": "beach_1grass"
 		}
 	]
 }

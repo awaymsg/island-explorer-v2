@@ -708,6 +708,10 @@ MonoBehaviour:
     Name: water_3beach
   - Tile: {fileID: 11400000, guid: 68a548e8307e58b40a39eda8ec74b0d1, type: 2}
     Name: water_4beach
+  - Tile: {fileID: 11400000, guid: 65632bc25cbdda348968c5af18776bee, type: 2}
+    Name: beach_pure
+  - Tile: {fileID: 11400000, guid: 7a809faf85c7017419b058da3bfbea26, type: 2}
+    Name: beach_1grass
   m_EnumMappings:
   - BiomeType: 1
     Name: deepwater
@@ -722,7 +726,6 @@ MonoBehaviour:
   - BiomeType: 6
     Name: mountain
   rulesJson: {fileID: 4900000, guid: a4a482493502de14fa8b200adcc04666, type: 3}
-  m_TileRules: []
   m_DefaultTiles:
   - BiomeType: 1
     Tile: {fileID: 11400000, guid: fc10b3d3810b3504e87ddcb8be55771c, type: 2}
@@ -737,7 +740,7 @@ MonoBehaviour:
   - BiomeType: 6
     Tile: {fileID: 11400000, guid: f76d7ae811bba074e8290df8e18fb662, type: 2}
   m_MapSize: {x: 50, y: 50}
-  m_bUseRandomSeed: 1
+  m_bUseRandomSeed: 0
   m_RandomSeed: 15
   m_GlobalAmplitudeScalar: 10
   m_FalloffFactor: 1
