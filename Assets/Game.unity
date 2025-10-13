@@ -714,6 +714,8 @@ MonoBehaviour:
     Name: beach_1grass
   - Tile: {fileID: 11400000, guid: 83f59e23aff28264e8d2d9b72b251d5d, type: 2}
     Name: beach_cornergrass
+  - Tile: {fileID: 11400000, guid: bc200e93de7691944b6931c44eec02a3, type: 2}
+    Name: beach_2grass
   m_EnumMappings:
   - BiomeType: 1
     Name: deepwater
@@ -743,7 +745,7 @@ MonoBehaviour:
     Tile: {fileID: 11400000, guid: f76d7ae811bba074e8290df8e18fb662, type: 2}
   m_MapSize: {x: 50, y: 50}
   m_bUseRandomSeed: 1
-  m_RandomSeed: 15
+  m_RandomSeed: 43
   m_GlobalAmplitudeScalar: 10
   m_FalloffFactor: 1
   m_bUseFractalNoise: 1
