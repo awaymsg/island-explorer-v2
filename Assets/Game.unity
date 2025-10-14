@@ -777,6 +777,60 @@ MonoBehaviour:
     BeachLevel: 30
     WaterLevel: 20
     DeepWaterLevel: 10
+--- !u!1 &1953528011
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1953528013}
+  - component: {fileID: 1953528012}
+  m_Layer: 0
+  m_Name: PartyManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1953528012
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1953528011}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b051a8e9b92891f4b838a0d410fbbbec, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CPartyManager
+  m_DefaultBodyParts:
+  - BodyPart: 1
+    MaxHealth: 100
+    Health: 100
+    StatModifiers: []
+    Modifications: []
+    bIsVital: 1
+  m_DefaultBodyPartConnections: []
+  m_TraitPool: []
+  m_PersonalityTraitPool: []
+--- !u!4 &1953528013
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1953528011}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0.25826, y: -0.06427, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
@@ -786,3 +840,4 @@ SceneRoots:
   - {fileID: 854178935}
   - {fileID: 1135005451}
   - {fileID: 995836896}
+  - {fileID: 1953528013}

@@ -7,7 +7,7 @@ using UnityEngine.Tilemaps;
 using static Unity.Collections.Unicode;
 using static UnityEngine.EventSystems.EventTrigger;
 
-public class MapGenerator : MonoBehaviour
+public class CMapGenerator : MonoBehaviour
 {
     [Header("TilemapRefs")]
     [SerializeField]
@@ -15,16 +15,16 @@ public class MapGenerator : MonoBehaviour
 
     [Header("Tile mappings")]
     [SerializeField, Tooltip("This maps strings to tiles for json file")]
-    private TileMapping[] m_TileMappings;
+    private STileMapping[] m_TileMappings;
     [SerializeField, Tooltip("This maps biomes to strings for json file")]
-    private EnumMapping[] m_EnumMappings;
+    private SEnumMapping[] m_EnumMappings;
 
     [SerializeField, Tooltip("Tile placement rules json file")]
     private TextAsset rulesJson;
 
     [Header("Default Tiles")]
     [SerializeField, Tooltip("Default tiles for no rules")]
-    private DefaultTile[] m_DefaultTiles;
+    private SDefaultTile[] m_DefaultTiles;
 
     [Header("MapSize")]
     [SerializeField]
@@ -43,7 +43,7 @@ public class MapGenerator : MonoBehaviour
     private bool m_bUseFractalNoise = false;
 
     [System.Serializable, Tooltip("Required for Fractal Noise! If fractal noise is selected, the first WaveFunction will be used for fractal noise. Otherwise each will be applied as layers")]
-    private struct WaveFunctions
+    private struct SWaveFunctions
     {
         public int m_Octaves;
         public float m_Persistence;
@@ -53,10 +53,10 @@ public class MapGenerator : MonoBehaviour
     }
 
     [SerializeField]
-    private WaveFunctions[] m_WaveFunctions;
+    private SWaveFunctions[] m_WaveFunctions;
 
     [SerializeField, Tooltip("Maximum threshold for each biome type")]
-    private ElevationLevels m_ElevationLevels;
+    private SElevationLevels m_ElevationLevels;
 
     private static int[] m_Permutation;
 
@@ -70,9 +70,9 @@ public class MapGenerator : MonoBehaviour
         new Vector2(1, 0), new Vector2(-1, 0), new Vector2(0, 1), new Vector2(0, -1)
     };
 
-    private static List<TileRule> m_TileRules = new List<TileRule>();
+    private static List<CTileRule> m_TileRules = new List<CTileRule>();
     private static Dictionary<string, TileBase> m_TileBook;
-    private static TerrainTile[,] m_TerrainTiles;
+    private static STerrainTile[,] m_TerrainTiles;
 
     // quick lookup
     private static readonly Matrix4x4[] RotationTable = new Matrix4x4[]
@@ -95,24 +95,24 @@ public class MapGenerator : MonoBehaviour
     {
         if (rulesJson != null)
         {
-            RuleCollection collection = JsonUtility.FromJson<RuleCollection>(rulesJson.text);
+            CRuleCollection collection = JsonUtility.FromJson<CRuleCollection>(rulesJson.text);
             m_TileRules = collection.Rules;
         }
     }
 
-    public RuleResult GetRule(string self, string west, string northwest, string north, string northeast, string east, string southeast, string south, string southwest)
+    public SRuleResult GetRule(string self, string west, string northwest, string north, string northeast, string east, string southeast, string south, string southwest)
     {
         foreach (var rule in m_TileRules)
         {
             if (MatchesRule(self, west, northwest, north, northeast, east, southeast, south, southwest, rule))
             {
-                return new RuleResult(rule.Result, rule.Rotations);
+                return new SRuleResult(rule.Result, rule.Rotations);
             }
         }
-        return new RuleResult("Empty", 0);
+        return new SRuleResult("Empty", 0);
     }
 
-    private bool MatchesRule(string self, string west, string northwest, string north, string northeast, string east, string southeast, string south, string southwest, TileRule rule)
+    private bool MatchesRule(string self, string west, string northwest, string north, string northeast, string east, string southeast, string south, string southwest, CTileRule rule)
     {
         return self == rule.SelfBiome &&
                Matches(west, rule.West) &&
@@ -134,7 +134,7 @@ public class MapGenerator : MonoBehaviour
     {
         m_TileBook = new Dictionary<string, TileBase>();
 
-        foreach (TileMapping tilemapping in m_TileMappings)
+        foreach (STileMapping tilemapping in m_TileMappings)
         {
             m_TileBook[tilemapping.Name] = tilemapping.Tile;
         }
@@ -142,7 +142,7 @@ public class MapGenerator : MonoBehaviour
         m_bIsTileBookInitialized = true;
     }
 
-    public TerrainTile[,] GenerateMap()
+    public STerrainTile[,] GenerateMap()
     {
         if (m_bUseRandomSeed)
         {
@@ -157,13 +157,13 @@ public class MapGenerator : MonoBehaviour
             for (int y = 0; y < m_MapSize.y; ++y)
             {
                 EBiomeType currentBiome = m_TerrainTiles[x, y].GetBiomeType();
-                RuleResult result = GetTile(currentBiome, x, y);
+                SRuleResult result = GetTile(currentBiome, x, y);
                 TileBase tile;
 
                 // if result is "empty", just place the base biome tile for now- rules may not yet be set up
                 if (result.Result == "Empty" || string.IsNullOrEmpty(result.Result))
                 {
-                    tile = Array.Find<DefaultTile>(m_DefaultTiles, p => p.BiomeType == currentBiome).Tile;
+                    tile = Array.Find<SDefaultTile>(m_DefaultTiles, p => p.BiomeType == currentBiome).Tile;
                 }
                 else
                 {
@@ -188,7 +188,7 @@ public class MapGenerator : MonoBehaviour
 
     private void GenerateHeightMap()
     {
-        m_TerrainTiles = new TerrainTile[m_MapSize.x, m_MapSize.y];
+        m_TerrainTiles = new STerrainTile[m_MapSize.x, m_MapSize.y];
 
         Vector2Int center = GetCenterPoint();
         float maxDistance = center.magnitude;
@@ -243,7 +243,7 @@ public class MapGenerator : MonoBehaviour
 
                 EBiomeType biomeType = GetBiomeType(weightedNoise);
 
-                m_TerrainTiles[x, y] = new TerrainTile(new Vector2Int(x, y), weightedNoise, /*bExplored*/ false, GetBiomeType(weightedNoise));
+                m_TerrainTiles[x, y] = new STerrainTile(new Vector2Int(x, y), weightedNoise, /*bExplored*/ false, GetBiomeType(weightedNoise));
             }
         }
 
@@ -407,7 +407,7 @@ public class MapGenerator : MonoBehaviour
 
     private string GetBiomeString(EBiomeType biomeType)
     {
-        EnumMapping mapping = Array.Find<EnumMapping>(m_EnumMappings, p => p.BiomeType == biomeType);
+        SEnumMapping mapping = Array.Find<SEnumMapping>(m_EnumMappings, p => p.BiomeType == biomeType);
 
         if (string.IsNullOrEmpty(mapping.Name))
         {
@@ -425,18 +425,18 @@ public class MapGenerator : MonoBehaviour
         return GetBiomeString(m_TerrainTiles[clampedX, clampedY].GetBiomeType());
     }
 
-    private RuleResult GetTile(EBiomeType biomeType, int x, int y)
+    private SRuleResult GetTile(EBiomeType biomeType, int x, int y)
     {
         if (!m_bIsBiomeTypesInitialized)
         {
             Debug.Log("GetTile - BiomeTypes have not been initialized!");
-            return new RuleResult("Empty", 0);
+            return new SRuleResult("Empty", 0);
         }
 
         if (!m_bIsTileBookInitialized)
         {
             Debug.Log("GetTile - TileBook has not been initialized!");
-            return new RuleResult("Empty", 0);
+            return new SRuleResult("Empty", 0);
         }
 
         // get strings to check rules

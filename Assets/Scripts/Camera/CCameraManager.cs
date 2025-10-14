@@ -1,7 +1,7 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-public class CameraManager : MonoBehaviour
+public class CCameraManager : MonoBehaviour
 {
     [Header("Movement Settings")]
     public float m_MoveSpeed = 10f;

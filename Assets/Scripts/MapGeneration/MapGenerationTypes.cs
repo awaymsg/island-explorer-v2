@@ -3,14 +3,14 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 
-public struct TerrainTile
+public struct STerrainTile
 {
     private Vector2Int Position;
     private float Elevation;
     private bool bExplored;
     private EBiomeType BiomeType;
 
-    public TerrainTile(Vector2Int position, float elevation, bool _bExplored, EBiomeType biomeType)
+    public STerrainTile(Vector2Int position, float elevation, bool _bExplored, EBiomeType biomeType)
     {
         Position = position;
         Elevation = elevation;
@@ -47,7 +47,7 @@ public enum EBiomeType : UInt16
 }
 
 [System.Serializable]
-public struct ElevationLevels
+public struct SElevationLevels
 {
     public float MountainLevel;
     public float ForestLevel;
@@ -58,7 +58,7 @@ public struct ElevationLevels
 }
 
 [System.Serializable]
-public class TileRule
+public class CTileRule
 {
     public string Name;
     public string SelfBiome;
@@ -84,35 +84,35 @@ public class TileRule
 }
 
 [System.Serializable]
-public class RuleCollection
+public class CRuleCollection
 {
-    public List<TileRule> Rules = new List<TileRule>();
+    public List<CTileRule> Rules = new List<CTileRule>();
 }
 
 [System.Serializable]
-public struct DefaultTile
+public struct SDefaultTile
 {
     public EBiomeType BiomeType;
     public TileBase Tile;
 }
 
 [System.Serializable]
-public struct TileMapping
+public struct STileMapping
 {
     public TileBase Tile;
     public string Name;
 }
 
 [System.Serializable]
-public struct EnumMapping
+public struct SEnumMapping
 {
     public EBiomeType BiomeType;
     public string Name;
 }
 
-public struct RuleResult
+public struct SRuleResult
 {
-    public RuleResult(string result, int rotations)
+    public SRuleResult(string result, int rotations)
     {
         Result = result;
         Rotations = rotations;
