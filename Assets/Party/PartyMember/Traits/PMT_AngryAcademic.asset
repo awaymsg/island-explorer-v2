@@ -10,18 +10,26 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 0889e8d3bb7140d4789834abdffe3ce7, type: 3}
-  m_Name: PMT_Angry
+  m_Name: PMT_AngryAcademic
   m_EditorClassIdentifier: Assembly-CSharp::CPartyMemberTrait
   m_TraitName: Angry Academic
-  m_Description: '{name} has a chip on their shoulder after having their thesis disproven
-    by their rival.'
-  m_TraitType: 3
+  m_TraitDescription: 
+  m_TraitType: 4
   m_InvalidatesTraits: []
   m_TraitEffects:
-  - BodyPartModifications: []
+  - BodyPartModifications:
+    - ModName: 
+      ModLocation: 1
+      InjuryType: 2
+      bPermanent: 1
+      HealTimeInDays: 0
+      bMultiplicative: 1
+      ModAmount: 90
+      Cost: -3
+      ModificationContext: 
     StatModifiers:
     - StatType: 7
       bMultiplicative: 0
       ModAmount: -10
       Cost: -3
-  m_Cost: -3
+  m_Cost: -6

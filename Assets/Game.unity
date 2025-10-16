@@ -119,6 +119,52 @@ NavMeshSettings:
     debug:
       m_Flags: 0
   m_NavMeshData: {fileID: 0}
+--- !u!1 &86794077
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 86794079}
+  - component: {fileID: 86794078}
+  m_Layer: 0
+  m_Name: GameManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &86794078
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 86794077}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 87dbdd667fdf99f448aeb1b19d697862, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::GameManager
+  m_bUseRandomSeed: 1
+  m_RandomSeed: 43
+--- !u!4 &86794079
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 86794077}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0.25826, y: -0.06427, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &519420028
 GameObject:
   m_ObjectHideFlags: 0
@@ -618,6 +664,10 @@ MonoBehaviour:
         m_CallState: 2
     m_ActionId: 712afc1a-9fa0-4cf8-befe-bd5ef9c43cc3
     m_ActionName: 'Camera/RightClickDrag[/Mouse/rightButton]'
+  - m_PersistentCalls:
+      m_Calls: []
+    m_ActionId: 56afbaeb-96f4-4ee8-9cd7-3d77cb1c32ec
+    m_ActionName: 'Player/Move[/Keyboard/w,/Keyboard/d,/Keyboard/a]'
   m_NeverAutoSwitchControlSchemes: 0
   m_DefaultControlScheme: 
   m_DefaultActionMap: Camera
@@ -729,7 +779,7 @@ MonoBehaviour:
     Name: forest
   - BiomeType: 6
     Name: mountain
-  rulesJson: {fileID: 4900000, guid: a4a482493502de14fa8b200adcc04666, type: 3}
+  m_RulesJson: {fileID: 4900000, guid: a4a482493502de14fa8b200adcc04666, type: 3}
   m_DefaultTiles:
   - BiomeType: 1
     Tile: {fileID: 11400000, guid: fc10b3d3810b3504e87ddcb8be55771c, type: 2}
@@ -744,8 +794,6 @@ MonoBehaviour:
   - BiomeType: 6
     Tile: {fileID: 11400000, guid: f76d7ae811bba074e8290df8e18fb662, type: 2}
   m_MapSize: {x: 50, y: 50}
-  m_bUseRandomSeed: 1
-  m_RandomSeed: 43
   m_GlobalAmplitudeScalar: 10
   m_FalloffFactor: 1
   m_bUseFractalNoise: 1
@@ -806,15 +854,22 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b051a8e9b92891f4b838a0d410fbbbec, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CPartyManager
+  m_DefaultPartyLeadersPool: []
+  m_DefaultPartyMembersPool: []
+  m_DefaultPartyMemberStats: []
   m_DefaultBodyParts:
-  - BodyPart: 1
+  - BodyPart: 2
     MaxHealth: 100
     Health: 100
-    StatModifiers: []
+    StatModifiers:
+    - Stat: 10
+      ModAmount: 1
     Modifications: []
     bIsVital: 1
-  m_DefaultBodyPartConnections: []
-  m_TraitPool: []
+    AttachedTo: 1
+    Attached: 
+  m_TraitPool:
+  - {fileID: 11400000, guid: 0c5eb64850f2bbb4fb58c688b89594cc, type: 2}
   m_PersonalityTraitPool: []
 --- !u!4 &1953528013
 Transform:
@@ -838,6 +893,7 @@ SceneRoots:
   - {fileID: 519420032}
   - {fileID: 619394802}
   - {fileID: 854178935}
+  - {fileID: 86794079}
   - {fileID: 1135005451}
   - {fileID: 995836896}
   - {fileID: 1953528013}

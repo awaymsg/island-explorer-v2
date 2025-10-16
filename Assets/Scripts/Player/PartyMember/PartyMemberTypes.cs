@@ -6,6 +6,7 @@ using UnityEngine;
 [Serializable]
 public enum EPartyMemberType
 {
+    Invalid = 0,
     Warrior,
     Scout,
     Hunter
@@ -14,7 +15,7 @@ public enum EPartyMemberType
 [Serializable]
 public enum EPartyMemberSkillType
 {
-    Invalid,
+    Invalid = 0,
     None,
     Buff,
     Event
@@ -23,7 +24,7 @@ public enum EPartyMemberSkillType
 [Serializable]
 public enum EPartyMemberTraitType
 {
-    Invalid,
+    Invalid = 0,
     None,
     Warrior,
     Social,
@@ -45,7 +46,7 @@ public struct SPartyMemberStatModifier
 [Serializable]
 public enum EPartyMemberStatType
 {
-    Invalid,
+    Invalid = 0,
     None,
     Attack,
     Defense,
@@ -54,7 +55,9 @@ public enum EPartyMemberStatType
     Science,
     Social,
     History,
-    Occult
+    Occult,
+    Serenity,
+    Morale
 }
 
 [Serializable]
@@ -65,9 +68,17 @@ public struct SPartyMemberStat
 }
 
 [Serializable]
+public struct SDefaultPartyMemberStats
+{
+    public EPartyMemberType Class;
+    public SPartyMemberStat[] BaseStats;
+}
+
+[Serializable]
 public enum EBodyPart
 {
-    Invalid,
+    Invalid = 0,
+    None,
     Soul,
     Mind,
     LeftEye,
@@ -106,16 +117,10 @@ public enum EBodyPart
 }
 
 [Serializable]
-public struct SBodyPartAttachment
-{
-    public EBodyPart AttachedTo;
-    public EBodyPart[] Attached;
-}
-
-[Serializable]
 public enum EBodyPartModification
 {
-    Invalid,
+    Invalid = 0,
+    Damaged,
     Broken,
     Pierced,
     Laceration,
@@ -123,6 +128,7 @@ public enum EBodyPartModification
     Amputated,
     Destroyed,
     Lame,
+    Enhanced,
     Replaced
 }
 
@@ -163,13 +169,19 @@ public struct SBodyPartStatModifier
 [Serializable]
 public class CBodyPart
 {
+    [Header("Basic Info")]
     public EBodyPart BodyPart;
     public float MaxHealth = 100;
     public float Health = 100;
+    [Tooltip("Party member stats this bodypart affects")]
     public SBodyPartStatModifier[] StatModifiers;
+    [Tooltip("Modifications to this bodypart")]
     public List<CBodyPartModification> Modifications;
     [Tooltip("If this is a vital body part, party member would die if it was destroyed")]
     public bool bIsVital = false;
+    [Header("Attachment")]
+    public EBodyPart AttachedTo;
+    public EBodyPart[] Attached;
 }
 
 [Serializable]

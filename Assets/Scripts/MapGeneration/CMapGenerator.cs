@@ -20,7 +20,7 @@ public class CMapGenerator : MonoBehaviour
     private SEnumMapping[] m_EnumMappings;
 
     [SerializeField, Tooltip("Tile placement rules json file")]
-    private TextAsset rulesJson;
+    private TextAsset m_RulesJson;
 
     [Header("Default Tiles")]
     [SerializeField, Tooltip("Default tiles for no rules")]
@@ -31,10 +31,6 @@ public class CMapGenerator : MonoBehaviour
     private Vector2Int m_MapSize;
 
     [Header("Generation")]
-    [SerializeField]
-    private bool m_bUseRandomSeed = false;
-    [SerializeField]
-    private int m_RandomSeed = 0;
     [SerializeField, Tooltip("Global scalar for noise amplitude")]
     private float m_GlobalAmplitudeScalar = 1.0f;
     [SerializeField, Tooltip("Fall off factor, the lower the number, the faster the noise amplitude falloff from the center.")]
@@ -83,19 +79,18 @@ public class CMapGenerator : MonoBehaviour
         Matrix4x4.TRS(Vector3.zero, Quaternion.Euler(0, 0, -270f), Vector3.one)
     };
 
-    void Start()
+    //-- getters
+    public Vector2Int MapSize
     {
-        LoadRulesFromJson();
-        InitializeTileBook();
-
-        GenerateMap();
+        get { return m_MapSize; }
     }
+    //--
 
     private void LoadRulesFromJson()
     {
-        if (rulesJson != null)
+        if (m_RulesJson != null)
         {
-            CRuleCollection collection = JsonUtility.FromJson<CRuleCollection>(rulesJson.text);
+            CRuleCollection collection = JsonUtility.FromJson<CRuleCollection>(m_RulesJson.text);
             m_TileRules = collection.Rules;
         }
     }
@@ -144,10 +139,8 @@ public class CMapGenerator : MonoBehaviour
 
     public STerrainTile[,] GenerateMap()
     {
-        if (m_bUseRandomSeed)
-        {
-            UnityEngine.Random.InitState(m_RandomSeed);
-        }
+        LoadRulesFromJson();
+        InitializeTileBook();
 
         InitializePermutationTable();
         GenerateHeightMap();
