@@ -15,11 +15,11 @@ MonoBehaviour:
   m_TraitName: Angry Academic
   m_TraitDescription: 
   m_TraitType: 4
-  m_InvalidatesTraits: []
+  m_InvalidatedTraits: []
   m_TraitEffects:
   - BodyPartModifications:
     - ModName: 
-      ModLocation: 1
+      ModLocation: 2
       InjuryType: 2
       bPermanent: 1
       HealTimeInDays: 0
@@ -32,4 +32,5 @@ MonoBehaviour:
       bMultiplicative: 0
       ModAmount: -10
       Cost: -3
+  m_bIsGenerationOnly: 1
   m_Cost: -6

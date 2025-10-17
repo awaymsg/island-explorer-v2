@@ -1,0 +1,4 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" editor-extension-mode="False">
+    <Style src="project://database/Assets/UI/LeftUIPanel/LeftUIPanelUSS.uss?fileID=7433441132597879392&amp;guid=d75b756bfe7586f4785d20f0a845828e&amp;type=3#LeftUIPanelUSS" />
+    <ui:VisualElement name="CharacterPanel" class="characterpanel" />
+</ui:UXML>

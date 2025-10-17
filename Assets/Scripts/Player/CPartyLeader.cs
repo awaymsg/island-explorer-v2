@@ -8,3 +8,8 @@ public class CPartyLeader : CPartyMember
 
     // add unique skills
 }
+
+public class CPartyLeaderRuntime : CPartyMemberRuntime
+{
+    public CPartyLeaderRuntime(CPartyMember partyMemberSO, CPartyManager partyManager) : base(partyMemberSO, partyManager) { }
+}

@@ -33,6 +33,14 @@ public enum EPartyMemberTraitType
 }
 
 [Serializable]
+public enum EPartyMemberGender
+{
+    Invalid = 0,
+    Male,
+    Female
+}
+
+[Serializable]
 public struct SPartyMemberStatModifier
 {
     public EPartyMemberStatType StatType;
@@ -50,7 +58,7 @@ public enum EPartyMemberStatType
     None,
     Attack,
     Defense,
-    Food,
+    Hunting,
     Nutrition,
     Science,
     Social,

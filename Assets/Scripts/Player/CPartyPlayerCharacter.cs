@@ -4,13 +4,30 @@ using System.Linq;
 
 public class CPartyPlayerCharacter : MonoBehaviour
 {
-    private CPartyLeader m_PartyLeader;
-    private List<CPartyMember> m_PartyMembers;
+    private CPartyLeaderRuntime m_PartyLeader;
+    private List<CPartyMemberRuntime> m_PartyMembers;
 
-    public void InitializePartyPlayerCharacter(CPartyLeader partyLeader, List<CPartyMember> partyMembers)
+    //-- getters
+    public CPartyLeaderRuntime PartyLeader
+    {  
+        get { return m_PartyLeader; }
+    }
+
+    public List<CPartyMemberRuntime> PartyMembers
+    {
+        get { return m_PartyMembers; }
+    }
+    //--
+
+    public void InitializePartyPlayerCharacter(CPartyLeaderRuntime partyLeader, List<CPartyMemberRuntime> partyMembers)
     {
         m_PartyLeader = partyLeader;
         m_PartyMembers = partyMembers;
+    }
+
+    public void AddPartyMember(CPartyMemberRuntime partyMember)
+    {
+        m_PartyMembers.Add(partyMember);
     }
 
     void Start()

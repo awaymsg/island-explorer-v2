@@ -22,6 +22,7 @@ public class CPartyMemberTrait : ScriptableObject
     [SerializeField, Tooltip("If true, this trait can only be assigned when a new party member is generated.")]
     private bool m_bIsGenerationOnly = true;
 
+    [System.NonSerialized]
     [SerializeField, ReadOnly(true)]
     private float m_Cost = 0f;
 

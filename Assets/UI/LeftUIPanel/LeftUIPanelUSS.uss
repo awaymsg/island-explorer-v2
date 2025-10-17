@@ -1,0 +1,40 @@
+:root {
+}
+
+.characterpanel {
+    position: absolute;
+    height: 100%;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: flex-start;
+    flex-grow: 1;
+    flex-shrink: 1;
+}
+
+.hidden {
+    display: none;
+    visibility: visible;
+}
+
+.CharacterProfileButton {
+    -unity-text-align: middle-center;
+    font-size: 14px;
+    padding: 2px;
+    margin: 0px;
+    width: auto;
+    height: auto;
+
+    background-color: rgba(0, 0, 0, 0);
+
+    transform-origin: center;
+    border-top-width: 1px;
+    border-right-width: 1px;
+    border-bottom-width: 1px;
+    border-left-width: 1px;
+    border-left-color: rgb(0, 0, 0);
+    border-right-color: rgb(0, 0, 0);
+    border-top-color: rgb(0, 0, 0);
+    border-bottom-color: rgb(0, 0, 0);
+}

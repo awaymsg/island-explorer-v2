@@ -7,42 +7,61 @@ using UnityEngine;
 [CreateAssetMenu(fileName = "PartyMember", menuName = "Scriptable Objects/PartyMember")]
 public class CPartyMember : ScriptableObject
 {
-    [SerializeField, Tooltip("Name of this party member type")]
-    protected EPartyMemberType m_PartyMemberClass;
+    [Tooltip("Name of this party member type")]
+    public EPartyMemberType m_PartyMemberClass;
+
+    public EPartyMemberGender m_PartyMemberGender;
+
+    [Tooltip("Special default skills of this party member type")]
+    public List<CPartyMemberSkill> m_PartyMemberSkills;
+
+    [Tooltip("Trait type bias for this party member type")]
+    public EPartyMemberTraitType m_TraitTypeBais;
+
+    [Tooltip("Trait bias amount, 0 is none, 1.0 is 100%")]
+    public float m_TraitBiasAmount = 0f;
+}
+
+public class CPartyMemberRuntime
+{
+    protected CPartyMember m_PartyMemberSO;
+    protected CPartyManager m_PartyManager;
 
     // name of the character
     protected string m_CharacterName;
 
-    [SerializeField, Tooltip("Special default skills of this party member type")]
-    protected List<CPartyMemberSkill> m_PartyMemberSkills;
-
-    [SerializeField, Tooltip("Trait type bias for this party member type")]
-    protected EPartyMemberTraitType m_TraitTypeBais;
-
-    [SerializeField, Tooltip("Trait bias amount, 0 is none, 1.0 is 100%")]
-    protected float m_TraitBiasAmount = 0f;
-
     // portrait for UI
     private Sprite m_PartyMemberPortrait;
 
-    protected List<CPartyMemberTrait> m_PartyMemberTraits;
-    protected List<CPartyMemberPersonalityTrait> m_PartyMemberPersonalityTraits;
-    protected List<CBodyPart> m_BodyParts;
+    protected List<CPartyMemberTrait> m_PartyMemberTraits = new List<CPartyMemberTrait>();
+    protected List<CPartyMemberPersonalityTrait> m_PartyMemberPersonalityTraits = new List<CPartyMemberPersonalityTrait>();
+    protected List<CBodyPart> m_BodyParts = new List<CBodyPart>();
 
     protected Dictionary<EPartyMemberStatType, float> m_PartyMemberStats;
 
     // player-facing
-    private Dictionary<EBodyPart, List<string>> m_BodyPartConditions;
-    private Dictionary<string, string> m_TraitDetails;
+    private Dictionary<EBodyPart, List<string>> m_BodyPartConditions = new Dictionary<EBodyPart, List<string>>();
+    private Dictionary<string, string> m_TraitDetails = new Dictionary<string, string>();
 
     protected UInt16 m_SkillLevel = 0;
 
     private float m_Cost = 0f;
 
+    public CPartyMemberRuntime(CPartyMember partyMemberSO, CPartyManager partyManager)
+    {
+        m_PartyMemberSO = partyMemberSO;
+        m_PartyManager = partyManager;
+    }
+
     //-- getters
     public string CharacterName
     {
         get { return m_CharacterName; }
+    }
+
+    public EPartyMemberGender PartyMemberGender
+    {
+        get { return m_PartyMemberSO.m_PartyMemberGender; }
     }
 
     public Sprite PartyMemberPortrait
@@ -58,10 +77,83 @@ public class CPartyMember : ScriptableObject
 
     public void InitializePartyMember()
     {
-        CPartyManager partyManagerReference = FindFirstObjectByType<CPartyManager>();
-        m_PartyMemberStats = partyManagerReference.GetDefaultPartyMemberStats(m_PartyMemberClass);
+        if (m_PartyManager == null)
+        {
+            Debug.Log("InitializePartyMember - PartyManager is null!");
+        }
 
-        CPartyMemberTrait[] traitPool = partyManagerReference.TraitPool;
+        m_PartyMemberStats = m_PartyManager.GetDefaultPartyMemberStats(m_PartyMemberSO.m_PartyMemberClass);
+
+        // todo: prefixes
+
+        if (m_PartyMemberSO.m_PartyMemberGender == EPartyMemberGender.Invalid)
+        {
+            Debug.Log("InitializePartyMember - party member gender is not set!");
+        }
+
+        if (m_PartyMemberSO.m_PartyMemberGender == EPartyMemberGender.Male)
+        {
+            string[] maleNames = m_PartyManager.MaleNamesPool;
+            if (maleNames.Length > 0)
+            {
+                int index = UnityEngine.Random.Range(0, maleNames.Length);
+                m_CharacterName = maleNames[index];
+            }
+            else
+            {
+                Debug.Log("InitializePartyMember - there are no names in the male names pool!");
+            }
+
+            Sprite[] malePortraits = m_PartyManager.MalePortraitsPool;
+            if (malePortraits.Length > 0)
+            {
+                int index = UnityEngine.Random.Range(0, malePortraits.Length);
+                m_PartyMemberPortrait = malePortraits[index];
+            }
+            else
+            {
+                Debug.Log("InitializePartyMember - male portraits pool is empty!");
+            }
+        }
+        else if (m_PartyMemberSO.m_PartyMemberGender == EPartyMemberGender.Female)
+        {
+            string[] femaleNames = m_PartyManager.FemaleNamesPool;
+            if (femaleNames.Length > 0)
+            {
+                int index = UnityEngine.Random.Range(0, femaleNames.Length);
+                m_CharacterName = femaleNames[index];
+            }
+            else
+            {
+                Debug.Log("InitializePartyMember - there are no names in the female names pool!");
+            }
+
+            Sprite[] femalePortraits = m_PartyManager.FemalePortraitsPool;
+            if (femalePortraits.Length > 0)
+            {
+                int index = UnityEngine.Random.Range(0, femalePortraits.Length);
+                m_PartyMemberPortrait = femalePortraits[index];
+            }
+            else
+            {
+                Debug.Log("InitializePartyMember - female portraits pool is empty!");
+            }
+        }
+
+        string[] surnames = m_PartyManager.Surnames;
+        if (surnames.Length > 0)
+        {
+            int index = UnityEngine.Random.Range(0, surnames.Length);
+            m_CharacterName += " " + surnames[index];
+        }
+        else
+        {
+            Debug.Log("InitializePartyMember - there are no names in the surnames pool!");
+        }
+
+        // todo: suffixes
+
+        CPartyMemberTrait[] traitPool = m_PartyManager.TraitPool;
 
         // for now just add randomly
         // todo: selectively add a number of traits
@@ -72,7 +164,7 @@ public class CPartyMember : ScriptableObject
         }
         else
         {
-            Debug.Log("InitializePartyMember, there are no traits in the pool!");
+            Debug.Log("InitializePartyMember - there are no traits in the pool!");
         }
 
         CalculateCost();
@@ -81,7 +173,7 @@ public class CPartyMember : ScriptableObject
     public void AddBodyMod(CBodyPartModification bodyMod)
     {
         CBodyPart bodyPart = m_BodyParts.Find(p => p.BodyPart == bodyMod.ModLocation);
-        if (bodyPart != null)
+        if (bodyPart == null)
         {
             Debug.Log("AddBodyMod - bodymod does not correspond to a bodypart!");
             return;
@@ -109,8 +201,12 @@ public class CPartyMember : ScriptableObject
         }
 
         // add player facing details
-        List<string> conditionContext = m_BodyPartConditions[bodyPart.BodyPart];
-        conditionContext.Add(bodyMod.ModificationContext);
+        if (!m_BodyPartConditions.ContainsKey(bodyPart.BodyPart))
+        {
+            m_BodyPartConditions.Add(bodyPart.BodyPart, new List<string>());
+        }
+
+        m_BodyPartConditions[bodyPart.BodyPart].Add(bodyMod.ModificationContext);
     }
 
     public void RemoveBodyMod(CBodyPartModification bodyMod)
@@ -142,10 +238,9 @@ public class CPartyMember : ScriptableObject
         }
 
         // remove player facing details
-        List<string> conditionContext = m_BodyPartConditions[bodyPart.BodyPart];
-        conditionContext.Remove(bodyMod.ModificationContext);
+        m_BodyPartConditions[bodyPart.BodyPart].Remove(bodyMod.ModificationContext);
 
-        if (conditionContext.Count() == 0)
+        if (m_BodyPartConditions[bodyPart.BodyPart].Count() == 0)
         {
             m_BodyPartConditions.Remove(bodyPart.BodyPart);
         }
@@ -187,7 +282,7 @@ public class CPartyMember : ScriptableObject
         }
 
         // add player facing details
-        m_TraitDetails[trait.TraitName] = trait.TraitDescription;
+        m_TraitDetails.Add(trait.TraitName, trait.TraitDescription);
     }
 
     public void RemoveTrait(CPartyMemberTrait trait)

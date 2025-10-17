@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Dynamic;
 using UnityEngine;
 
 public class CPartyManager : MonoBehaviour
@@ -22,7 +23,30 @@ public class CPartyManager : MonoBehaviour
     [SerializeField, Tooltip("All available personality traits")]
     private CPartyMemberPersonalityTrait[] m_PersonalityTraitPool;
 
+    [SerializeField, Tooltip("Male names pool")]
+    private string[] m_MaleNames;
+
+    [SerializeField, Tooltip("Female names pool")]
+    private string[] m_FemaleNames;
+
+    [SerializeField, Tooltip("Surnames names pool")]
+    private string[] m_Surnames;
+
+    [SerializeField, Tooltip("Prefixes / honorifics pool")]
+    private string[] m_Prefixes;
+
+    [SerializeField, Tooltip("Suffixes pool")]
+    private string[] m_Suffixes;
+
+    [SerializeField, Tooltip("Male portraits pool")]
+    private Sprite[] m_MalePortraits;
+
+    [SerializeField, Tooltip("Female portraits pool")]
+    private Sprite[] m_FemalePortraits;
+
     private CPartyPlayerCharacter m_PartyPlayerCharacter;
+
+    private CCharacterListUI m_CharacterListUI;
 
     //-- getters
     public CPartyLeader[] DefaultPartyLeadersPool
@@ -54,7 +78,52 @@ public class CPartyManager : MonoBehaviour
     {
         get { return m_PartyPlayerCharacter; }
     }
+
+    public string[] MaleNamesPool
+    {
+        get { return m_MaleNames; }
+    }
+
+    public string[] FemaleNamesPool
+    {
+        get { return m_FemaleNames; }
+    }
+
+    public string[] Surnames
+    {
+        get { return m_Surnames; }
+    }
+
+    public string[] Prefixes
+    { 
+        get { return m_Prefixes; }
+    }
+
+    public string[] Suffixes
+    {
+        get { return m_Suffixes; }
+    }
+
+    public Sprite[] MalePortraitsPool
+    {
+        get { return m_MalePortraits; }
+    }
+
+    public Sprite[] FemalePortraitsPool
+    {
+        get { return m_FemalePortraits; }
+    }
     //--
+
+    public void Initialize()
+    {
+        m_CharacterListUI = FindFirstObjectByType<CCharacterListUI>();
+
+        if (m_CharacterListUI == null)
+        {
+            Debug.Log("CPartyManager::Start - m_CharacterListUI is null!");
+        }
+    }
 
     public Dictionary<EPartyMemberStatType, float> GetDefaultPartyMemberStats(EPartyMemberType type)
     {
@@ -74,25 +143,49 @@ public class CPartyManager : MonoBehaviour
         return defaultStatsBook;
     }
 
-    public CPartyMember CreatePartyMember(CPartyMember defaultMember)
+    public CPartyMemberRuntime CreatePartyMember(CPartyMember defaultMember)
     {
-        defaultMember.InitializePartyMember();
+        CPartyMemberRuntime newPartyMember = new CPartyMemberRuntime(defaultMember, this);
 
-        return defaultMember;
+        newPartyMember.InitializePartyMember();
+
+        return newPartyMember;
     }
     
-    public CPartyLeader CreatePartyLeader(CPartyLeader defaultPartyLeader)
+    public CPartyLeaderRuntime CreatePartyLeader(CPartyLeader defaultPartyLeader)
     {
-        defaultPartyLeader.InitializePartyMember();
+        CPartyLeaderRuntime newPartyLeader = new CPartyLeaderRuntime(defaultPartyLeader, this);
 
-        return defaultPartyLeader;
+        newPartyLeader.InitializePartyMember();
+
+        return newPartyLeader;
     }
 
-    public CPartyPlayerCharacter CreatePartyPlayerCharacter(CPartyPlayerCharacter defaultPlayerCharacter, CPartyLeader partyLeader, List<CPartyMember> partyMembers)
+    public CPartyPlayerCharacter CreatePartyPlayerCharacter(CPartyPlayerCharacter defaultPlayerCharacter, CPartyLeaderRuntime partyLeader, List<CPartyMemberRuntime> partyMembers)
     {
         defaultPlayerCharacter.InitializePartyPlayerCharacter(partyLeader, partyMembers);
         m_PartyPlayerCharacter = defaultPlayerCharacter;
 
+        if (m_CharacterListUI != null)
+        {
+            m_CharacterListUI.AddCharacterButton(partyLeader);
+
+            foreach (CPartyMemberRuntime partyMember in partyMembers)
+            {
+                m_CharacterListUI.AddCharacterButton(partyMember);
+            }
+        }
+
         return defaultPlayerCharacter;
+    }
+
+    public void AddMemberToParty(CPartyMemberRuntime partyMember)
+    {
+        m_PartyPlayerCharacter.AddPartyMember(partyMember);
+
+        if (m_CharacterListUI != null)
+        {
+            m_CharacterListUI.AddCharacterButton(partyMember);
+        }
     }
 }
