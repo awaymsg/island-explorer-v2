@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Dynamic;
+using System.Linq;
 using UnityEngine;
 
 public class CPartyManager : MonoBehaviour
@@ -10,9 +11,6 @@ public class CPartyManager : MonoBehaviour
 
     [SerializeField, Tooltip("Premade default party members by class")]
     private CPartyMember[] m_DefaultPartyMembersPool;
-
-    [SerializeField, Tooltip("Default stats for classes")]
-    private SDefaultPartyMemberStats[] m_DefaultPartyMemberStats;
 
     [SerializeField, Tooltip("All body parts base stats")]
     private CBodyPart[] m_DefaultBodyParts;
@@ -115,7 +113,7 @@ public class CPartyManager : MonoBehaviour
     }
     //--
 
-    public void Initialize()
+    public void Awake()
     {
         m_CharacterListUI = FindFirstObjectByType<CCharacterListUI>();
 
@@ -123,24 +121,6 @@ public class CPartyManager : MonoBehaviour
         {
             Debug.Log("CPartyManager::Start - m_CharacterListUI is null!");
         }
-    }
-
-    public Dictionary<EPartyMemberStatType, float> GetDefaultPartyMemberStats(EPartyMemberType type)
-    {
-        SDefaultPartyMemberStats defaultStats = Array.Find<SDefaultPartyMemberStats>(m_DefaultPartyMemberStats, p => p.Class == type);
-        if (defaultStats.Class == EPartyMemberType.Invalid)
-        {
-            return null;
-        }
-
-        Dictionary<EPartyMemberStatType, float> defaultStatsBook = new Dictionary<EPartyMemberStatType, float>();
-
-        foreach (SPartyMemberStat defaultStat in defaultStats.BaseStats)
-        {
-            defaultStatsBook[defaultStat.StatType] = defaultStat.Value;
-        }
-
-        return defaultStatsBook;
     }
 
     public CPartyMemberRuntime CreatePartyMember(CPartyMember defaultMember)

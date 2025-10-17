@@ -37,8 +37,6 @@ public class GameManager : MonoBehaviour
         m_MapGenerator = FindFirstObjectByType<CMapGenerator>();
         m_PartyManager = FindFirstObjectByType<CPartyManager>();
 
-        m_PartyManager.Initialize();
-
         m_Map = m_MapGenerator.GenerateMap();
 
         CreatePlayerCharacter();

@@ -1,6 +1,7 @@
 using JetBrains.Annotations;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 [Serializable]
@@ -43,6 +44,15 @@ public enum EPartyMemberGender
 [Serializable]
 public struct SPartyMemberStatModifier
 {
+    // copy constructor
+    public SPartyMemberStatModifier(SPartyMemberStatModifier other)
+    {
+        StatType = other.StatType;
+        bMultiplicative = other.bMultiplicative;
+        ModAmount = other.ModAmount;
+        Cost = other.Cost;
+    }
+
     public EPartyMemberStatType StatType;
     public bool bMultiplicative;
     public float ModAmount;
@@ -65,7 +75,9 @@ public enum EPartyMemberStatType
     History,
     Occult,
     Serenity,
-    Morale
+    Morale,
+    Attractiveness,
+    Gayness
 }
 
 [Serializable]
@@ -73,13 +85,6 @@ public struct SPartyMemberStat
 {
     public EPartyMemberStatType StatType;
     public float Value;
-}
-
-[Serializable]
-public struct SDefaultPartyMemberStats
-{
-    public EPartyMemberType Class;
-    public SPartyMemberStat[] BaseStats;
 }
 
 [Serializable]
@@ -143,6 +148,25 @@ public enum EBodyPartModification
 [Serializable]
 public class CBodyPartModification
 {
+    // copy constructor
+    public CBodyPartModification(CBodyPartModification other)
+    {
+        if (other == null)
+        {
+            return;
+        }
+
+        ModName = other.ModName;
+        ModLocation = other.ModLocation;
+        InjuryType = other.InjuryType;
+        bPermanent = other.bPermanent;
+        HealTimeInDays = other.HealTimeInDays;
+        bMultiplicative = other.bMultiplicative;
+        ModAmount = other.ModAmount;
+        Cost = other.Cost;
+        ModificationContext = other.ModificationContext;
+    }
+
     [Tooltip("Player-facing name")]
     public string ModName;
     public EBodyPart ModLocation;
@@ -158,6 +182,7 @@ public class CBodyPartModification
     [Tooltip("Overall cost of this modification")]
     public float Cost;
 
+    [Tooltip("Player facing description of this modification")]
     public string ModificationContext;
 
     public float CalculateCost()
@@ -169,6 +194,12 @@ public class CBodyPartModification
 [Serializable]
 public struct SBodyPartStatModifier
 {
+    public SBodyPartStatModifier(SBodyPartStatModifier other)
+    {
+        Stat = other.Stat;
+        ModAmount = other.ModAmount;
+    }
+
     public EPartyMemberStatType Stat;
     [Tooltip("Overall multiplicative effect on the stat")]
     public float ModAmount;
@@ -177,6 +208,24 @@ public struct SBodyPartStatModifier
 [Serializable]
 public class CBodyPart
 {
+    // copy constructor
+    public CBodyPart(CBodyPart other)
+    {
+        if (other == null)
+        {
+            return;
+        }
+
+        BodyPart = other.BodyPart;
+        MaxHealth = other.MaxHealth;
+        Health = other.Health;
+        bIsVital = other.bIsVital;
+        AttachedTo = other.AttachedTo;
+
+        StatModifiers = other.StatModifiers?.Select(mod => new SBodyPartStatModifier(mod)).ToArray();
+        Modifications = other.Modifications?.Select(mod => new CBodyPartModification(mod)).ToList();
+    }
+
     [Header("Basic Info")]
     public EBodyPart BodyPart;
     public float MaxHealth = 100;
@@ -189,7 +238,6 @@ public class CBodyPart
     public bool bIsVital = false;
     [Header("Attachment")]
     public EBodyPart AttachedTo;
-    public EBodyPart[] Attached;
 }
 
 [Serializable]

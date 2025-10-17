@@ -959,7 +959,11 @@ MonoBehaviour:
       Value: 5
     - StatType: 10
       Value: 30
-    - StatType: 10
+    - StatType: 11
+      Value: 30
+    - StatType: 12
+      Value: 25
+    - StatType: 11
       Value: 30
   m_DefaultBodyParts:
   - BodyPart: 2
@@ -970,7 +974,17 @@ MonoBehaviour:
       ModAmount: 1
     Modifications: []
     bIsVital: 1
-    AttachedTo: 1
+    AttachedTo: 19
+    Attached: 
+  - BodyPart: 3
+    MaxHealth: 100
+    Health: 100
+    StatModifiers:
+    - Stat: 11
+      ModAmount: 1
+    Modifications: []
+    bIsVital: 1
+    AttachedTo: 6
     Attached: 
   m_TraitPool:
   - {fileID: 11400000, guid: 0c5eb64850f2bbb4fb58c688b89594cc, type: 2}

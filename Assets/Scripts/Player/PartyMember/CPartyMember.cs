@@ -12,6 +12,9 @@ public class CPartyMember : ScriptableObject
 
     public EPartyMemberGender m_PartyMemberGender;
 
+    [Tooltip("Default stats for this party member")]
+    public SPartyMemberStat[] m_BaseStats;
+
     [Tooltip("Special default skills of this party member type")]
     public List<CPartyMemberSkill> m_PartyMemberSkills;
 
@@ -33,9 +36,9 @@ public class CPartyMemberRuntime
     // portrait for UI
     private Sprite m_PartyMemberPortrait;
 
-    protected List<CPartyMemberTrait> m_PartyMemberTraits = new List<CPartyMemberTrait>();
+    protected List<CPartyMemberTraitRuntime> m_PartyMemberTraits = new List<CPartyMemberTraitRuntime>();
     protected List<CPartyMemberPersonalityTrait> m_PartyMemberPersonalityTraits = new List<CPartyMemberPersonalityTrait>();
-    protected List<CBodyPart> m_BodyParts = new List<CBodyPart>();
+    protected CBodyPart[] m_BodyParts;
 
     protected Dictionary<EPartyMemberStatType, float> m_PartyMemberStats;
 
@@ -45,7 +48,7 @@ public class CPartyMemberRuntime
 
     protected UInt16 m_SkillLevel = 0;
 
-    private float m_Cost = 0f;
+    private float m_TotalCost = 0f;
 
     public CPartyMemberRuntime(CPartyMember partyMemberSO, CPartyManager partyManager)
     {
@@ -69,9 +72,9 @@ public class CPartyMemberRuntime
         get { return m_PartyMemberPortrait; }
     }
 
-    public float Cost
+    public float TotalCost
     {
-        get { return m_Cost; }
+        get { return m_TotalCost; }
     }
     //--
 
@@ -82,7 +85,10 @@ public class CPartyMemberRuntime
             Debug.Log("InitializePartyMember - PartyManager is null!");
         }
 
-        m_PartyMemberStats = m_PartyManager.GetDefaultPartyMemberStats(m_PartyMemberSO.m_PartyMemberClass);
+        m_PartyMemberStats = GetBaseStats();
+
+        // make a deep copy of this array
+        m_BodyParts = m_PartyManager.DefaultBodyParts?.Select(bodyPart => new CBodyPart(bodyPart)).ToArray() ?? Array.Empty<CBodyPart>();
 
         // todo: prefixes
 
@@ -170,9 +176,23 @@ public class CPartyMemberRuntime
         CalculateCost();
     }
 
+    private Dictionary<EPartyMemberStatType, float> GetBaseStats()
+    {
+        SPartyMemberStat[] defaultStats = m_PartyMemberSO.m_BaseStats;
+
+        Dictionary<EPartyMemberStatType, float> defaultStatsBook = new Dictionary<EPartyMemberStatType, float>();
+
+        foreach (SPartyMemberStat defaultStat in defaultStats)
+        {
+            defaultStatsBook[defaultStat.StatType] = defaultStat.Value;
+        }
+
+        return defaultStatsBook;
+    }
+
     public void AddBodyMod(CBodyPartModification bodyMod)
     {
-        CBodyPart bodyPart = m_BodyParts.Find(p => p.BodyPart == bodyMod.ModLocation);
+        CBodyPart bodyPart = Array.Find<CBodyPart>(m_BodyParts, p => p.BodyPart == bodyMod.ModLocation);
         if (bodyPart == null)
         {
             Debug.Log("AddBodyMod - bodymod does not correspond to a bodypart!");
@@ -211,7 +231,7 @@ public class CPartyMemberRuntime
 
     public void RemoveBodyMod(CBodyPartModification bodyMod)
     {
-        CBodyPart bodyPart = m_BodyParts.Find(p => p.BodyPart == bodyMod.ModLocation);
+        CBodyPart bodyPart = Array.Find(m_BodyParts, p => p.BodyPart == bodyMod.ModLocation);
         if (bodyPart != null)
         {
             Debug.Log("RemoveBodyMod - bodymod does not correspond to a bodypart!");
@@ -248,9 +268,9 @@ public class CPartyMemberRuntime
 
     public void AddTrait(CPartyMemberTrait trait)
     {
-        m_PartyMemberTraits.Add(trait);
+        CPartyMemberTraitRuntime runtimeTrait = new CPartyMemberTraitRuntime(trait);
 
-        foreach (SPartyMemberTraitEffect traitEffect in trait.TraitEffects)
+        foreach (SPartyMemberTraitEffect traitEffect in runtimeTrait.TraitEffects)
         {
             // essentially move the bodymod from the trait to the actual bodypart
             List<CBodyPartModification> bodyModsToRemove = new List<CBodyPartModification>();
@@ -281,14 +301,14 @@ public class CPartyMemberRuntime
             }
         }
 
+        m_PartyMemberTraits.Add(runtimeTrait);
+
         // add player facing details
-        m_TraitDetails.Add(trait.TraitName, trait.TraitDescription);
+        m_TraitDetails.Add(trait.m_TraitName, trait.m_TraitDescription);
     }
 
-    public void RemoveTrait(CPartyMemberTrait trait)
+    public void RemoveTrait(CPartyMemberTraitRuntime trait)
     {
-        m_PartyMemberTraits.Remove(trait);
-
         foreach (SPartyMemberTraitEffect traitEffect in trait.TraitEffects)
         {
             // revert stat modifiers
@@ -305,6 +325,8 @@ public class CPartyMemberRuntime
             }
         }
 
+        m_PartyMemberTraits.Remove(trait);
+
         // remove player facing details
         m_TraitDetails.Remove(trait.TraitName);
     }
@@ -313,7 +335,7 @@ public class CPartyMemberRuntime
     {
         float totalCost = 0f;
 
-        foreach (CPartyMemberTrait trait in m_PartyMemberTraits)
+        foreach (CPartyMemberTraitRuntime trait in m_PartyMemberTraits)
         {
             totalCost += trait.CalculateCosts();
         }
@@ -326,6 +348,7 @@ public class CPartyMemberRuntime
         }
         // todo: personality trait
 
+        m_TotalCost = totalCost;
         return totalCost;
     }
 }

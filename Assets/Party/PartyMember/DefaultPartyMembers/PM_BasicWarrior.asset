@@ -14,6 +14,31 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::CPartyMember
   m_PartyMemberClass: 1
   m_PartyMemberGender: 1
+  m_BaseStats:
+  - StatType: 2
+    Value: 60
+  - StatType: 3
+    Value: 30
+  - StatType: 4
+    Value: 30
+  - StatType: 5
+    Value: 20
+  - StatType: 6
+    Value: 5
+  - StatType: 7
+    Value: 10
+  - StatType: 8
+    Value: 5
+  - StatType: 9
+    Value: 10
+  - StatType: 10
+    Value: 30
+  - StatType: 11
+    Value: 40
+  - StatType: 12
+    Value: 20
+  - StatType: 12
+    Value: 20
   m_PartyMemberSkills: []
   m_TraitTypeBais: 1
   m_TraitBiasAmount: 0

@@ -9,7 +9,7 @@ public class CCharacterListUI : MonoBehaviour
     private UIDocument m_CharacterListUI;
     private VisualElement m_CharacterPanel;
 
-    private void Start()
+    private void Awake()
     {
         m_CharacterListUI = GetComponent<UIDocument>();
         m_CharacterPanel = m_CharacterListUI.rootVisualElement.Q<VisualElement>("CharacterPanel");
@@ -51,6 +51,6 @@ public class CCharacterListUI : MonoBehaviour
     public void OnButtonClicked(CPartyMemberRuntime partyMember)
     {
         Debug.Log(partyMember.CharacterName);
-        Debug.Log(partyMember.CalculateCost());
+        Debug.Log(partyMember.TotalCost);
     }
 }

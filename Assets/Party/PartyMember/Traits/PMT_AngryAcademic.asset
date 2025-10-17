@@ -13,24 +13,29 @@ MonoBehaviour:
   m_Name: PMT_AngryAcademic
   m_EditorClassIdentifier: Assembly-CSharp::CPartyMemberTrait
   m_TraitName: Angry Academic
-  m_TraitDescription: 
+  m_TraitDescription: Their thesis was lambasted in front of a court of their peers,
+    but deep in their heart they know they were right.
   m_TraitType: 4
   m_InvalidatedTraits: []
   m_TraitEffects:
   - BodyPartModifications:
-    - ModName: 
+    - ModName: Affliction of the Soul
       ModLocation: 2
-      InjuryType: 2
+      InjuryType: 1
       bPermanent: 1
       HealTimeInDays: 0
       bMultiplicative: 1
-      ModAmount: 90
+      ModAmount: 0.9
       Cost: -3
-      ModificationContext: 
+      ModificationContext: Anger and resentment gnaw at their being.
     StatModifiers:
     - StatType: 7
       bMultiplicative: 0
       ModAmount: -10
       Cost: -3
+    - StatType: 6
+      bMultiplicative: 0
+      ModAmount: 10
+      Cost: 3
   m_bIsGenerationOnly: 1
-  m_Cost: -6
+  m_TotalCost: -3
