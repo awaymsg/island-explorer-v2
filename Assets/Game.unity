@@ -962,10 +962,19 @@ MonoBehaviour:
   m_PersonalityTraitPool: []
   m_MaleNames:
   - John
+  - Lenny
+  - Stamford
+  - Pickle
   m_FemaleNames:
   - Jane
+  - Marie
+  - Denise
+  - Abigail
   m_Surnames:
   - Smith
+  - Everbottom
+  - Plinkett
+  - Bassoon
   m_Prefixes: []
   m_Suffixes: []
   m_MalePortraits:

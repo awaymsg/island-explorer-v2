@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+using UnityEditor.Search;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -100,10 +102,17 @@ public class CCharacterListUI : MonoBehaviour
     private string GetShortStatsString(CPartyMemberRuntime partyMember)
     {
         string statsString = "Traits: ";
+        int index = 0;
 
-        foreach (var trait in partyMember.TraitDetails)
+        foreach (string trait in partyMember.TraitDetails.Keys)
         {
-            statsString += trait.Key + " ";
+            statsString += trait;
+            if (index < partyMember.TraitDetails.Count - 1)
+            {
+                statsString += ", ";
+            }
+
+            index++;
         }
 
         return statsString;
