@@ -47,15 +47,21 @@ public struct SPartyMemberStatModifier
     // copy constructor
     public SPartyMemberStatModifier(SPartyMemberStatModifier other)
     {
+        StatModName = other.StatModName;
         StatType = other.StatType;
         bMultiplicative = other.bMultiplicative;
         ModAmount = other.ModAmount;
+        bIsPermanent = other.bIsPermanent;
+        RemovalTimeInDays = other.RemovalTimeInDays;
         Cost = other.Cost;
     }
 
+    public string StatModName;
     public EPartyMemberStatType StatType;
     public bool bMultiplicative;
     public float ModAmount;
+    public bool bIsPermanent;
+    public float RemovalTimeInDays;
 
     [Tooltip("How valuable this modifier is")]
     public float Cost;
@@ -77,14 +83,55 @@ public enum EPartyMemberStatType
     Serenity,
     Morale,
     Attractiveness,
-    Gayness
+    Gayness,
+    Happiness
 }
 
 [Serializable]
-public struct SPartyMemberStat
+public struct SPartyMemberDefaultStat
 {
     public EPartyMemberStatType StatType;
     public float Value;
+}
+
+public struct SPartyMemberStat
+{
+    public SPartyMemberStat(float value)
+    {
+        Value = value;
+        CurrentModifiers = new List<SPartyMemberStatModifier>();
+    }
+
+    public void AddMod(SPartyMemberStatModifier modifier)
+    {
+        if (modifier.bMultiplicative)
+        {
+            Value *= modifier.ModAmount;
+        }
+        else
+        {
+            Value += modifier.ModAmount;
+        }
+
+        CurrentModifiers.Add(modifier);
+    }
+
+    public void RemoveMod(SPartyMemberStatModifier modifier)
+    {
+        if (modifier.bMultiplicative)
+        {
+            Value /= modifier.ModAmount;
+        }
+        else
+        {
+            Value -= modifier.ModAmount;
+        }
+
+        CurrentModifiers.Remove(modifier);
+    }
+
+    public float Value;
+    public List<SPartyMemberStatModifier> CurrentModifiers;
 }
 
 [Serializable]
@@ -94,6 +141,7 @@ public enum EBodyPart
     None,
     Soul,
     Mind,
+    Spirit,
     LeftEye,
     RightEye,
     Brain,

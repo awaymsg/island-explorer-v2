@@ -13,7 +13,7 @@ public class CPartyMember : ScriptableObject
     public EPartyMemberGender m_PartyMemberGender;
 
     [Tooltip("Default stats for this party member")]
-    public SPartyMemberStat[] m_BaseStats;
+    public SPartyMemberDefaultStat[] m_BaseStats;
 
     [Tooltip("Special default skills of this party member type")]
     public List<CPartyMemberSkill> m_PartyMemberSkills;
@@ -40,7 +40,7 @@ public class CPartyMemberRuntime
     protected List<CPartyMemberPersonalityTrait> m_PartyMemberPersonalityTraits = new List<CPartyMemberPersonalityTrait>();
     protected CBodyPart[] m_BodyParts;
 
-    protected Dictionary<EPartyMemberStatType, float> m_PartyMemberStats;
+    protected Dictionary<EPartyMemberStatType, SPartyMemberStat> m_PartyMemberStats;
 
     // player-facing
     private Dictionary<EBodyPart, List<string>> m_BodyPartConditions = new Dictionary<EBodyPart, List<string>>();
@@ -75,6 +75,11 @@ public class CPartyMemberRuntime
     public float TotalCost
     {
         get { return m_TotalCost; }
+    }
+
+    public Dictionary<string, string> TraitDetails
+    {
+        get { return m_TraitDetails; }
     }
     //--
 
@@ -176,15 +181,16 @@ public class CPartyMemberRuntime
         CalculateCost();
     }
 
-    private Dictionary<EPartyMemberStatType, float> GetBaseStats()
+    private Dictionary<EPartyMemberStatType, SPartyMemberStat> GetBaseStats()
     {
-        SPartyMemberStat[] defaultStats = m_PartyMemberSO.m_BaseStats;
+        SPartyMemberDefaultStat[] defaultStats = m_PartyMemberSO.m_BaseStats;
 
-        Dictionary<EPartyMemberStatType, float> defaultStatsBook = new Dictionary<EPartyMemberStatType, float>();
+        Dictionary<EPartyMemberStatType, SPartyMemberStat> defaultStatsBook = new Dictionary<EPartyMemberStatType, SPartyMemberStat>();
 
-        foreach (SPartyMemberStat defaultStat in defaultStats)
+        foreach (SPartyMemberDefaultStat defaultStat in defaultStats)
         {
-            defaultStatsBook[defaultStat.StatType] = defaultStat.Value;
+            SPartyMemberStat stat = new SPartyMemberStat(defaultStat.Value);
+            defaultStatsBook[defaultStat.StatType] = stat;
         }
 
         return defaultStatsBook;
@@ -290,14 +296,7 @@ public class CPartyMemberRuntime
             // apply stat modifiers
             foreach (SPartyMemberStatModifier statMod in traitEffect.StatModifiers)
             {
-                if (statMod.bMultiplicative)
-                {
-                    m_PartyMemberStats[statMod.StatType] *= statMod.ModAmount;
-                }
-                else
-                {
-                    m_PartyMemberStats[statMod.StatType] += statMod.ModAmount;
-                }
+                m_PartyMemberStats[statMod.StatType].AddMod(statMod);
             }
         }
 
@@ -314,14 +313,7 @@ public class CPartyMemberRuntime
             // revert stat modifiers
             foreach (SPartyMemberStatModifier statMod in traitEffect.StatModifiers)
             {
-                if (statMod.bMultiplicative)
-                {
-                    m_PartyMemberStats[statMod.StatType] /= statMod.ModAmount;
-                }
-                else
-                {
-                    m_PartyMemberStats[statMod.StatType] -= statMod.ModAmount;
-                }
+                m_PartyMemberStats[statMod.StatType].RemoveMod(statMod);
             }
         }
 

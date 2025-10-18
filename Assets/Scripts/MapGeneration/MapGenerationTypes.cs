@@ -72,15 +72,6 @@ public class CTileRule
     public string[] SouthWest = new string[] { "*" };
     public int Rotations;
     public string Result;
-
-    /*
-    [Tooltip("REQUIRES 5 ELEMENTS, first element is self biome, neighbors will be west north east south")]
-    public EBiomeType[] Rule;
-    [Tooltip("Number of rotations to do on the tile")]
-    public int Rotations;
-    [Tooltip("The tile")]
-    public TileBase Tile;
-    */
 }
 
 [System.Serializable]

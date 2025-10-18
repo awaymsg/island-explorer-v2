@@ -938,33 +938,6 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 62131c6cbae4ab54ead2e7e520395040, type: 2}
   m_DefaultPartyMembersPool:
   - {fileID: 11400000, guid: 565fce51dafe8b34b94096c154f496e7, type: 2}
-  m_DefaultPartyMemberStats:
-  - Class: 1
-    BaseStats:
-    - StatType: 2
-      Value: 60
-    - StatType: 3
-      Value: 40
-    - StatType: 4
-      Value: 40
-    - StatType: 5
-      Value: 30
-    - StatType: 6
-      Value: 10
-    - StatType: 7
-      Value: 10
-    - StatType: 8
-      Value: 10
-    - StatType: 9
-      Value: 5
-    - StatType: 10
-      Value: 30
-    - StatType: 11
-      Value: 30
-    - StatType: 12
-      Value: 25
-    - StatType: 11
-      Value: 30
   m_DefaultBodyParts:
   - BodyPart: 2
     MaxHealth: 100
@@ -975,7 +948,6 @@ MonoBehaviour:
     Modifications: []
     bIsVital: 1
     AttachedTo: 19
-    Attached: 
   - BodyPart: 3
     MaxHealth: 100
     Health: 100
@@ -985,7 +957,6 @@ MonoBehaviour:
     Modifications: []
     bIsVital: 1
     AttachedTo: 6
-    Attached: 
   m_TraitPool:
   - {fileID: 11400000, guid: 0c5eb64850f2bbb4fb58c688b89594cc, type: 2}
   m_PersonalityTraitPool: []
@@ -1085,6 +1056,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: '::'
   m_CharacterButtonTemplate: {fileID: 9197481963319205126, guid: 1e8a4b9b1be57014b80b83bc7495cfdf, type: 3}
+  m_CharacterShortInfoPanelTemplate: {fileID: 9197481963319205126, guid: 31b1a569527c971409023a1438032774, type: 3}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0

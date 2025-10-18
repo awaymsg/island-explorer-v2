@@ -18,7 +18,7 @@
     visibility: visible;
 }
 
-.CharacterProfileButton {
+.characterProfileButton {
     -unity-text-align: middle-center;
     font-size: 14px;
     padding: 2px;
@@ -37,4 +37,32 @@
     border-right-color: rgb(0, 0, 0);
     border-top-color: rgb(0, 0, 0);
     border-bottom-color: rgb(0, 0, 0);
+}
+
+.characterShortInfoPanel {
+    position: absolute;
+    width: 200px;
+    background-color: rgba(0.1, 0.1, 0.1, 0.95);
+
+    padding: 2px;
+    display: flex;
+    
+    border-top-width: 1px;
+    border-right-width: 1px;
+    border-bottom-width: 1px;
+    border-left-width: 1px;
+    border-left-color: rgba(255, 255, 255, 0.3);
+    border-right-color: rgba(255, 255, 255, 0.3);
+    border-top-color: rgba(255, 255, 255, 0.3);
+    border-bottom-color: rgba(255, 255, 255, 0.3);
+}
+
+.white-text {
+    color: #ffffff;
+    font-size: 14px;
+}
+
+.white-text-small {
+    color: #ffffff;
+    font-size: 8px;
 }

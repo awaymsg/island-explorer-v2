@@ -37,8 +37,10 @@ MonoBehaviour:
     Value: 40
   - StatType: 12
     Value: 20
-  - StatType: 12
-    Value: 20
+  - StatType: 13
+    Value: 10
+  - StatType: 14
+    Value: 60
   m_PartyMemberSkills: []
   m_TraitTypeBais: 1
   m_TraitBiasAmount: 0
