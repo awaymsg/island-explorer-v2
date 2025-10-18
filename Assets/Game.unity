@@ -947,7 +947,7 @@ MonoBehaviour:
       ModAmount: 1
     Modifications: []
     bIsVital: 1
-    AttachedTo: 19
+    AttachedTo: 20
   - BodyPart: 3
     MaxHealth: 100
     Health: 100
@@ -956,7 +956,7 @@ MonoBehaviour:
       ModAmount: 1
     Modifications: []
     bIsVital: 1
-    AttachedTo: 6
+    AttachedTo: 7
   m_TraitPool:
   - {fileID: 11400000, guid: 0c5eb64850f2bbb4fb58c688b89594cc, type: 2}
   m_PersonalityTraitPool: []
