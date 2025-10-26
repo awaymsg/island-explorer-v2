@@ -83,6 +83,8 @@ public class CMapGenerator : MonoBehaviour
         Matrix4x4.TRS(Vector3.zero, Quaternion.Euler(0, 0, -270f), Vector3.one)
     };
 
+    private bool m_bIgnoreTileRules = false;
+
     //-- getters
     public Vector2Int MapSize
     {
@@ -98,6 +100,11 @@ public class CMapGenerator : MonoBehaviour
     {
         get { return m_FogMap; }
     }
+
+    public bool IgnoreTileRules
+    {
+        set { m_bIgnoreTileRules = value; }
+    }
     //--
 
     private void LoadRulesFromJson()
@@ -111,6 +118,11 @@ public class CMapGenerator : MonoBehaviour
 
     public SRuleResult GetRule(string self, string west, string northwest, string north, string northeast, string east, string southeast, string south, string southwest)
     {
+        if (m_bIgnoreTileRules)
+        {
+            return new SRuleResult("Empty", 0);
+        }
+
         foreach (var rule in m_TileRules)
         {
             if (MatchesRule(self, west, northwest, north, northeast, east, southeast, south, southwest, rule))

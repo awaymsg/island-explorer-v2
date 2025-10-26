@@ -152,6 +152,7 @@ MonoBehaviour:
   m_RandomSeed: 43
   m_PartyPlayerCharacterPrefab: {fileID: 234909392250611176, guid: 12f91a7f2fa6cb6488c98fc9c73f4519, type: 3}
   m_bShowFog: 1
+  m_bIgnoreTileRules: 0
 --- !u!4 &86794079
 Transform:
   m_ObjectHideFlags: 0

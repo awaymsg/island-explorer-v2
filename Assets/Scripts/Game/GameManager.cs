@@ -19,6 +19,8 @@ public class GameManager : MonoBehaviour
     [Header("Debug")]
     [SerializeField]
     private bool m_bShowFog = true;
+    [SerializeField]
+    private bool m_bIgnoreTileRules = false;
 
     private CMapGenerator m_MapGenerator;
     private CPartyManager m_PartyManager;
@@ -50,6 +52,7 @@ public class GameManager : MonoBehaviour
         Camera camera = FindFirstObjectByType<Camera>();
         m_CameraManager = camera.GetComponent<CCameraManager>();
 
+        m_MapGenerator.IgnoreTileRules = m_bIgnoreTileRules;
         m_Map = m_MapGenerator.GenerateMap();
         m_MapGenerator.CreateFog();
 
@@ -273,6 +276,5 @@ public class GameManager : MonoBehaviour
                 m_FogMap.GetComponent<TilemapRenderer>().enabled = false;
             }
         }
-
     }
 }
