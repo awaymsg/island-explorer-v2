@@ -14,11 +14,16 @@ public class CCameraManager : MonoBehaviour
     private static float m_ZoomInput;
     private static bool m_bEnableMapMovement = false;
 
-    private Camera m_Cam;
+    private Camera m_Camera;
 
-    private void Start()
+    public static bool IsCameraMapMovementEnabled
     {
-        m_Cam = GetComponent<Camera>();
+        get { return m_bEnableMapMovement; }
+    }
+
+    private void Awake()
+    {
+        m_Camera = GetComponent<Camera>();
     }
 
     void Update()
@@ -56,7 +61,13 @@ public class CCameraManager : MonoBehaviour
         if (m_ZoomInput != 0)
         {
             float zoomChange = -m_ZoomInput * m_ZoomSpeed;
-            m_Cam.orthographicSize = Mathf.Clamp(m_Cam.orthographicSize + zoomChange, m_MinZoom, m_MaxZoom);
+            m_Camera.orthographicSize = Mathf.Clamp(m_Camera.orthographicSize + zoomChange, m_MinZoom, m_MaxZoom);
         }
+    }
+
+    public void MoveCameraToPosition(Vector3 worldPosition)
+    {
+        worldPosition.z = m_Camera.transform.position.z;
+        m_Camera.transform.position = worldPosition;
     }
 }

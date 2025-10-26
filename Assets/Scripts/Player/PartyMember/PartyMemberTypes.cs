@@ -84,7 +84,9 @@ public enum EPartyMemberStatType
     Morale,
     Attractiveness,
     Gayness,
-    Happiness
+    Happiness,
+    Medicine,
+    Vision
 }
 
 [Serializable]

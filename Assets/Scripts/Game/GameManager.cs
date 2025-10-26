@@ -1,6 +1,8 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.InputSystem;
+using UnityEngine.Tilemaps;
 
 public class GameManager : MonoBehaviour
 {
@@ -10,16 +12,25 @@ public class GameManager : MonoBehaviour
     private int m_RandomSeed = 0;
 
     [SerializeField, Tooltip("Player party character prefab")]
-    GameObject m_PartyPlayerCharacterPrefab;
+    private GameObject m_PartyPlayerCharacterPrefab;
+
+    private CCameraManager m_CameraManager;
+
+    [Header("Debug")]
+    [SerializeField]
+    private bool m_bShowFog = true;
 
     private CMapGenerator m_MapGenerator;
     private CPartyManager m_PartyManager;
 
     private STerrainTile[,] m_Map;
     private Grid m_WorldGrid;
+    private Tilemap m_FogMap;
 
     private GameObject m_PartyPlayerGameObject;
     private CPartyPlayerCharacter m_PartyPlayerCharacter;
+
+    private bool m_MoveConsumed = false;
 
     public CPartyPlayerCharacter PartyPlayerCharacter
     {
@@ -30,14 +41,19 @@ public class GameManager : MonoBehaviour
     {
         if (m_bUseRandomSeed)
         {
-            UnityEngine.Random.InitState(m_RandomSeed);
+            Random.InitState(m_RandomSeed);
         }
 
         m_WorldGrid = FindFirstObjectByType<Grid>();
         m_MapGenerator = FindFirstObjectByType<CMapGenerator>();
         m_PartyManager = FindFirstObjectByType<CPartyManager>();
+        Camera camera = FindFirstObjectByType<Camera>();
+        m_CameraManager = camera.GetComponent<CCameraManager>();
 
         m_Map = m_MapGenerator.GenerateMap();
+        m_MapGenerator.CreateFog();
+
+        m_FogMap = m_MapGenerator.FogMap;
 
         CreatePlayerCharacter();
     }
@@ -73,7 +89,102 @@ public class GameManager : MonoBehaviour
         List<CPartyMemberRuntime> partyMembers = new List<CPartyMemberRuntime>();
         partyMembers.Add(partyMember);
 
-        m_PartyManager.CreatePartyPlayerCharacter(m_PartyPlayerCharacter, partyLeader, partyMembers);
+        m_PartyPlayerCharacter = m_PartyManager.CreatePartyPlayerCharacter(m_PartyPlayerCharacter, partyLeader, partyMembers);
+        m_PartyPlayerGameObject.GetComponent<SpriteRenderer>().sprite = defaultPartyLeader.m_OverworldSprite;
+
+        Vector2Int startingLocation = FindStartingLocation();
+        m_PartyPlayerCharacter.CurrentLocation = startingLocation;
+        MovePlayerToCell(startingLocation);
+        MoveCameraToCell(startingLocation);
+    }
+
+    // input
+    public void OnMove(InputAction.CallbackContext context)
+    {
+        if (!CCameraManager.IsCameraMapMovementEnabled)
+        {
+            Vector2Int movement;
+
+            Vector2 moveInput = context.ReadValue<Vector2>();
+
+            if (!m_MoveConsumed && moveInput != Vector2.zero)
+            {
+                if (moveInput.y != 0)
+                {
+                    movement = new Vector2Int((int)Mathf.Sign(moveInput.y), 0);
+                }
+                else
+                {
+                    movement = new Vector2Int(0, -(int)Mathf.Sign(moveInput.x));
+                }
+
+                MovePlayerToCell(m_PartyPlayerCharacter.CurrentLocation + movement);
+
+                m_MoveConsumed = true;
+            }
+
+            if (context.canceled)
+            {
+                m_MoveConsumed = false;
+            }
+        }
+    }
+
+    private void PlaceObjectOnCell(GameObject objectToPlace, Vector2Int cell)
+    {
+        cell = ClampCell(cell);
+        Vector3Int cellVector3 = new Vector3Int(cell.x, cell.y);
+
+        Vector3 worldPosition = m_WorldGrid.GetCellCenterWorld(cellVector3);
+        worldPosition.z = 0;
+
+        objectToPlace.transform.position = worldPosition;
+    }
+
+    private void MovePlayerToCell(Vector2Int cell)
+    {
+        cell = ClampCell(cell);
+        Vector3Int cellVector3 = new Vector3Int(cell.x, cell.y);
+
+        Vector3 worldPosition = m_WorldGrid.GetCellCenterWorld(cellVector3);
+        worldPosition.z = 0;
+
+        m_PartyPlayerGameObject.transform.position = worldPosition;
+        m_PartyPlayerCharacter.CurrentLocation = cell;
+
+        STerrainTile terrainTile = m_Map[cell.x, cell.y];
+
+        // update seen tiles (TEMP, no vision stat adjustments yet)
+        for (int x = -1; x <= 1; ++x)
+        {
+            for (int y = -1; y <= 1; ++y)
+            {
+                int newX = Mathf.Clamp(cell.x + x, 0, m_Map.GetLength(0) - 1);
+                int newY = Mathf.Clamp(cell.y + y, 0, m_Map.GetLength(1) - 1);
+                Vector3Int newLocation = new Vector3Int(newX, newY, 0);
+
+                m_Map[newX, newY].SetIsSeen(true);
+
+                m_FogMap.SetTile(newLocation, null);
+            }
+        }
+    }
+
+    private void MoveCameraToCell(Vector2Int cell)
+    {
+        cell = ClampCell(cell);
+        Vector3Int cellVector3 = new Vector3Int(cell.x, cell.y);
+
+        Vector3 worldPosition = m_WorldGrid.GetCellCenterWorld(cellVector3);
+        m_CameraManager.MoveCameraToPosition(worldPosition);
+    }
+
+    private Vector2Int ClampCell(Vector2Int cell)
+    {
+        cell.x = Mathf.Clamp(cell.x, 0, m_Map.GetLength(0) - 1);
+        cell.y = Mathf.Clamp(cell.y, 0, m_Map.GetLength(1) - 1);
+
+        return cell;
     }
 
     private Vector2Int FindStartingLocation()
@@ -145,7 +256,23 @@ public class GameManager : MonoBehaviour
             }
         }
 
-        Debug.Log("FindStartingLocation - could not find a starting location!");
-        return new Vector2Int();
+        Debug.Log("FindStartingLocation - could not find a starting location! Trying again!");
+        return FindStartingLocation();
+    }
+
+    private void OnValidate()
+    {
+        if (m_FogMap != null)
+        {
+            if (m_bShowFog)
+            {
+                m_FogMap.GetComponent<TilemapRenderer>().enabled = true;
+            }
+            else
+            {
+                m_FogMap.GetComponent<TilemapRenderer>().enabled = false;
+            }
+        }
+
     }
 }

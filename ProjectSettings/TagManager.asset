@@ -2,7 +2,7 @@
 %TAG !u! tag:unity3d.com,2011:
 --- !u!78 &1
 TagManager:
-  serializedVersion: 2
+  serializedVersion: 3
   tags: []
   layers:
   - Default
@@ -41,3 +41,20 @@ TagManager:
   - name: Default
     uniqueID: 0
     locked: 0
+  - name: Terrain
+    uniqueID: 1930267589
+    locked: 0
+  - name: TerrainFlair
+    uniqueID: 798986089
+    locked: 0
+  - name: POI
+    uniqueID: 3554016455
+    locked: 0
+  - name: Entities
+    uniqueID: 567583777
+    locked: 0
+  - name: Fog
+    uniqueID: 1484975041
+    locked: 0
+  m_RenderingLayers:
+  - Default

@@ -12,6 +12,10 @@ public class CMapGenerator : MonoBehaviour
     [Header("TilemapRefs")]
     [SerializeField]
     private Tilemap m_TerrainMap;
+    [SerializeField]
+    private Tilemap m_FogMap;
+    [SerializeField]
+    private Tile m_FogTile;
 
     [Header("Tile mappings")]
     [SerializeField, Tooltip("This maps strings to tiles for json file")]
@@ -83,6 +87,16 @@ public class CMapGenerator : MonoBehaviour
     public Vector2Int MapSize
     {
         get { return m_MapSize; }
+    }
+
+    public Tilemap TerrainMap
+    {
+        get { return m_TerrainMap; }
+    }
+
+    public Tilemap FogMap
+    {
+        get { return m_FogMap; }
     }
     //--
 
@@ -236,7 +250,7 @@ public class CMapGenerator : MonoBehaviour
 
                 EBiomeType biomeType = GetBiomeType(weightedNoise);
 
-                m_TerrainTiles[x, y] = new STerrainTile(new Vector2Int(x, y), weightedNoise, /*bExplored*/ false, GetBiomeType(weightedNoise));
+                m_TerrainTiles[x, y] = new STerrainTile(weightedNoise, /*bExplored*/ false, GetBiomeType(weightedNoise));
             }
         }
 
@@ -444,5 +458,19 @@ public class CMapGenerator : MonoBehaviour
         string southwest = GetNeighborBiome(x - 1, y - 1);
 
         return GetRule(self, west, northwest, north, northeast, east, southeast, south, southwest);
+    }
+
+    public void CreateFog()
+    {
+        for (int x = 0; x < m_MapSize.x; ++x)
+        {
+            for (int y = 0; y < m_MapSize.y; ++y)
+            {
+                if (!m_TerrainTiles[x, y].IsSeen())
+                {
+                    m_FogMap.SetTile(new Vector3Int(x, y), m_FogTile);
+                }
+            }
+        }
     }
 }

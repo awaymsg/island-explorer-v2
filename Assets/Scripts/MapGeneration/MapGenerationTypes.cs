@@ -5,16 +5,14 @@ using UnityEngine.Tilemaps;
 
 public struct STerrainTile
 {
-    private Vector2Int Position;
     private float Elevation;
-    private bool bExplored;
+    private bool bSeen;
     private EBiomeType BiomeType;
 
-    public STerrainTile(Vector2Int position, float elevation, bool _bExplored, EBiomeType biomeType)
+    public STerrainTile(float elevation, bool _bExplored, EBiomeType biomeType)
     {
-        Position = position;
         Elevation = elevation;
-        bExplored = _bExplored;
+        bSeen = _bExplored;
         BiomeType = biomeType;
     }
 
@@ -23,9 +21,14 @@ public struct STerrainTile
         return Elevation;
     }
 
-    public bool IsExplored()
+    public bool IsSeen()
     {
-        return bExplored;
+        return bSeen;
+    }
+
+    public void SetIsSeen(bool bIsSeen)
+    {
+        bSeen = bIsSeen;
     }
 
     public EBiomeType GetBiomeType()

@@ -6,6 +6,7 @@ public class CPartyPlayerCharacter : MonoBehaviour
 {
     private CPartyLeaderRuntime m_PartyLeader;
     private List<CPartyMemberRuntime> m_PartyMembers;
+    private Vector2Int m_CurrentLocation;
 
     //-- getters
     public CPartyLeaderRuntime PartyLeader
@@ -16,6 +17,12 @@ public class CPartyPlayerCharacter : MonoBehaviour
     public List<CPartyMemberRuntime> PartyMembers
     {
         get { return m_PartyMembers; }
+    }
+
+    public Vector2Int CurrentLocation
+    {
+        get { return m_CurrentLocation; }
+        set { m_CurrentLocation = value; }
     }
     //--
 
