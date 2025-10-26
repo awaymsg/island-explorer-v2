@@ -858,6 +858,24 @@ MonoBehaviour:
     Name: beach_cornergrass
   - Tile: {fileID: 11400000, guid: bc200e93de7691944b6931c44eec02a3, type: 2}
     Name: beach_2grass
+  - Tile: {fileID: 11400000, guid: 67d33a147b4dbec4cba8b7f7f39e5cd7, type: 2}
+    Name: beach_3grass
+  - Tile: {fileID: 11400000, guid: d363802a3b8945f438027c0edf99281b, type: 2}
+    Name: beach_4grass
+  - Tile: {fileID: 11400000, guid: e6d9f9dc88adc1e44b86f6191b5876fe, type: 2}
+    Name: water_1grass
+  - Tile: {fileID: 11400000, guid: 58c956b7f47fe7f448e23e677f512dff, type: 2}
+    Name: water_cornergrass
+  - Tile: {fileID: 11400000, guid: 3abbe29de3864954098c12dece941ba6, type: 2}
+    Name: water_2grass
+  - Tile: {fileID: 11400000, guid: 110f4b1314093e742ac28afe7cea8f85, type: 2}
+    Name: water_3grass
+  - Tile: {fileID: 11400000, guid: 8267dca78d2a69943af1bfebb6bbf92d, type: 2}
+    Name: water_4grass
+  - Tile: {fileID: 11400000, guid: 166b63a7ce93a594392d70c036979927, type: 2}
+    Name: water_1beach_1grass
+  - Tile: {fileID: 11400000, guid: 166b63a7ce93a594392d70c036979927, type: 2}
+    Name: water_
   m_EnumMappings:
   - BiomeType: 1
     Name: deepwater
