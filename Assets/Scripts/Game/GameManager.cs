@@ -72,10 +72,10 @@ public class GameManager : MonoBehaviour
             return;
         }
 
-        int leaderIndex = UnityEngine.Random.Range(0, m_PartyManager.DefaultPartyLeadersPool.Length);
+        int leaderIndex = Random.Range(0, m_PartyManager.DefaultPartyLeadersPool.Length);
         CPartyLeader defaultPartyLeader = m_PartyManager.DefaultPartyLeadersPool[leaderIndex];
 
-        int memberindex = UnityEngine.Random.Range(0, m_PartyManager.DefaultPartyMembersPool.Length);
+        int memberindex = Random.Range(0, m_PartyManager.DefaultPartyMembersPool.Length);
         CPartyMember defaultPartyMember = m_PartyManager.DefaultPartyMembersPool[memberindex];
 
         // instantiate and initialize the player
