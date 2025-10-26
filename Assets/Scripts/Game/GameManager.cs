@@ -57,6 +57,7 @@ public class GameManager : MonoBehaviour
         m_MapGenerator.CreateFog();
 
         m_FogMap = m_MapGenerator.FogMap;
+        m_FogMap.GetComponent<TilemapRenderer>().enabled = m_bShowFog;
 
         CreatePlayerCharacter();
     }

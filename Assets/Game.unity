@@ -152,7 +152,7 @@ MonoBehaviour:
   m_RandomSeed: 43
   m_PartyPlayerCharacterPrefab: {fileID: 234909392250611176, guid: 12f91a7f2fa6cb6488c98fc9c73f4519, type: 3}
   m_bShowFog: 1
-  m_bIgnoreTileRules: 0
+  m_bIgnoreTileRules: 1
 --- !u!4 &86794079
 Transform:
   m_ObjectHideFlags: 0
@@ -510,7 +510,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 854178934}
   serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: 0.38268343, w: 0.92387956}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -518,7 +518,7 @@ Transform:
   - {fileID: 970083616}
   - {fileID: 1653088790}
   m_Father: {fileID: 2138713278}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 45}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!156049354 &854178936
 Grid:
   m_ObjectHideFlags: 0
@@ -527,9 +527,9 @@ Grid:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 854178934}
   m_Enabled: 1
-  m_CellSize: {x: 1, y: 1, z: 0}
+  m_CellSize: {x: 1, y: 0.5, z: 0}
   m_CellGap: {x: 0, y: 0, z: 0}
-  m_CellLayout: 0
+  m_CellLayout: 2
   m_CellSwizzle: 0
 --- !u!1 &970083613
 GameObject:
@@ -825,7 +825,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::MapGenerator
   m_TerrainMap: {fileID: 970083614}
   m_FogMap: {fileID: 1653088792}
-  m_FogTile: {fileID: 11400000, guid: e1be5d07a2575ad42a07d618e9557110, type: 2}
+  m_FogTile: {fileID: 11400000, guid: e76a5561e729adc4388314c31d2973c5, type: 2}
   m_TileMappings:
   - Tile: {fileID: 11400000, guid: fc10b3d3810b3504e87ddcb8be55771c, type: 2}
     Name: deepwater_pure
@@ -893,17 +893,17 @@ MonoBehaviour:
   m_RulesJson: {fileID: 4900000, guid: a4a482493502de14fa8b200adcc04666, type: 3}
   m_DefaultTiles:
   - BiomeType: 1
-    Tile: {fileID: 11400000, guid: fc10b3d3810b3504e87ddcb8be55771c, type: 2}
+    Tile: {fileID: 11400000, guid: 3de3ac1d92213b049aaab64662a7e4c7, type: 2}
   - BiomeType: 2
-    Tile: {fileID: 11400000, guid: 47091accd11d9284e9005faa78fd2636, type: 2}
+    Tile: {fileID: 11400000, guid: cb9600951f42d324a8fdb423bacfe0ed, type: 2}
   - BiomeType: 3
-    Tile: {fileID: 11400000, guid: 65632bc25cbdda348968c5af18776bee, type: 2}
+    Tile: {fileID: 11400000, guid: 040a8f0ee51f1514f9ec81d287cc28d1, type: 2}
   - BiomeType: 4
-    Tile: {fileID: 11400000, guid: 0cd687f8bb8f7e14b8b41b03469e6ba3, type: 2}
+    Tile: {fileID: 11400000, guid: 2c860217bb52587478248b0230851329, type: 2}
   - BiomeType: 5
-    Tile: {fileID: 11400000, guid: c76b5e6da04f8944a82da6ac94102a86, type: 2}
+    Tile: {fileID: 11400000, guid: bbeeca41f483682478889966678dcdab, type: 2}
   - BiomeType: 6
-    Tile: {fileID: 11400000, guid: f76d7ae811bba074e8290df8e18fb662, type: 2}
+    Tile: {fileID: 11400000, guid: ef2389b713e995544afdae81d9f5b7bd, type: 2}
   m_MapSize: {x: 50, y: 50}
   m_GlobalAmplitudeScalar: 10
   m_FalloffFactor: 1
@@ -1249,7 +1249,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 0.5, z: 1}
+  m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 854178935}
