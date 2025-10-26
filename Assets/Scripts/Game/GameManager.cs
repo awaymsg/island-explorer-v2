@@ -7,7 +7,7 @@ using UnityEngine.Tilemaps;
 public class GameManager : MonoBehaviour
 {
     [SerializeField]
-    private bool m_bUseRandomSeed = false;
+    private bool m_bUseSeed = false;
     [SerializeField]
     private int m_RandomSeed = 0;
 
@@ -41,7 +41,7 @@ public class GameManager : MonoBehaviour
 
     void Start()
     {
-        if (m_bUseRandomSeed)
+        if (m_bUseSeed)
         {
             Random.InitState(m_RandomSeed);
         }
