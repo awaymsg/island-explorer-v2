@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.Tilemaps;
 
-public class GameManager : MonoBehaviour
+public class CGameManager : MonoBehaviour
 {
     [SerializeField]
     private bool m_bUseSeed = false;

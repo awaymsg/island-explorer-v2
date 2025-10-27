@@ -152,7 +152,7 @@ MonoBehaviour:
   m_RandomSeed: 43
   m_PartyPlayerCharacterPrefab: {fileID: 234909392250611176, guid: 12f91a7f2fa6cb6488c98fc9c73f4519, type: 3}
   m_bShowFog: 1
-  m_bIgnoreTileRules: 1
+  m_bIgnoreTileRules: 0
 --- !u!4 &86794079
 Transform:
   m_ObjectHideFlags: 0
@@ -829,58 +829,24 @@ MonoBehaviour:
   m_FlairMap: {fileID: 2112288922}
   m_POIMap: {fileID: 2069730828}
   m_FogMap: {fileID: 1653088792}
-  m_FogTile: {fileID: 11400000, guid: e76a5561e729adc4388314c31d2973c5, type: 2}
+  m_FogTile: {fileID: 11400000, guid: 30a7d21762d4d3247be47f19fcf02962, type: 2}
   m_TileMappings:
-  - Tile: {fileID: 11400000, guid: fc10b3d3810b3504e87ddcb8be55771c, type: 2}
-    Name: deepwater_pure
-  - Tile: {fileID: 11400000, guid: 1f97bea1d9a38d945a3d6cee28a5493f, type: 2}
-    Name: deepwater_1water
-  - Tile: {fileID: 11400000, guid: 3979ab0e38cc418449b55d0fa7a46d5e, type: 2}
-    Name: deepwater_2water
-  - Tile: {fileID: 11400000, guid: dda0bfedadf5a8445be62d5c85535405, type: 2}
-    Name: deepwater_3water
-  - Tile: {fileID: 11400000, guid: d171cddfe182d3c4b9f4d72f27c2ae41, type: 2}
-    Name: deepwater_4water
-  - Tile: {fileID: 11400000, guid: 7a91d7c2a8c42b8429043b78f7c06086, type: 2}
-    Name: deepwater_cornerwater
-  - Tile: {fileID: 11400000, guid: 47091accd11d9284e9005faa78fd2636, type: 2}
-    Name: water_pure
-  - Tile: {fileID: 11400000, guid: a15f8eac785832c40bfa909a69c27dab, type: 2}
-    Name: water_1beach
-  - Tile: {fileID: 11400000, guid: 06219ed4c0d1a5a47979cc72e9c13d0a, type: 2}
-    Name: water_cornerbeach
-  - Tile: {fileID: 11400000, guid: c3cff1d6d757cab4a93e42cef162c8a4, type: 2}
-    Name: water_2beach
-  - Tile: {fileID: 11400000, guid: 3ea1172f3043db348b9f0b489f6386df, type: 2}
-    Name: water_3beach
-  - Tile: {fileID: 11400000, guid: 68a548e8307e58b40a39eda8ec74b0d1, type: 2}
-    Name: water_4beach
-  - Tile: {fileID: 11400000, guid: 65632bc25cbdda348968c5af18776bee, type: 2}
-    Name: beach_pure
-  - Tile: {fileID: 11400000, guid: 7a809faf85c7017419b058da3bfbea26, type: 2}
-    Name: beach_1grass
-  - Tile: {fileID: 11400000, guid: 83f59e23aff28264e8d2d9b72b251d5d, type: 2}
-    Name: beach_cornergrass
-  - Tile: {fileID: 11400000, guid: bc200e93de7691944b6931c44eec02a3, type: 2}
-    Name: beach_2grass
-  - Tile: {fileID: 11400000, guid: 67d33a147b4dbec4cba8b7f7f39e5cd7, type: 2}
-    Name: beach_3grass
-  - Tile: {fileID: 11400000, guid: d363802a3b8945f438027c0edf99281b, type: 2}
-    Name: beach_4grass
-  - Tile: {fileID: 11400000, guid: e6d9f9dc88adc1e44b86f6191b5876fe, type: 2}
-    Name: water_1grass
-  - Tile: {fileID: 11400000, guid: 58c956b7f47fe7f448e23e677f512dff, type: 2}
-    Name: water_cornergrass
-  - Tile: {fileID: 11400000, guid: 3abbe29de3864954098c12dece941ba6, type: 2}
-    Name: water_2grass
-  - Tile: {fileID: 11400000, guid: 110f4b1314093e742ac28afe7cea8f85, type: 2}
-    Name: water_3grass
-  - Tile: {fileID: 11400000, guid: 8267dca78d2a69943af1bfebb6bbf92d, type: 2}
-    Name: water_4grass
-  - Tile: {fileID: 11400000, guid: 166b63a7ce93a594392d70c036979927, type: 2}
-    Name: water_1beach_1grass
-  - Tile: {fileID: 11400000, guid: 166b63a7ce93a594392d70c036979927, type: 2}
-    Name: water_
+  - Tile: {fileID: 11400000, guid: a0705d81a0d484643b9fa9d06bc78a77, type: 2}
+    Name: water_west-north_land
+  - Tile: {fileID: 11400000, guid: 8e141b39c15641b4aa9c3138b07b18b1, type: 2}
+    Name: water_north-east_land
+  - Tile: {fileID: 11400000, guid: 45e90840825919f42b0a3076c1cc755a, type: 2}
+    Name: water_east-south_land
+  - Tile: {fileID: 11400000, guid: 27c1265ae8072b64f8dabc29a50c0026, type: 2}
+    Name: water_south-west_land
+  - Tile: {fileID: 11400000, guid: 3687dd5c830f1df45b200aba1c8b5c45, type: 2}
+    Name: water_west_land
+  - Tile: {fileID: 11400000, guid: e1c065eb24465fd45ac1d8df67d54808, type: 2}
+    Name: water_north_land
+  - Tile: {fileID: 11400000, guid: 052c8043f39c54e4ba7fdbae80ba4a65, type: 2}
+    Name: water_south_land
+  - Tile: {fileID: 11400000, guid: e76a5561e729adc4388314c31d2973c5, type: 2}
+    Name: water_east_land
   m_EnumMappings:
   - BiomeType: 1
     Name: deepwater
@@ -894,7 +860,7 @@ MonoBehaviour:
     Name: forest
   - BiomeType: 6
     Name: mountain
-  m_RulesJson: {fileID: 4900000, guid: a4a482493502de14fa8b200adcc04666, type: 3}
+  m_RulesJson: {fileID: 4900000, guid: 4eb8854f982b2e8488304e6b824edbed, type: 3}
   m_DefaultTiles:
   - BiomeType: 1
     Tile: {fileID: 11400000, guid: 3de3ac1d92213b049aaab64662a7e4c7, type: 2}
