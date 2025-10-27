@@ -193,7 +193,15 @@ public class CMapGenerator : MonoBehaviour
                 }
                 else
                 {
-                    tile = m_TileBook[result.Result];
+                    if (m_TileBook.ContainsKey(result.Result))
+                    {
+                        tile = m_TileBook[result.Result];
+                    }
+                    else
+                    {
+                        Debug.Log(string.Format("Missing tile from result: {1}", result.Result));
+                        tile = Array.Find<SDefaultTile>(m_DefaultTiles, p => p.BiomeType == currentBiome).Tile;
+                    }
                 }
 
                 if (tile == null)

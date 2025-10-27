@@ -829,7 +829,7 @@ MonoBehaviour:
   m_FlairMap: {fileID: 2112288922}
   m_POIMap: {fileID: 2069730828}
   m_FogMap: {fileID: 1653088792}
-  m_FogTile: {fileID: 11400000, guid: 30a7d21762d4d3247be47f19fcf02962, type: 2}
+  m_FogTile: {fileID: 11400000, guid: 2f718c3994b5a8f42bc2f497655a4893, type: 2}
   m_TileMappings:
   - Tile: {fileID: 11400000, guid: a0705d81a0d484643b9fa9d06bc78a77, type: 2}
     Name: water_west-north_land
@@ -847,6 +847,20 @@ MonoBehaviour:
     Name: water_south_land
   - Tile: {fileID: 11400000, guid: e76a5561e729adc4388314c31d2973c5, type: 2}
     Name: water_east_land
+  - Tile: {fileID: 11400000, guid: 57adb9531dbf0884fbe92dffa5c478a3, type: 2}
+    Name: water_west-east_land
+  - Tile: {fileID: 11400000, guid: d63e7f8e422089c47861804a8876be00, type: 2}
+    Name: water_north-south_land
+  - Tile: {fileID: 11400000, guid: c08c10a455c439846a6a763ea72de6b1, type: 2}
+    Name: water_west-north-east_land
+  - Tile: {fileID: 11400000, guid: 15bd06bda22c1834097ab3aed89f0538, type: 2}
+    Name: water_north-east-south_land
+  - Tile: {fileID: 11400000, guid: 352a2470fcaa4294f860a3c7e6ed7c2d, type: 2}
+    Name: water_east-south-west_land
+  - Tile: {fileID: 11400000, guid: 30a7d21762d4d3247be47f19fcf02962, type: 2}
+    Name: water_south-west-north_land
+  - Tile: {fileID: 11400000, guid: 2a1a9b56c3be8d744b4d73c21925d7aa, type: 2}
+    Name: water_all-sides_land
   m_EnumMappings:
   - BiomeType: 1
     Name: deepwater

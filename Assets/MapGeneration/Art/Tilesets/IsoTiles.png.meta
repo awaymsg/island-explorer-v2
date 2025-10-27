@@ -468,8 +468,8 @@ TextureImporter:
       name: IsoTiles_16
       rect:
         serializedVersion: 2
-        x: 96
-        y: 0
+        x: 0
+        y: 48
         width: 32
         height: 16
       alignment: 0
@@ -482,6 +482,94 @@ TextureImporter:
       bones: []
       spriteID: 5820b625cc9062244b0f1f18d80a7f18
       internalID: -1928145036
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: IsoTiles_17
+      rect:
+        serializedVersion: 2
+        x: 32
+        y: 48
+        width: 32
+        height: 16
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: eef095f228c2b254fa60b3de3d8bb767
+      internalID: 683022716
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: IsoTiles_18
+      rect:
+        serializedVersion: 2
+        x: 64
+        y: 48
+        width: 32
+        height: 16
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 0d9b38b30456cbf4d9c1c3a37dffcdc4
+      internalID: 1514433534
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: IsoTiles_19
+      rect:
+        serializedVersion: 2
+        x: 96
+        y: 48
+        width: 32
+        height: 16
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: efc854811c9178b4ab5ff48f1ed128e3
+      internalID: 392026540
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: IsoTiles_20
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 32
+        width: 32
+        height: 16
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 1ee55b99b2785c741825b57f69c87e4e
+      internalID: -841357483
       vertices: []
       indices: 
       edges: []
@@ -511,7 +599,11 @@ TextureImporter:
       IsoTiles_14: 849311574
       IsoTiles_15: -921499149
       IsoTiles_16: -1928145036
+      IsoTiles_17: 683022716
+      IsoTiles_18: 1514433534
+      IsoTiles_19: 392026540
       IsoTiles_2: -1536990942
+      IsoTiles_20: -841357483
       IsoTiles_3: -2088297154
       IsoTiles_4: -820033474
       IsoTiles_5: 943348789
