@@ -1,3 +1,11 @@
+update: 10/27/25 added concept of POIs (temp sprites), layered terrain, with better tileset made by jack & kayleigh, also now true isometric
+-
+<img width="1167" height="617" alt="image" src="https://github.com/user-attachments/assets/09793615-1a02-49f7-a10f-42da77a790ef" />
+
+next: fire emblem style movement system & movement rules
+later: expand UI, events system
+
+
 update: 10/25/25 added basic UI with temp assets, player character, data driven party & trait system, fog of war, changed to isometric view
 -
 <img width="972" height="599" alt="image" src="https://github.com/user-attachments/assets/7d3de39a-6515-4193-bb3b-37ed883ba3aa" />
