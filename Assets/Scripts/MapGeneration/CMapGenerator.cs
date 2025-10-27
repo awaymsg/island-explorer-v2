@@ -13,6 +13,10 @@ public class CMapGenerator : MonoBehaviour
     [SerializeField]
     private Tilemap m_TerrainMap;
     [SerializeField]
+    private Tilemap m_FlairMap;
+    [SerializeField]
+    private Tilemap m_POIMap;
+    [SerializeField]
     private Tilemap m_FogMap;
     [SerializeField]
     private Tile m_FogTile;
@@ -42,7 +46,7 @@ public class CMapGenerator : MonoBehaviour
     [SerializeField]
     private bool m_bUseFractalNoise = false;
 
-    [System.Serializable, Tooltip("Required for Fractal Noise! If fractal noise is selected, the first WaveFunction will be used for fractal noise. Otherwise each will be applied as layers")]
+    [Serializable, Tooltip("Required for Fractal Noise! If fractal noise is selected, the first WaveFunction will be used for fractal noise. Otherwise each will be applied as layers")]
     private struct SWaveFunctions
     {
         public int m_Octaves;
@@ -57,6 +61,9 @@ public class CMapGenerator : MonoBehaviour
 
     [SerializeField, Tooltip("Maximum threshold for each biome type")]
     private SElevationLevels m_ElevationLevels;
+
+    [SerializeField]
+    private SPOIMapping[] m_POIMappings;
 
     private static int[] m_Permutation;
 
@@ -197,12 +204,59 @@ public class CMapGenerator : MonoBehaviour
 
                 Vector3Int position = new Vector3Int(x, y, 0);
 
+                TileBase poiTile = AddPOI(m_TerrainTiles[x, y]);
+
                 m_TerrainMap.SetTile(position, tile);
                 m_TerrainMap.SetTransformMatrix(position, RotationTable[result.Rotations]);
+
+                if (poiTile != null)
+                {
+                    m_POIMap.SetTile(position, poiTile);
+                }
             }
         }
 
         return m_TerrainTiles;
+    }
+
+    private TileBase AddPOI(STerrainTile terrainTile)
+    {
+        TileBase selectedPOITile = null;
+
+        if (terrainTile.GetBiomeType() != EBiomeType.Invalid)
+        {
+            SPOIMapping poiMapping = Array.Find(m_POIMappings, p => p.BiomeType == terrainTile.GetBiomeType());
+
+            float minLikelihood = 100f;
+
+            if (poiMapping.BiomeType != EBiomeType.Invalid)
+            {
+                float random = UnityEngine.Random.Range(0f, 100f);
+
+                foreach (SPOISettings poiSetting in poiMapping.POISettings)
+                {
+                    if (random < poiSetting.Likelihood)
+                    {
+                        // TODO: set POI on tile
+                        if (poiSetting.Likelihood < minLikelihood)
+                        {
+                            minLikelihood = poiSetting.Likelihood;
+                            selectedPOITile = poiSetting.Tile;
+                        }
+                        else if (poiSetting.Likelihood == minLikelihood)
+                        {
+                            // If chances are the same, roll for stomping
+                            if (UnityEngine.Random.Range(0, 1) > 0.5f)
+                            {
+                                selectedPOITile = poiSetting.Tile;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        return selectedPOITile;
     }
 
     private void GenerateHeightMap()
@@ -262,7 +316,7 @@ public class CMapGenerator : MonoBehaviour
 
                 EBiomeType biomeType = GetBiomeType(weightedNoise);
 
-                m_TerrainTiles[x, y] = new STerrainTile(weightedNoise, /*bExplored*/ false, GetBiomeType(weightedNoise));
+                m_TerrainTiles[x, y] = new STerrainTile(weightedNoise, /*bExplored*/ false, GetBiomeType(weightedNoise), 1f);
             }
         }
 

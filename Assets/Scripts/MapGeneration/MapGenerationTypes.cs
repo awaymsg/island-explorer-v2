@@ -8,12 +8,14 @@ public struct STerrainTile
     private float Elevation;
     private bool bSeen;
     private EBiomeType BiomeType;
+    private float TraversalRate;
 
-    public STerrainTile(float elevation, bool _bExplored, EBiomeType biomeType)
+    public STerrainTile(float elevation, bool _bExplored, EBiomeType biomeType, float traversalRate)
     {
         Elevation = elevation;
         bSeen = _bExplored;
         BiomeType = biomeType;
+        TraversalRate = traversalRate;
     }
 
     public float GetElevation()
@@ -35,9 +37,14 @@ public struct STerrainTile
     {
         return BiomeType;
     }
+
+    public float GetTraversalRate()
+    {
+        return TraversalRate;
+    }
 }
 
-[System.Serializable]
+[Serializable]
 public enum EBiomeType : UInt16
 {
     Invalid,
@@ -49,7 +56,7 @@ public enum EBiomeType : UInt16
     Mountain
 }
 
-[System.Serializable]
+[Serializable]
 public struct SElevationLevels
 {
     public float MountainLevel;
@@ -60,7 +67,7 @@ public struct SElevationLevels
     public float DeepWaterLevel;
 }
 
-[System.Serializable]
+[Serializable]
 public class CTileRule
 {
     public string Name;
@@ -77,27 +84,27 @@ public class CTileRule
     public string Result;
 }
 
-[System.Serializable]
+[Serializable]
 public class CRuleCollection
 {
     public List<CTileRule> Rules = new List<CTileRule>();
 }
 
-[System.Serializable]
+[Serializable]
 public struct SDefaultTile
 {
     public EBiomeType BiomeType;
     public TileBase Tile;
 }
 
-[System.Serializable]
+[Serializable]
 public struct STileMapping
 {
     public TileBase Tile;
     public string Name;
 }
 
-[System.Serializable]
+[Serializable]
 public struct SEnumMapping
 {
     public EBiomeType BiomeType;
@@ -114,4 +121,21 @@ public struct SRuleResult
 
     public string Result;
     public int Rotations;
+}
+
+[Serializable]
+public struct SPOISettings
+{
+    public string Name;
+    public TileBase Tile;
+    public float Likelihood;
+
+    // todo: add POI event(s)
+}
+
+[Serializable]
+public struct SPOIMapping
+{
+    public EBiomeType BiomeType;
+    public SPOISettings[] POISettings;
 }
