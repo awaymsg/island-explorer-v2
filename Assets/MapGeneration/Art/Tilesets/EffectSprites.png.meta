@@ -117,7 +117,7 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 0
-        y: 0
+        y: 16
         width: 32
         height: 16
       alignment: 0
@@ -139,7 +139,7 @@ TextureImporter:
       rect:
         serializedVersion: 2
         x: 32
-        y: 0
+        y: 16
         width: 32
         height: 16
       alignment: 0
@@ -152,6 +152,28 @@ TextureImporter:
       bones: []
       spriteID: e85bbe0e426d6514b9ea5028eda65d1d
       internalID: 454121955
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: EffectSprites_2
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 0
+        width: 32
+        height: 16
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 4c70949a50ae93e43b45b7760232924a
+      internalID: 1747059094
       vertices: []
       indices: 
       edges: []
@@ -174,6 +196,7 @@ TextureImporter:
     nameFileIdTable:
       EffectSprites_0: 4253616494184998278
       EffectSprites_1: 454121955
+      EffectSprites_2: 1747059094
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

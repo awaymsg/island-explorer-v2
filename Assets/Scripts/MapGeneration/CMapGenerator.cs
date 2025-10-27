@@ -17,6 +17,8 @@ public class CMapGenerator : MonoBehaviour
     [SerializeField]
     private Tilemap m_POIMap;
     [SerializeField]
+    private Tilemap m_EffectsMap;
+    [SerializeField]
     private Tilemap m_FogMap;
     [SerializeField]
     private Tile m_FogTile;
@@ -106,6 +108,11 @@ public class CMapGenerator : MonoBehaviour
     public Tilemap FogMap
     {
         get { return m_FogMap; }
+    }
+
+    public Tilemap EffectsMap
+    {
+        get { return m_EffectsMap; }
     }
 
     public bool IgnoreTileRules

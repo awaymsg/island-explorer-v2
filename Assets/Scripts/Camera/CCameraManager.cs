@@ -1,13 +1,20 @@
+using JetBrains.Annotations;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
 public class CCameraManager : MonoBehaviour
 {
     [Header("Movement Settings")]
-    public float m_MoveSpeed = 10f;
-    public float m_ZoomSpeed = 20f;
-    public float m_MinZoom = 2f;
-    public float m_MaxZoom = 20f;
+    [SerializeField]
+    private float m_MoveSpeed = 10f;
+    [SerializeField]
+    private float m_ZoomSpeed = 20f;
+    [SerializeField]
+    private float m_MinZoom = 2f;
+    [SerializeField]
+    private float m_MaxZoom = 20f;
+    [SerializeField]
+    private float m_FollowSpeed = 1f;
 
     // Input values
     private static Vector2 m_MoveInput;
@@ -15,11 +22,19 @@ public class CCameraManager : MonoBehaviour
     private static bool m_bEnableMapMovement = false;
 
     private Camera m_Camera;
+    private GameObject m_TargetPlayer;
 
+    // getters and setters
     public static bool IsCameraMapMovementEnabled
     {
         get { return m_bEnableMapMovement; }
     }
+
+    public GameObject TargetPlayer
+    {
+        set { m_TargetPlayer = value; }
+    }
+    //--
 
     private void Awake()
     {
@@ -28,8 +43,23 @@ public class CCameraManager : MonoBehaviour
 
     void Update()
     {
-        HandleMovement();
         HandleZoom();
+
+        if (m_bEnableMapMovement)
+        {
+            HandleMovement();
+        }
+        else
+        {
+            if (m_TargetPlayer != null)
+            {
+                Vector2 cameraPosition = m_Camera.transform.position;
+                Vector2 playerPosition = m_TargetPlayer.transform.position;
+                Vector2 newPosition = Vector2.Lerp(cameraPosition, playerPosition, m_FollowSpeed * Time.deltaTime);
+
+                m_Camera.transform.position = new Vector3(newPosition.x, newPosition.y, m_Camera.transform.position.z);
+            }
+        }
     }
 
     public void OnMove(InputAction.CallbackContext context)

@@ -47,6 +47,9 @@ TagManager:
   - name: TerrainFlair
     uniqueID: 798986089
     locked: 0
+  - name: Effects
+    uniqueID: 3332826997
+    locked: 0
   - name: POI
     uniqueID: 3554016455
     locked: 0

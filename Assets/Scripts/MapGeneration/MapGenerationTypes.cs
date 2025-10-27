@@ -9,13 +9,15 @@ public struct STerrainTile
     private bool bSeen;
     private EBiomeType BiomeType;
     private float TraversalRate;
+    private bool bPlayerOccupied;
 
-    public STerrainTile(float elevation, bool _bExplored, EBiomeType biomeType, float traversalRate)
+    public STerrainTile(float elevation, bool _bExplored, EBiomeType biomeType, float traversalRate, bool _bPlayerOccupied = false)
     {
         Elevation = elevation;
         bSeen = _bExplored;
         BiomeType = biomeType;
         TraversalRate = traversalRate;
+        bPlayerOccupied = _bPlayerOccupied;
     }
 
     public float GetElevation()
@@ -41,6 +43,16 @@ public struct STerrainTile
     public float GetTraversalRate()
     {
         return TraversalRate;
+    }
+
+    public bool IsPlayerOccupied()
+    {
+        return bPlayerOccupied;
+    }
+
+    public void SetPlayerOccupied(bool _bPlayerOccupied)
+    {
+        bPlayerOccupied = _bPlayerOccupied;
     }
 }
 

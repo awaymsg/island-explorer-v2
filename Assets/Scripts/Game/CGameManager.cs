@@ -13,8 +13,10 @@ public class CGameManager : MonoBehaviour
 
     [SerializeField, Tooltip("Player party character prefab")]
     private GameObject m_PartyPlayerCharacterPrefab;
-
-    private CCameraManager m_CameraManager;
+    [SerializeField, Tooltip("Effect tile when a location is selected")]
+    private TileBase m_LocationSelectHighlightTile;
+    [SerializeField, Tooltip("Effect tile when a player is selected")]
+    private TileBase m_PlayerSelectHighlightTile;
 
     [Header("Debug")]
     [SerializeField]
@@ -25,9 +27,13 @@ public class CGameManager : MonoBehaviour
     private CMapGenerator m_MapGenerator;
     private CPartyManager m_PartyManager;
 
-    private STerrainTile[,] m_Map;
+    private STerrainTile[,] m_TerrainTileMap;
     private Grid m_WorldGrid;
     private Tilemap m_FogMap;
+    private Tilemap m_EffectsMap;
+
+    private Camera m_Camera;
+    private CCameraManager m_CameraManager;
 
     private GameObject m_PartyPlayerGameObject;
     private CPartyPlayerCharacter m_PartyPlayerCharacter;
@@ -49,15 +55,17 @@ public class CGameManager : MonoBehaviour
         m_WorldGrid = FindFirstObjectByType<Grid>();
         m_MapGenerator = FindFirstObjectByType<CMapGenerator>();
         m_PartyManager = FindFirstObjectByType<CPartyManager>();
-        Camera camera = FindFirstObjectByType<Camera>();
-        m_CameraManager = camera.GetComponent<CCameraManager>();
+        m_Camera = FindFirstObjectByType<Camera>();
+        m_CameraManager = m_Camera.GetComponent<CCameraManager>();
 
         m_MapGenerator.IgnoreTileRules = m_bIgnoreTileRules;
-        m_Map = m_MapGenerator.GenerateMap();
+        m_TerrainTileMap = m_MapGenerator.GenerateMap();
         m_MapGenerator.CreateFog();
 
         m_FogMap = m_MapGenerator.FogMap;
         m_FogMap.GetComponent<TilemapRenderer>().enabled = m_bShowFog;
+
+        m_EffectsMap = m_MapGenerator.EffectsMap;
 
         CreatePlayerCharacter();
     }
@@ -82,7 +90,7 @@ public class CGameManager : MonoBehaviour
         int memberindex = Random.Range(0, m_PartyManager.DefaultPartyMembersPool.Length);
         CPartyMember defaultPartyMember = m_PartyManager.DefaultPartyMembersPool[memberindex];
 
-        // instantiate and initialize the player
+        // Instantiate and initialize the player
         m_PartyPlayerGameObject = Instantiate(m_PartyPlayerCharacterPrefab);
         m_PartyPlayerCharacter = m_PartyPlayerGameObject.GetComponent<CPartyPlayerCharacter>();
 
@@ -100,9 +108,12 @@ public class CGameManager : MonoBehaviour
         m_PartyPlayerCharacter.CurrentLocation = startingLocation;
         MovePlayerToCell(startingLocation);
         MoveCameraToCell(startingLocation);
+
+        // Set camera to target player
+        m_CameraManager.TargetPlayer = m_PartyPlayerGameObject;
     }
 
-    // input
+    // Input
     public void OnMove(InputAction.CallbackContext context)
     {
         if (!CCameraManager.IsCameraMapMovementEnabled)
@@ -134,6 +145,50 @@ public class CGameManager : MonoBehaviour
         }
     }
 
+    public void OnClick(InputAction.CallbackContext context)
+    {
+        if (context.performed)
+        {
+            HandleTileClick();
+        }
+    }
+
+    private void HandleTileClick()
+    {
+        Vector2 mousePosition = Mouse.current.position.ReadValue();
+        Vector3 worldPosition = m_Camera.ScreenToWorldPoint(mousePosition);
+        Vector3Int cellPosition = m_WorldGrid.WorldToCell(worldPosition);
+
+        if (!IsCellValid(cellPosition))
+        {
+            return;
+        }
+
+        STerrainTile selectedTile = m_TerrainTileMap[cellPosition.x, cellPosition.y];
+        if (selectedTile.IsPlayerOccupied())
+        {
+            if (m_EffectsMap.HasTile(cellPosition))
+            {
+                m_EffectsMap.SetTile(cellPosition, null);
+            }
+            else
+            {
+                m_EffectsMap.SetTile(cellPosition, m_PlayerSelectHighlightTile);
+            }
+        }
+        else
+        {
+            if (m_EffectsMap.HasTile(cellPosition))
+            {
+                m_EffectsMap.SetTile(cellPosition, null);
+            }
+            else
+            {
+                m_EffectsMap.SetTile(cellPosition, m_LocationSelectHighlightTile);
+            }
+        }
+    }
+
     private void PlaceObjectOnCell(GameObject objectToPlace, Vector2Int cell)
     {
         cell = ClampCell(cell);
@@ -150,24 +205,31 @@ public class CGameManager : MonoBehaviour
         cell = ClampCell(cell);
         Vector3Int cellVector3 = new Vector3Int(cell.x, cell.y);
 
+        // Try change occupied status of previous location
+        Vector3Int prevCell = m_WorldGrid.WorldToCell(m_PartyPlayerGameObject.transform.position);
+        if (IsCellValid(prevCell))
+        {
+            m_TerrainTileMap[prevCell.x, prevCell.y].SetPlayerOccupied(false);
+        }
+
         Vector3 worldPosition = m_WorldGrid.GetCellCenterWorld(cellVector3);
         worldPosition.z = 0;
 
         m_PartyPlayerGameObject.transform.position = worldPosition;
         m_PartyPlayerCharacter.CurrentLocation = cell;
 
-        STerrainTile terrainTile = m_Map[cell.x, cell.y];
+        m_TerrainTileMap[cell.x, cell.y].SetPlayerOccupied(true);
 
-        // update seen tiles (TEMP, no vision stat adjustments yet)
+        // Update seen tiles (TEMP, no vision stat adjustments yet)
         for (int x = -1; x <= 1; ++x)
         {
             for (int y = -1; y <= 1; ++y)
             {
-                int newX = Mathf.Clamp(cell.x + x, 0, m_Map.GetLength(0) - 1);
-                int newY = Mathf.Clamp(cell.y + y, 0, m_Map.GetLength(1) - 1);
+                int newX = Mathf.Clamp(cell.x + x, 0, m_TerrainTileMap.GetLength(0) - 1);
+                int newY = Mathf.Clamp(cell.y + y, 0, m_TerrainTileMap.GetLength(1) - 1);
                 Vector3Int newLocation = new Vector3Int(newX, newY, 0);
 
-                m_Map[newX, newY].SetIsSeen(true);
+                m_TerrainTileMap[newX, newY].SetIsSeen(true);
 
                 m_FogMap.SetTile(newLocation, null);
             }
@@ -185,24 +247,37 @@ public class CGameManager : MonoBehaviour
 
     private Vector2Int ClampCell(Vector2Int cell)
     {
-        cell.x = Mathf.Clamp(cell.x, 0, m_Map.GetLength(0) - 1);
-        cell.y = Mathf.Clamp(cell.y, 0, m_Map.GetLength(1) - 1);
+        cell.x = Mathf.Clamp(cell.x, 0, m_TerrainTileMap.GetLength(0) - 1);
+        cell.y = Mathf.Clamp(cell.y, 0, m_TerrainTileMap.GetLength(1) - 1);
 
         return cell;
     }
 
+    private bool IsCellValid(Vector3Int cell)
+    {
+        if (cell.x >= 0 && cell.x < m_TerrainTileMap.GetLength(0))
+        {
+            if (cell.y >= 0 && cell.y < m_TerrainTileMap.GetLength(1))
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     private Vector2Int FindStartingLocation()
     {
-        if (m_Map == null || m_Map.Length == 0)
+        if (m_TerrainTileMap == null || m_TerrainTileMap.Length == 0)
         {
             Debug.Log("FindStartingLocation - map is null or empty!");
             return new Vector2Int();
         }
 
-        int direction = UnityEngine.Random.Range(0, 2);        
+        int direction = Random.Range(0, 2);        
 
         bool bNearSide = true;
-        int side = UnityEngine.Random.Range(0, 2);
+        int side = Random.Range(0, 2);
 
         if (side == 1)
         {
@@ -211,13 +286,13 @@ public class CGameManager : MonoBehaviour
 
         if (direction == 0)
         {
-            int y = UnityEngine.Random.Range(0, m_MapGenerator.MapSize.y);
+            int y = Random.Range(0, m_MapGenerator.MapSize.y);
 
             if (bNearSide)
             {
                 for (int i = 0; i < m_MapGenerator.MapSize.x; ++i)
                 {
-                    if (m_Map[i, y].GetBiomeType() == EBiomeType.Beach)
+                    if (m_TerrainTileMap[i, y].GetBiomeType() == EBiomeType.Beach)
                     {
                         return new Vector2Int(i, y);
                     }
@@ -227,7 +302,7 @@ public class CGameManager : MonoBehaviour
             {
                 for (int i = m_MapGenerator.MapSize.y - 1; i >= 0; --i)
                 {
-                    if (m_Map[i, y].GetBiomeType() == EBiomeType.Beach)
+                    if (m_TerrainTileMap[i, y].GetBiomeType() == EBiomeType.Beach)
                     {
                         return new Vector2Int(i, y);
                     }
@@ -236,13 +311,13 @@ public class CGameManager : MonoBehaviour
         }
         else
         {
-            int x = UnityEngine.Random.Range(0, m_MapGenerator.MapSize.x);
+            int x = Random.Range(0, m_MapGenerator.MapSize.x);
 
             if (bNearSide)
             {
                 for (int i = 0; i < m_MapGenerator.MapSize.x; ++i)
                 {
-                    if (m_Map[x, i].GetBiomeType() == EBiomeType.Beach)
+                    if (m_TerrainTileMap[x, i].GetBiomeType() == EBiomeType.Beach)
                     {
                         return new Vector2Int(x, i);
                     }
@@ -252,7 +327,7 @@ public class CGameManager : MonoBehaviour
             {
                 for (int i = m_MapGenerator.MapSize.x - 1; i >= 0; --i)
                 {
-                    if (m_Map[x, i].GetBiomeType() == EBiomeType.Beach)
+                    if (m_TerrainTileMap[x, i].GetBiomeType() == EBiomeType.Beach)
                     {
                         return new Vector2Int(x, i);
                     }
