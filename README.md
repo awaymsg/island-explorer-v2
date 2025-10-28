@@ -1,3 +1,10 @@
+update: 10/28/25 changed movement to select->right click based, and also added camera follow
+-
+<img width="1197" height="626" alt="image" src="https://github.com/user-attachments/assets/ca8cf9d6-4401-45ce-b7f1-130864fdf379" />
+next: clean up movement, consider non-instant movement design (movement over time)
+later: expand UI, events system
+
+
 update: 10/27/25 added concept of POIs (temp sprites), layered terrain, with better tileset made by jack & kayleigh, also now true isometric
 -
 <img width="1167" height="617" alt="image" src="https://github.com/user-attachments/assets/09793615-1a02-49f7-a10f-42da77a790ef" />
