@@ -38,7 +38,8 @@ public enum EPartyMemberGender
 {
     Invalid = 0,
     Male,
-    Female
+    Female,
+    Neutral
 }
 
 [Serializable]
@@ -86,7 +87,10 @@ public enum EPartyMemberStatType
     Gayness,
     Happiness,
     Medicine,
-    Vision
+    Vision,
+    Stamina,
+    Magic,
+    Fortitude
 }
 
 [Serializable]

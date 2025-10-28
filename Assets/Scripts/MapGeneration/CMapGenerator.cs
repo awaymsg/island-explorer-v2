@@ -209,7 +209,7 @@ public class CMapGenerator : MonoBehaviour
                     }
                     else
                     {
-                        Debug.Log(string.Format("Missing tile from result: {1}", result.Result));
+                        Debug.Log(string.Format("Missing tile from result: {0}", result.Result));
                         tile = Array.Find<SDefaultTile>(m_DefaultTiles, p => p.BiomeType == currentBiome).Tile;
                     }
                 }

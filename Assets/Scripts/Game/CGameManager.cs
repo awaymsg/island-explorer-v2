@@ -60,6 +60,8 @@ public class CGameManager : MonoBehaviour
             Random.InitState(m_RandomSeed);
         }
 
+        Debug.Log(string.Format("RandomSeed: {0}", Random.seed));
+
         m_WorldGrid = FindFirstObjectByType<Grid>();
         m_MapGenerator = FindFirstObjectByType<CMapGenerator>();
         m_PartyManager = FindFirstObjectByType<CPartyManager>();

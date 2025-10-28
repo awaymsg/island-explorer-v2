@@ -148,14 +148,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 87dbdd667fdf99f448aeb1b19d697862, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::GameManager
-  m_bUseSeed: 0
-  m_RandomSeed: 43
+  m_bUseSeed: 1
+  m_RandomSeed: 47
   m_PartyPlayerCharacterPrefab: {fileID: 234909392250611176, guid: 12f91a7f2fa6cb6488c98fc9c73f4519, type: 3}
   m_LocationSelectHighlightTile: {fileID: 11400000, guid: 2917f8a7507d5714d8fc823a59443571, type: 2}
   m_PlayerSelectHighlightTile: {fileID: 11400000, guid: 9c39fd6e1e0a28c488131ef85c41cae6, type: 2}
-  m_bShowFog: 1
+  m_bShowFog: 0
   m_bIgnoreTileRules: 0
-  m_bPathFindDiagonals: 0
+  m_bPathFindDiagonals: 1
 --- !u!4 &86794079
 Transform:
   m_ObjectHideFlags: 0
@@ -1059,6 +1059,38 @@ MonoBehaviour:
     Name: water_southwest-northwest-northeast_land
   - Tile: {fileID: 11400000, guid: 90e8ebde45045634490bc654c472a94b, type: 2}
     Name: water_southeast-southwest-northwest_land
+  - Tile: {fileID: 11400000, guid: ea400772c7363864397e401bfc17d6dc, type: 2}
+    Name: water_west-northeast_land
+  - Tile: {fileID: 11400000, guid: 778afdd01cf585d47ba9d3b90fcc1f85, type: 2}
+    Name: water_north-southeast_land
+  - Tile: {fileID: 11400000, guid: 046e445ad2398b44497deed176ce40a2, type: 2}
+    Name: water_east-southwest_land
+  - Tile: {fileID: 11400000, guid: d20128419b6c215488ab4680cb2e7756, type: 2}
+    Name: water_south-northwest_land
+  - Tile: {fileID: 11400000, guid: 49b7df010a511f74fb76ebe158338280, type: 2}
+    Name: water_west-southeast_land
+  - Tile: {fileID: 11400000, guid: 634a399b08a3011419aec94a5351125b, type: 2}
+    Name: water_north-southwest_land
+  - Tile: {fileID: 11400000, guid: 2cd053e1895db1c4d84476fff1af1d17, type: 2}
+    Name: water_east-northwest_land
+  - Tile: {fileID: 11400000, guid: 1f2d3058048b66f4596af68c589ba71e, type: 2}
+    Name: water_south-northeast_land
+  - Tile: {fileID: 11400000, guid: 095978ed1dbd67049b629f6eee5828e1, type: 2}
+    Name: water_west-northeast-southeast_land
+  - Tile: {fileID: 11400000, guid: 19fc54d9f635c4148b51e480f5a0acf0, type: 2}
+    Name: water_north-southeast-southwest_land
+  - Tile: {fileID: 11400000, guid: 01cbe43f4a9d3574fbcd06ef0e8e5b7c, type: 2}
+    Name: water_east-northwest-southwest_land
+  - Tile: {fileID: 11400000, guid: 7430fcc6a1d7fd94dbf696e8321347ce, type: 2}
+    Name: water_south-northwest-northeast_land
+  - Tile: {fileID: 11400000, guid: 2ff32f275c8424a4990405cfa80b910e, type: 2}
+    Name: water_west-north-southeast_land
+  - Tile: {fileID: 11400000, guid: 3d7dd1712a7e43f47b83c01dafa3b625, type: 2}
+    Name: water_north-east-southwest_land
+  - Tile: {fileID: 11400000, guid: 7af1ca40fe944134997b686344667479, type: 2}
+    Name: water_east-south-northwest_land
+  - Tile: {fileID: 11400000, guid: 0056af8d65ec93c408cc8688dcd7776e, type: 2}
+    Name: water_south-west-northeast_land
   m_EnumMappings:
   - BiomeType: 1
     Name: deepwater
