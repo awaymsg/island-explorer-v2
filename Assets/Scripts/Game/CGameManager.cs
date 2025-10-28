@@ -145,11 +145,12 @@ public class CGameManager : MonoBehaviour
         {
             if (m_EffectsMap.HasTile(cellPosition))
             {
-                m_EffectsMap.SetTile(cellPosition, null);
+                m_EffectsMap.ClearAllTiles();
                 m_bPlayerSelected = false;
             }
             else
             {
+                m_EffectsMap.ClearAllTiles();
                 m_EffectsMap.SetTile(cellPosition, m_PlayerSelectHighlightTile);
                 m_bPlayerSelected = true;
             }
@@ -189,12 +190,30 @@ public class CGameManager : MonoBehaviour
         m_CurrentPath = m_PathFinder.GetPath(m_CurrentPlayerPosition, cellPosition);
         
         float totalMovement = 0f;
+        Vector3Int previous = m_CurrentPlayerPosition;
 
         // Keep the queue intact, we're just previewing 
         foreach (Vector3Int node in m_CurrentPath.AsEnumerable())
         {
             m_EffectsMap.SetTile(node, m_PlayerSelectHighlightTile);
-            totalMovement += m_TerrainTileMap[node.x, node.y].GetTraversalRate();
+
+            // Ignore the self tile
+            if (node == m_CurrentPlayerPosition)
+            {
+                continue;
+            }
+
+            // If this is a diagonal, multiply movement cost by 1.4
+            if (Mathf.Abs(node.x - previous.x) == 1 && Mathf.Abs(node.y - previous.y) == 1)
+            {
+                totalMovement += m_TerrainTileMap[node.x, node.y].GetTraversalRate() * 1.4f;
+            }
+            else
+            {
+                totalMovement += m_TerrainTileMap[node.x, node.y].GetTraversalRate();
+            }
+
+            previous = node;
         }
 
         Debug.Log(string.Format("Total Movement: {0}", totalMovement));

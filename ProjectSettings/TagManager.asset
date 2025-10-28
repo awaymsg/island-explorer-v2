@@ -47,9 +47,6 @@ TagManager:
   - name: TerrainFlair
     uniqueID: 798986089
     locked: 0
-  - name: Effects
-    uniqueID: 3332826997
-    locked: 0
   - name: POI
     uniqueID: 3554016455
     locked: 0
@@ -58,6 +55,9 @@ TagManager:
     locked: 0
   - name: Fog
     uniqueID: 1484975041
+    locked: 0
+  - name: Effects
+    uniqueID: 3332826997
     locked: 0
   m_RenderingLayers:
   - Default

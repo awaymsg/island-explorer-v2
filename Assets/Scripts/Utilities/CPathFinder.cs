@@ -7,26 +7,26 @@ public class CPathFinder
     private STerrainTile[,] m_TileGrid;
     private EBiomeType tiletype;
     bool m_Diagonals;
-    int maxX, maxY;
+    int m_MaxX, m_MaxY;
 
-    // Constructor takes in tilegrid and diagonal
+    // Constructor takes in tilegrid and allow diagonal
     public CPathFinder(bool diag, STerrainTile[,] tileGrid)
     {
         m_TileGrid = tileGrid;
         m_Diagonals = diag;
 
-        maxX = m_TileGrid.GetLength(0);
-        maxY = m_TileGrid.GetLength(1);
+        m_MaxX = m_TileGrid.GetLength(0);
+        m_MaxY = m_TileGrid.GetLength(1);
     }
 
     // Assigns creates tileNodes 2D array
     private TileNode[,] AssignNodes()
     {
-        TileNode[,] tileNodes = new TileNode[maxX, maxY];
+        TileNode[,] tileNodes = new TileNode[m_MaxX, m_MaxY];
 
-        for (int i = 0; i < maxX; i++)
+        for (int i = 0; i < m_MaxX; i++)
         {
-            for (int j = 0; j < maxY; j++)
+            for (int j = 0; j < m_MaxY; j++)
             {
                 // for now all tiles are walkable
                 tileNodes[i, j] = new TileNode(/*bIsWalkable*/ m_TileGrid[i, j].GetBiomeType() != EBiomeType.Invalid, i, j);
@@ -73,19 +73,19 @@ public class CPathFinder
 
             foreach (TileNode neighbor in GetNeighbors(tileNodes, current))
             {
-                if (!neighbor.walkable || closed.Contains(neighbor))
+                if (!neighbor.Walkable || closed.Contains(neighbor))
                 {
                     continue;
                 }
 
-                float mod = m_TileGrid[neighbor.x, neighbor.y].GetTraversalRate();
+                float mod = m_TileGrid[neighbor.X, neighbor.Y].GetTraversalRate();
 
                 float newMovementCost = current.gCost + GetDistance(current, neighbor) * mod;
                 if (newMovementCost < neighbor.gCost || !open.Contains(neighbor))
                 {
                     neighbor.gCost = newMovementCost;
                     neighbor.hCost = GetDistance(neighbor, target);
-                    neighbor.parent = current;
+                    neighbor.Parent = current;
 
                     if (!open.Contains(neighbor))
                         open.Add(neighbor);
@@ -105,17 +105,17 @@ public class CPathFinder
         while (current != start)
         {
             nodePath.Add(current);
-            current = current.parent;
+            current = current.Parent;
         }
 
         nodePath.Reverse();
 
         Queue<Vector3Int> path = new Queue<Vector3Int>();
-        path.Enqueue(new Vector3Int(start.x, start.y));
+        path.Enqueue(new Vector3Int(start.X, start.Y));
 
         foreach (TileNode node in nodePath)
         {
-            path.Enqueue(new Vector3Int(node.x, node.y));
+            path.Enqueue(new Vector3Int(node.X, node.Y));
         }
 
         return path;
@@ -124,8 +124,8 @@ public class CPathFinder
     // Calculates the "distance" between two tiles
     private int GetDistance(TileNode a, TileNode b)
     {
-        int distX = Mathf.Abs(a.x - b.x);
-        int distY = Mathf.Abs(a.y - b.y);
+        int distX = Mathf.Abs(a.X - b.X);
+        int distY = Mathf.Abs(a.Y - b.Y);
 
         if (m_Diagonals)
         {
@@ -170,9 +170,9 @@ public class CPathFinder
                     }
                 }
 
-                int tempX = node.x + i;
-                int tempZ = node.y + j;
-                if (tempX >= 0 && tempX < maxX && tempZ >= 0 && tempZ < maxY)
+                int tempX = node.X + i;
+                int tempZ = node.Y + j;
+                if (tempX >= 0 && tempX < m_MaxX && tempZ >= 0 && tempZ < m_MaxY)
                 {
                     neighbors.Add(nodes[tempX, tempZ]);
                 }
@@ -190,20 +190,20 @@ public class CPathFinder
     // Tile node for A* pathing
     private class TileNode
     {
-        public bool walkable;
+        public bool Walkable;
         public float gCost;
         public float hCost;
         public float fCost { get { return gCost + hCost; } }
-        public TileNode parent;
-        public int x;
-        public int y;
+        public TileNode Parent;
+        public int X;
+        public int Y;
 
         public TileNode(bool walk, int posX, int posY)
         {
-            walkable = walk;
-            x = posX;
-            y = posY;
-            parent = null;
+            Walkable = walk;
+            X = posX;
+            Y = posY;
+            Parent = null;
         }
     }
 }
