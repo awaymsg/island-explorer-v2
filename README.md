@@ -1,4 +1,4 @@
-update: 10/28/25 changed movement to select->right click based, and also added camera follow
+update: 10/28/25 changed movement to select->right click based, and also added camera follow, updated sprites and some rules
 -
 <img width="1197" height="626" alt="image" src="https://github.com/user-attachments/assets/ca8cf9d6-4401-45ce-b7f1-130864fdf379" />
 next: clean up movement, consider non-instant movement design (movement over time)
