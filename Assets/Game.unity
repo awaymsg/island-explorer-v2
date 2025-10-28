@@ -1029,6 +1029,36 @@ MonoBehaviour:
     Name: water_south-west-north_land
   - Tile: {fileID: 11400000, guid: 2a1a9b56c3be8d744b4d73c21925d7aa, type: 2}
     Name: water_all-sides_land
+  - Tile: {fileID: 11400000, guid: 0f9b7ce486351af4d8649d5fb8fd0898, type: 2}
+    Name: water_northwest_land
+  - Tile: {fileID: 11400000, guid: 6d9cab27d081871468f1f5a04f8a1c67, type: 2}
+    Name: water_northeast_land
+  - Tile: {fileID: 11400000, guid: 4c208301b7deeca48a84156f171aae68, type: 2}
+    Name: water_southeast_land
+  - Tile: {fileID: 11400000, guid: 73139f2f06f523c4db56f163436c7fed, type: 2}
+    Name: water_southwest_land
+  - Tile: {fileID: 11400000, guid: 73b2f4f2af3656b4f9d2e1d770051428, type: 2}
+    Name: water_northwest-northeast_land
+  - Tile: {fileID: 11400000, guid: a6ceaf1d52d30e842add106a66b913e4, type: 2}
+    Name: water_northeast-southeast_land
+  - Tile: {fileID: 11400000, guid: 7393c9506c313214f8edef0ca70c3444, type: 2}
+    Name: water_southeast-southwest_land
+  - Tile: {fileID: 11400000, guid: 9664c2150f2d9e04eab8030e05768820, type: 2}
+    Name: water_southwest-northwest_land
+  - Tile: {fileID: 11400000, guid: 3fa72124e33cdb848b1f4a3b7b35ffec, type: 2}
+    Name: water_northwest-southeast_land
+  - Tile: {fileID: 11400000, guid: 074f9289afb396f43a8972362262c990, type: 2}
+    Name: water_northeast-southwest_land
+  - Tile: {fileID: 11400000, guid: d2ef122349d4be941ac29864f4da144a, type: 2}
+    Name: water_northwest-northeast-southeast_land
+  - Tile: {fileID: 11400000, guid: 79a7b74400e541140bb598edfca4e2d9, type: 2}
+    Name: water_northeast-southeast-southwest_land
+  - Tile: {fileID: 11400000, guid: 90e8ebde45045634490bc654c472a94b, type: 2}
+    Name: water_southeast-southwest-northwest_land
+  - Tile: {fileID: 11400000, guid: 087842bd740c78e4e83ef69d02f9d4cb, type: 2}
+    Name: water_southwest-northwest-northeast_land
+  - Tile: {fileID: 11400000, guid: 90e8ebde45045634490bc654c472a94b, type: 2}
+    Name: water_southeast-southwest-northwest_land
   m_EnumMappings:
   - BiomeType: 1
     Name: deepwater
