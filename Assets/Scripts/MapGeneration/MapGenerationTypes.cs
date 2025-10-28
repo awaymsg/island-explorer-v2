@@ -1,3 +1,4 @@
+using JetBrains.Annotations;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
@@ -16,7 +17,7 @@ public struct STerrainTile
         Elevation = elevation;
         bSeen = _bExplored;
         BiomeType = biomeType;
-        TraversalRate = traversalRate;
+        TraversalRate = traversalRate;  
         bPlayerOccupied = _bPlayerOccupied;
     }
 
@@ -77,6 +78,13 @@ public struct SElevationLevels
     public float BeachLevel;
     public float WaterLevel;
     public float DeepWaterLevel;
+}
+
+[Serializable]
+public struct SBiomeMovement
+{
+    public EBiomeType BiomeType;
+    public float MovementTime;
 }
 
 [Serializable]

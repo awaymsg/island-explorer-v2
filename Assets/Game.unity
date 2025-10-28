@@ -153,8 +153,9 @@ MonoBehaviour:
   m_PartyPlayerCharacterPrefab: {fileID: 234909392250611176, guid: 12f91a7f2fa6cb6488c98fc9c73f4519, type: 3}
   m_LocationSelectHighlightTile: {fileID: 11400000, guid: 2917f8a7507d5714d8fc823a59443571, type: 2}
   m_PlayerSelectHighlightTile: {fileID: 11400000, guid: 9c39fd6e1e0a28c488131ef85c41cae6, type: 2}
-  m_bShowFog: 1
+  m_bShowFog: 0
   m_bIgnoreTileRules: 0
+  m_bPathFindDiagonals: 0
 --- !u!4 &86794079
 Transform:
   m_ObjectHideFlags: 0
@@ -719,18 +720,6 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
-      - m_Target: {fileID: 86794078}
-        m_TargetAssemblyTypeName: GameManager, Assembly-CSharp
-        m_MethodName: OnMove
-        m_Mode: 0
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
     m_ActionId: fe6f1da9-3f32-4406-9a22-dfd2e3a3be58
     m_ActionName: 'Camera/Move[/Keyboard/w,/Keyboard/s,/Keyboard/a,/Keyboard/d]'
   - m_PersistentCalls:
@@ -781,6 +770,38 @@ MonoBehaviour:
         m_CallState: 2
     m_ActionId: 65407d35-85f2-4558-bccc-72a0ad75f081
     m_ActionName: 'General/Select[/Mouse/leftButton]'
+  - m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 86794078}
+        m_TargetAssemblyTypeName: CGameManager, Assembly-CSharp
+        m_MethodName: OnMouseOverGrid
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+    m_ActionId: 2d7d0c55-c563-4a13-853f-e004a619e449
+    m_ActionName: 'General/Mouseover[/Mouse/position]'
+  - m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 86794078}
+        m_TargetAssemblyTypeName: CGameManager, Assembly-CSharp
+        m_MethodName: OnRightClick
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+    m_ActionId: 8a665028-2b24-48e9-be75-b3351eb8640b
+    m_ActionName: 'General/Move/Cancel[/Mouse/rightButton]'
   m_NeverAutoSwitchControlSchemes: 0
   m_DefaultControlScheme: 
   m_DefaultActionMap: General
@@ -1067,6 +1088,19 @@ MonoBehaviour:
     BeachLevel: 30
     WaterLevel: 20
     DeepWaterLevel: 10
+  m_MovementRates:
+  - BiomeType: 1
+    MovementTime: 10
+  - BiomeType: 2
+    MovementTime: 5
+  - BiomeType: 3
+    MovementTime: 1
+  - BiomeType: 4
+    MovementTime: 2
+  - BiomeType: 5
+    MovementTime: 4
+  - BiomeType: 6
+    MovementTime: 7
   m_POIMappings:
   - BiomeType: 3
     POISettings:

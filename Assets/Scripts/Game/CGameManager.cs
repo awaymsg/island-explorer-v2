@@ -1,5 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.Tilemaps;
@@ -23,6 +25,8 @@ public class CGameManager : MonoBehaviour
     private bool m_bShowFog = true;
     [SerializeField]
     private bool m_bIgnoreTileRules = false;
+    [SerializeField]
+    private bool m_bPathFindDiagonals = false;
 
     private CMapGenerator m_MapGenerator;
     private CPartyManager m_PartyManager;
@@ -38,7 +42,11 @@ public class CGameManager : MonoBehaviour
     private GameObject m_PartyPlayerGameObject;
     private CPartyPlayerCharacter m_PartyPlayerCharacter;
 
-    private bool m_MoveConsumed = false;
+    private bool m_bPlayerSelected = false;
+    private Vector3Int m_CurrentPlayerPosition;
+    private Queue<Vector3Int> m_CurrentPath;
+
+    private CPathFinder m_PathFinder;
 
     public CPartyPlayerCharacter PartyPlayerCharacter
     {
@@ -66,6 +74,8 @@ public class CGameManager : MonoBehaviour
         m_FogMap.GetComponent<TilemapRenderer>().enabled = m_bShowFog;
 
         m_EffectsMap = m_MapGenerator.EffectsMap;
+
+        m_PathFinder = new CPathFinder(m_bPathFindDiagonals, m_TerrainTileMap);
 
         CreatePlayerCharacter();
     }
@@ -114,47 +124,13 @@ public class CGameManager : MonoBehaviour
     }
 
     // Input
-    public void OnMove(InputAction.CallbackContext context)
-    {
-        if (!CCameraManager.IsCameraMapMovementEnabled)
-        {
-            Vector2Int movement;
-
-            Vector2 moveInput = context.ReadValue<Vector2>();
-
-            if (!m_MoveConsumed && moveInput != Vector2.zero)
-            {
-                if (moveInput.y != 0)
-                {
-                    movement = new Vector2Int((int)Mathf.Sign(moveInput.y), 0);
-                }
-                else
-                {
-                    movement = new Vector2Int(0, -(int)Mathf.Sign(moveInput.x));
-                }
-
-                MovePlayerToCell(m_PartyPlayerCharacter.CurrentLocation + movement);
-
-                m_MoveConsumed = true;
-            }
-
-            if (context.canceled)
-            {
-                m_MoveConsumed = false;
-            }
-        }
-    }
-
     public void OnClick(InputAction.CallbackContext context)
     {
-        if (context.performed)
+        if (!context.performed)
         {
-            HandleTileClick();
+            return;
         }
-    }
 
-    private void HandleTileClick()
-    {
         Vector2 mousePosition = Mouse.current.position.ReadValue();
         Vector3 worldPosition = m_Camera.ScreenToWorldPoint(mousePosition);
         Vector3Int cellPosition = m_WorldGrid.WorldToCell(worldPosition);
@@ -170,14 +146,21 @@ public class CGameManager : MonoBehaviour
             if (m_EffectsMap.HasTile(cellPosition))
             {
                 m_EffectsMap.SetTile(cellPosition, null);
+                m_bPlayerSelected = false;
             }
             else
             {
                 m_EffectsMap.SetTile(cellPosition, m_PlayerSelectHighlightTile);
+                m_bPlayerSelected = true;
             }
         }
         else
         {
+            if (m_bPlayerSelected)
+            {
+                return;
+            }
+
             if (m_EffectsMap.HasTile(cellPosition))
             {
                 m_EffectsMap.SetTile(cellPosition, null);
@@ -186,6 +169,58 @@ public class CGameManager : MonoBehaviour
             {
                 m_EffectsMap.SetTile(cellPosition, m_LocationSelectHighlightTile);
             }
+        }
+    }
+
+    public void OnMouseOverGrid(InputAction.CallbackContext context)
+    {
+        if (!m_bPlayerSelected || !context.performed)
+        {
+            return;
+        }
+
+        m_EffectsMap.ClearAllTiles();
+
+        Vector2 mousePosition = Mouse.current.position.ReadValue();
+        Vector3 worldPosition = m_Camera.ScreenToWorldPoint(mousePosition);
+        Vector3Int cellPosition = m_WorldGrid.WorldToCell(worldPosition);
+
+        // Store the current path in case we wish to use it
+        m_CurrentPath = m_PathFinder.GetPath(m_CurrentPlayerPosition, cellPosition);
+        
+        float totalMovement = 0f;
+
+        // Keep the queue intact, we're just previewing 
+        foreach (Vector3Int node in m_CurrentPath.AsEnumerable())
+        {
+            m_EffectsMap.SetTile(node, m_PlayerSelectHighlightTile);
+            totalMovement += m_TerrainTileMap[node.x, node.y].GetTraversalRate();
+        }
+
+        Debug.Log(string.Format("Total Movement: {0}", totalMovement));
+    }
+
+    public void OnRightClick(InputAction.CallbackContext context)
+    {
+        if (!context.performed)
+        {
+            return;
+        }
+
+        if (!m_bPlayerSelected)
+        {
+            m_EffectsMap.ClearAllTiles();
+        }
+        else if (m_CurrentPath.Count > 0)
+        {
+            while (m_CurrentPath.Count > 0)
+            {
+                Vector3Int node = m_CurrentPath.Dequeue();  
+                MovePlayerToCell(new Vector2Int(node.x, node.y));
+            }
+
+            m_EffectsMap.ClearAllTiles();
+            m_bPlayerSelected = false;
         }
     }
 
@@ -219,6 +254,7 @@ public class CGameManager : MonoBehaviour
         m_PartyPlayerCharacter.CurrentLocation = cell;
 
         m_TerrainTileMap[cell.x, cell.y].SetPlayerOccupied(true);
+        m_CurrentPlayerPosition = cellVector3;
 
         // Update seen tiles (TEMP, no vision stat adjustments yet)
         for (int x = -1; x <= 1; ++x)

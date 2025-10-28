@@ -64,6 +64,9 @@ public class CMapGenerator : MonoBehaviour
     [SerializeField, Tooltip("Maximum threshold for each biome type")]
     private SElevationLevels m_ElevationLevels;
 
+    [SerializeField, Tooltip("Movement rate by biome")]
+    private SBiomeMovement[] m_MovementRates;
+
     [SerializeField]
     private SPOIMapping[] m_POIMappings;
 
@@ -331,7 +334,8 @@ public class CMapGenerator : MonoBehaviour
 
                 EBiomeType biomeType = GetBiomeType(weightedNoise);
 
-                m_TerrainTiles[x, y] = new STerrainTile(weightedNoise, /*bExplored*/ false, GetBiomeType(weightedNoise), 1f);
+                SBiomeMovement biomeMovement = Array.Find(m_MovementRates, p => p.BiomeType == biomeType);
+                m_TerrainTiles[x, y] = new STerrainTile(weightedNoise, /*bExplored*/ false, biomeType, (biomeMovement.BiomeType == EBiomeType.Invalid) ? 1f : biomeMovement.MovementTime);
             }
         }
 
