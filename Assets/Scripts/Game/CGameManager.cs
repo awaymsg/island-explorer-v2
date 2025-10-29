@@ -80,7 +80,7 @@ public class CGameManager : MonoBehaviour
         m_FogMap.GetComponent<TilemapRenderer>().enabled = m_bShowFog;
         m_EffectsMap = m_MapGenerator.EffectsMap;
 
-        m_PathFinder = new CPathFinder(m_bPathFindDiagonals, m_TerrainTileMap);
+        m_PathFinder = new CPathFinder(m_bPathFindDiagonals, m_TerrainTileMap, m_bShowFog);
 
         m_UIManager.InitializeWorldInfoPanel();
 
@@ -214,16 +214,21 @@ public class CGameManager : MonoBehaviour
                     continue;
                 }
 
+                bool bIsFogged = m_FogMap.HasTile(node) && m_bShowFog;
+
+                float traversalRate = bIsFogged ? 1f : m_TerrainTileMap[node.x, node.y].GetTraversalRate();
+                float dangerAmount = bIsFogged ? 0f : m_TerrainTileMap[node.x, node.y].GetDangerAmount();
+
                 // If this is a diagonal, multiply movement cost by 1.4
                 if (Mathf.Abs(node.x - previous.x) == 1 && Mathf.Abs(node.y - previous.y) == 1)
                 {
-                    totalMovement += m_TerrainTileMap[node.x, node.y].GetTraversalRate() * 1.4f;
-                    totalDanger += m_TerrainTileMap[node.x, node.y].GetDangerAmount() * 1.4f;
+                    totalMovement += traversalRate * 1.4f;
+                    totalDanger += dangerAmount * 1.4f;
                 }
                 else
                 {
-                    totalMovement += m_TerrainTileMap[node.x, node.y].GetTraversalRate();
-                    totalDanger += m_TerrainTileMap[node.x, node.y].GetDangerAmount();
+                    totalMovement += traversalRate;
+                    totalDanger += dangerAmount;
                 }
 
                 previous = node;
@@ -233,6 +238,15 @@ public class CGameManager : MonoBehaviour
         }
         else
         {
+            bool bIsFogged = m_FogMap.HasTile(cellPosition) && m_bShowFog;
+
+            if (bIsFogged)
+            {
+                m_UIManager.UpdateWorldInfo("Biome: ???\nTraversal Time: ???\nDanger Level: ???");
+
+                return;
+            }
+
             STerrainTile currentTile = m_TerrainTileMap[cellPosition.x, cellPosition.y];
 
             m_UIManager.UpdateWorldInfo(string.Format("Biome: {0}\nTraversal Time: {1}\nDanger Level: {2}", currentTile.GetBiomeType().ToString(), currentTile.GetTraversalRate(), currentTile.GetDangerAmount()));
@@ -421,10 +435,20 @@ public class CGameManager : MonoBehaviour
             if (m_bShowFog)
             {
                 m_FogMap.GetComponent<TilemapRenderer>().enabled = true;
+
+                if (m_PathFinder != null)
+                {
+                    m_PathFinder.SetHasFog(true);
+                }
             }
             else
             {
                 m_FogMap.GetComponent<TilemapRenderer>().enabled = false;
+
+                if (m_PathFinder != null)
+                {
+                    m_PathFinder.SetHasFog(false);
+                }
             }
         }
     }

@@ -153,7 +153,7 @@ MonoBehaviour:
   m_PartyPlayerCharacterPrefab: {fileID: 234909392250611176, guid: 12f91a7f2fa6cb6488c98fc9c73f4519, type: 3}
   m_LocationSelectHighlightTile: {fileID: 11400000, guid: 2917f8a7507d5714d8fc823a59443571, type: 2}
   m_PlayerSelectHighlightTile: {fileID: 11400000, guid: 9c39fd6e1e0a28c488131ef85c41cae6, type: 2}
-  m_bShowFog: 0
+  m_bShowFog: 1
   m_bIgnoreTileRules: 0
   m_bPathFindDiagonals: 1
 --- !u!4 &86794079

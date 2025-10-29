@@ -5,18 +5,24 @@ using UnityEngine;
 public class CPathFinder
 {
     private STerrainTile[,] m_TileGrid;
-    private EBiomeType tiletype;
     bool m_Diagonals;
     int m_MaxX, m_MaxY;
+    bool m_bHasFog = true;
 
     // Constructor takes in tilegrid and allow diagonal
-    public CPathFinder(bool diag, STerrainTile[,] tileGrid)
+    public CPathFinder(bool diag, STerrainTile[,] tileGrid, bool bHasFog)
     {
         m_TileGrid = tileGrid;
         m_Diagonals = diag;
 
         m_MaxX = m_TileGrid.GetLength(0);
         m_MaxY = m_TileGrid.GetLength(1);
+        m_bHasFog = bHasFog;
+    }
+
+    public void SetHasFog(bool bHasFog)
+    {
+        m_bHasFog = bHasFog;
     }
 
     // Assigns creates tileNodes 2D array
@@ -78,7 +84,9 @@ public class CPathFinder
                     continue;
                 }
 
-                float mod = m_TileGrid[neighbor.X, neighbor.Y].GetTraversalRate();
+                // Only use movement mod if the tile has already been seen, if we have fog on
+                STerrainTile terrainTile = m_TileGrid[neighbor.X, neighbor.Y];
+                float mod = (!m_bHasFog || terrainTile.IsSeen()) ? terrainTile.GetTraversalRate() : 1f;
 
                 float newMovementCost = current.gCost + GetDistance(current, neighbor) * mod;
                 if (newMovementCost < neighbor.gCost || !open.Contains(neighbor))
