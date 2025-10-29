@@ -45,11 +45,13 @@ public class CGameManager : MonoBehaviour
     private GameObject m_PartyPlayerGameObject;
     private CPartyPlayerCharacter m_PartyPlayerCharacter;
 
+    private CPathFinder m_PathFinder;
+
+    // Gameplay important vars
+    private float m_DayCount = 0f;
     private bool m_bPlayerSelected = false;
     private Vector3Int m_CurrentPlayerPosition;
     private Queue<Vector3Int> m_CurrentPath;
-
-    private CPathFinder m_PathFinder;
 
     public CPartyPlayerCharacter PartyPlayerCharacter
     {
@@ -243,7 +245,7 @@ public class CGameManager : MonoBehaviour
                 previous = node;
             }
 
-            m_UIManager.UpdateWorldInfo(string.Format("Estimated Traversal Time: {0}\nEstimated Danger Level: {1}", totalMovement, totalDanger));
+            m_UIManager.UpdateWorldInfo(string.Format("Estimated Traversal Time: {0}d\nEstimated Danger Level: {1}", totalMovement, totalDanger));
         }
         else
         {
@@ -258,7 +260,7 @@ public class CGameManager : MonoBehaviour
 
             STerrainTile currentTile = m_TerrainTileMap[cellPosition.x, cellPosition.y];
 
-            m_UIManager.UpdateWorldInfo(string.Format("Biome: {0}\nTraversal Time: {1}\nDanger Level: {2}", currentTile.GetBiomeType().ToString(), currentTile.GetTraversalRate(), currentTile.GetDangerAmount()));
+            m_UIManager.UpdateWorldInfo(string.Format("Biome: {0}\nTraversal Time: {1}d\nDanger Level: {2}", currentTile.GetBiomeType().ToString(), currentTile.GetTraversalRate(), currentTile.GetDangerAmount()));
         }
     }
 
