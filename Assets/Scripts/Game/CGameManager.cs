@@ -147,6 +147,15 @@ public class CGameManager : MonoBehaviour
             return;
         }
 
+        // Deselect if we have player selected
+        if (m_bPlayerSelected)
+        {
+            m_EffectsMap.ClearAllTiles();
+            m_bPlayerSelected = false;
+
+            return;
+        }
+
         STerrainTile selectedTile = m_TerrainTileMap[cellPosition.x, cellPosition.y];
         if (selectedTile.IsPlayerOccupied())
         {
