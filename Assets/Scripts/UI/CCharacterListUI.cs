@@ -57,7 +57,7 @@ public class CCharacterListUI : MonoBehaviour
         m_CharacterPanel.Clear();
     }
 
-    public void OnButtonClicked(CPartyMemberRuntime partyMember)
+    private void OnButtonClicked(CPartyMemberRuntime partyMember)
     {
         Debug.Log(partyMember.CharacterName);
         Debug.Log(partyMember.TotalCost);

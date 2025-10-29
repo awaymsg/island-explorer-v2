@@ -8,11 +8,13 @@ using UnityEngine.Tilemaps;
 
 public class CGameManager : MonoBehaviour
 {
+    [Header("Generation")]
     [SerializeField]
     private bool m_bUseSeed = false;
     [SerializeField]
     private int m_RandomSeed = 0;
 
+    [Header("Character & Refs")]
     [SerializeField, Tooltip("Player party character prefab")]
     private GameObject m_PartyPlayerCharacterPrefab;
     [SerializeField, Tooltip("Effect tile when a location is selected")]
@@ -38,6 +40,7 @@ public class CGameManager : MonoBehaviour
 
     private Camera m_Camera;
     private CCameraManager m_CameraManager;
+    private CUIManager m_UIManager;
 
     private GameObject m_PartyPlayerGameObject;
     private CPartyPlayerCharacter m_PartyPlayerCharacter;
@@ -67,6 +70,7 @@ public class CGameManager : MonoBehaviour
         m_PartyManager = FindFirstObjectByType<CPartyManager>();
         m_Camera = FindFirstObjectByType<Camera>();
         m_CameraManager = m_Camera.GetComponent<CCameraManager>();
+        m_UIManager = FindFirstObjectByType<CUIManager>();
 
         m_MapGenerator.IgnoreTileRules = m_bIgnoreTileRules;
         m_TerrainTileMap = m_MapGenerator.GenerateMap();
@@ -74,10 +78,11 @@ public class CGameManager : MonoBehaviour
 
         m_FogMap = m_MapGenerator.FogMap;
         m_FogMap.GetComponent<TilemapRenderer>().enabled = m_bShowFog;
-
         m_EffectsMap = m_MapGenerator.EffectsMap;
 
         m_PathFinder = new CPathFinder(m_bPathFindDiagonals, m_TerrainTileMap);
+
+        m_UIManager.InitializeWorldInfoPanel();
 
         CreatePlayerCharacter();
     }
@@ -177,48 +182,61 @@ public class CGameManager : MonoBehaviour
 
     public void OnMouseOverGrid(InputAction.CallbackContext context)
     {
-        if (!m_bPlayerSelected || !context.performed)
+        if (!context.performed)
         {
             return;
         }
-
-        m_EffectsMap.ClearAllTiles();
 
         Vector2 mousePosition = Mouse.current.position.ReadValue();
         Vector3 worldPosition = m_Camera.ScreenToWorldPoint(mousePosition);
         Vector3Int cellPosition = m_WorldGrid.WorldToCell(worldPosition);
 
-        // Store the current path in case we wish to use it
-        m_CurrentPath = m_PathFinder.GetPath(m_CurrentPlayerPosition, cellPosition);
-        
-        float totalMovement = 0f;
-        Vector3Int previous = m_CurrentPlayerPosition;
-
-        // Keep the queue intact, we're just previewing 
-        foreach (Vector3Int node in m_CurrentPath.AsEnumerable())
+        if (m_bPlayerSelected)
         {
-            m_EffectsMap.SetTile(node, m_PlayerSelectHighlightTile);
+            m_EffectsMap.ClearAllTiles();
 
-            // Ignore the self tile
-            if (node == m_CurrentPlayerPosition)
+            // Store the current path in case we wish to use it
+            m_CurrentPath = m_PathFinder.GetPath(m_CurrentPlayerPosition, cellPosition);
+
+            float totalMovement = 0f;
+            float totalDanger = 0f;
+
+            Vector3Int previous = m_CurrentPlayerPosition;
+
+            // Keep the queue intact, we're just previewing 
+            foreach (Vector3Int node in m_CurrentPath.AsEnumerable())
             {
-                continue;
+                m_EffectsMap.SetTile(node, m_PlayerSelectHighlightTile);
+
+                // Ignore the self tile
+                if (node == m_CurrentPlayerPosition)
+                {
+                    continue;
+                }
+
+                // If this is a diagonal, multiply movement cost by 1.4
+                if (Mathf.Abs(node.x - previous.x) == 1 && Mathf.Abs(node.y - previous.y) == 1)
+                {
+                    totalMovement += m_TerrainTileMap[node.x, node.y].GetTraversalRate() * 1.4f;
+                    totalDanger += m_TerrainTileMap[node.x, node.y].GetDangerAmount() * 1.4f;
+                }
+                else
+                {
+                    totalMovement += m_TerrainTileMap[node.x, node.y].GetTraversalRate();
+                    totalDanger += m_TerrainTileMap[node.x, node.y].GetDangerAmount();
+                }
+
+                previous = node;
             }
 
-            // If this is a diagonal, multiply movement cost by 1.4
-            if (Mathf.Abs(node.x - previous.x) == 1 && Mathf.Abs(node.y - previous.y) == 1)
-            {
-                totalMovement += m_TerrainTileMap[node.x, node.y].GetTraversalRate() * 1.4f;
-            }
-            else
-            {
-                totalMovement += m_TerrainTileMap[node.x, node.y].GetTraversalRate();
-            }
-
-            previous = node;
+            m_UIManager.UpdateWorldInfo(string.Format("Estimated Traversal Time: {0}\nEstimated Danger Level: {1}", totalMovement, totalDanger));
         }
+        else
+        {
+            STerrainTile currentTile = m_TerrainTileMap[cellPosition.x, cellPosition.y];
 
-        Debug.Log(string.Format("Total Movement: {0}", totalMovement));
+            m_UIManager.UpdateWorldInfo(string.Format("Biome: {0}\nTraversal Time: {1}\nDanger Level: {2}", currentTile.GetBiomeType().ToString(), currentTile.GetTraversalRate(), currentTile.GetDangerAmount()));
+        }
     }
 
     public void OnRightClick(InputAction.CallbackContext context)
