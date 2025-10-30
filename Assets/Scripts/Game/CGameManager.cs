@@ -66,7 +66,8 @@ public class CGameManager : MonoBehaviour
     private float m_TimeCounter = 0f;
     private float m_CurrentTrueMovementRate = 0f;
     private Vector3 m_MovementPerTick = Vector3.zero;
-    private float m_OccurredMovement = 0f;
+    private Vector3 m_TargetPositionNextTick = Vector3.zero;
+    private float m_OccurredMovement = 0f;  
 
     public CPartyPlayerCharacter PartyPlayerCharacter
     {
@@ -106,7 +107,7 @@ public class CGameManager : MonoBehaviour
 
     private void Update()
     {
-        if (m_bStartMove == false)
+        if (m_bStartMove == false && m_PartyPlayerGameObject != null)
         {
             return;
         }
@@ -115,6 +116,15 @@ public class CGameManager : MonoBehaviour
         if (m_TimeCounter < m_TickSpeed)
         {
             m_TimeCounter += Time.deltaTime;
+
+            if (m_TargetPositionNextTick != Vector3.zero)
+            {
+                float t = Mathf.Clamp01(m_TimeCounter / m_TickSpeed);
+                t = Mathf.SmoothStep(0f, 1f, t);
+
+                m_PartyPlayerGameObject.transform.position = Vector3.Lerp(m_PartyPlayerGameObject.transform.position, m_TargetPositionNextTick, t);
+            }
+
             return;
         }
 
@@ -229,7 +239,7 @@ public class CGameManager : MonoBehaviour
         // Move player in increments
         if (m_OccurredMovement < m_CurrentTrueMovementRate)
         {
-            m_PartyPlayerGameObject.transform.position += m_MovementPerTick;
+            m_TargetPositionNextTick = m_PartyPlayerGameObject.transform.position + m_MovementPerTick;
             m_OccurredMovement += 1f / m_StepsInADay;
             m_OccurredMovement = (float)System.Math.Round(m_OccurredMovement, 1);
 
@@ -250,6 +260,7 @@ public class CGameManager : MonoBehaviour
             m_MovementPerTick = Vector3.zero;
             m_TargetCell = Vector3Int.zero;
             m_CurrentTrueMovementRate = 0f;
+            m_TargetPositionNextTick = Vector3.zero;
         }
     }
 
