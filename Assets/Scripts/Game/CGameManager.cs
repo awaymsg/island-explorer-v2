@@ -24,6 +24,12 @@ public class CGameManager : MonoBehaviour
     [SerializeField, Tooltip("Effect tile when a player is selected")]
     private TileBase m_PlayerSelectHighlightTile;
 
+    [Header("Passage of time")]
+    [SerializeField, Tooltip("Tick speed in seconds")]
+    private float m_TickSpeed = 0.1f;
+    [SerializeField, Tooltip("Division of days into steps")]
+    private int m_StepsInADay = 10;
+
     [Header("Debug")]
     [SerializeField]
     private bool m_bShowFog = true;
@@ -31,10 +37,6 @@ public class CGameManager : MonoBehaviour
     private bool m_bIgnoreTileRules = false;
     [SerializeField]
     private bool m_bPathFindDiagonals = false;
-    [SerializeField, Tooltip("Tick speed in seconds")]
-    private float m_TickSpeed = 0.1f;
-    [SerializeField, Tooltip("Division of days into steps")]
-    private int m_StepsInADay = 10;
 
     private CMapGenerator m_MapGenerator;
     private CPartyManager m_PartyManager;
@@ -67,7 +69,7 @@ public class CGameManager : MonoBehaviour
     private float m_CurrentTrueMovementRate = 0f;
     private Vector3 m_MovementPerTick = Vector3.zero;
     private Vector3 m_TargetPositionNextTick = Vector3.zero;
-    private float m_OccurredMovement = 0f;  
+    private float m_OccurredMovement = 0f;
 
     public CPartyPlayerCharacter PartyPlayerCharacter
     {
