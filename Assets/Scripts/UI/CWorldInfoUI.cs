@@ -18,7 +18,7 @@ public class CWorldInfoUI : MonoBehaviour
 
     public void InitializeWorldInfoPanel()
     {
-        m_DayInfoLabel.text = "Day 1, Hour 0";
+        m_DayInfoLabel.text = "Day 0";
         m_WorldInfoLabel.text = "";
     }
 

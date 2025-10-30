@@ -1,6 +1,8 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
+using Unity.Hierarchy;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -29,6 +31,10 @@ public class CGameManager : MonoBehaviour
     private bool m_bIgnoreTileRules = false;
     [SerializeField]
     private bool m_bPathFindDiagonals = false;
+    [SerializeField, Tooltip("Tick speed in seconds")]
+    private float m_TickSpeed = 0.1f;
+    [SerializeField, Tooltip("Division of days into steps")]
+    private int m_StepsInADay = 10;
 
     private CMapGenerator m_MapGenerator;
     private CPartyManager m_PartyManager;
@@ -48,17 +54,26 @@ public class CGameManager : MonoBehaviour
     private CPathFinder m_PathFinder;
 
     // Gameplay important vars
-    private float m_DayCount = 0f;
+    private float m_DayCount = 0;
     private bool m_bPlayerSelected = false;
-    private Vector3Int m_CurrentPlayerPosition;
+    private Vector3Int m_CurrentPlayerCell;
     private Queue<Vector3Int> m_CurrentPath;
+    private Queue<float> m_CurrentTruePathMovementRates;
+    private Queue<float> m_CurrentEstimatedPathMovementRates;
+    private float m_TotalEstimatedMovementRemaining = 0f;
+    private bool m_bStartMove = false;
+    private Vector3Int m_TargetCell = Vector3Int.zero;
+    private float m_TimeCounter = 0f;
+    private float m_CurrentTrueMovementRate = 0f;
+    private Vector3 m_MovementPerTick = Vector3.zero;
+    private float m_OccurredMovement = 0f;
 
     public CPartyPlayerCharacter PartyPlayerCharacter
     {
         get { return m_PartyPlayerCharacter; }
     }
 
-    void Start()
+    private void Start()
     {
         if (m_bUseSeed)
         {
@@ -87,6 +102,26 @@ public class CGameManager : MonoBehaviour
         m_UIManager.InitializeWorldInfoPanel();
 
         CreatePlayerCharacter();
+    }
+
+    private void Update()
+    {
+        if (m_bStartMove == false)
+        {
+            return;
+        }
+
+        // Only tick at set speed
+        if (m_TimeCounter < m_TickSpeed)
+        {
+            m_TimeCounter += Time.deltaTime;
+            return;
+        }
+
+        // Reset timer
+        m_TimeCounter = 0f;
+
+        MoveCharacter();
     }
 
     private void CreatePlayerCharacter()
@@ -130,6 +165,92 @@ public class CGameManager : MonoBehaviour
 
         // Set camera to target player
         m_CameraManager.TargetPlayer = m_PartyPlayerGameObject;
+    }
+
+    private void MoveCharacter()
+    {
+        // If we do not have a target cell, try to obtain one. If there are no cells left, we're done moving!
+        if (m_TargetCell == Vector3Int.zero)
+        {
+            if (m_CurrentPath.Count > 0)
+            {
+                m_TargetCell = m_CurrentPath.Dequeue();
+
+                // Ignore if tile is starting tile
+                if (m_TargetCell == m_CurrentPlayerCell)
+                {
+                    m_TargetCell = Vector3Int.zero;
+                    return;
+                }
+
+                // m_CurrentPathMovementRates does not contain starting tile's movement rate 
+                m_CurrentTrueMovementRate = m_CurrentTruePathMovementRates.Dequeue();
+
+                // If the estimated tile movement rate is lower than the actual, update estimate
+                float estimatedNextMoveTime = m_CurrentEstimatedPathMovementRates.Dequeue();
+
+                if (m_CurrentTrueMovementRate > estimatedNextMoveTime)
+                {
+                    // TODO: show message to ask to continue moving or not
+                }
+
+                // Update estimated move time remaining, account for 1 extra step
+                m_TotalEstimatedMovementRemaining = m_CurrentTrueMovementRate;
+                foreach (float estimatedMoveTime in m_CurrentEstimatedPathMovementRates.AsEnumerable())
+                {
+                    m_TotalEstimatedMovementRemaining += estimatedMoveTime;
+                }
+
+                m_UIManager.UpdateWorldInfo(string.Format("Estimated Traversal Time: {0}", m_TotalEstimatedMovementRemaining));
+            }
+            else
+            {
+                // We are out of paths, so we're done moving! Reset to able to move state!
+                m_EffectsMap.ClearAllTiles();
+                m_bPlayerSelected = false;
+                m_bStartMove = false;
+
+                return;
+            }
+        }
+
+        STerrainTile currentTile = m_TerrainTileMap[m_CurrentPlayerCell.x, m_CurrentPlayerCell.y];
+
+        // Find increment to move
+        if (m_MovementPerTick == Vector3.zero)
+        {
+            Vector3 currentPosition = m_WorldGrid.GetCellCenterWorld(m_CurrentPlayerCell);
+            Vector3 targetPosition = m_WorldGrid.GetCellCenterWorld(m_TargetCell);
+            m_MovementPerTick = (targetPosition - currentPosition) / (m_CurrentTrueMovementRate * m_StepsInADay);
+
+            m_OccurredMovement = 0f;
+        }
+
+        // Move player in increments
+        if (m_OccurredMovement < m_CurrentTrueMovementRate)
+        {
+            m_PartyPlayerGameObject.transform.position += m_MovementPerTick;
+            m_OccurredMovement += 1f / m_StepsInADay;
+            m_OccurredMovement = (float)System.Math.Round(m_OccurredMovement, 1);
+
+            // We moved, so increment day
+            m_DayCount += 1f / m_StepsInADay;
+            m_DayCount = (float)System.Math.Round(m_DayCount, 1);
+            m_UIManager.UpdateDayInfo(string.Format("Day: {0}", m_DayCount));
+
+            // Decrement estimated move time remaining
+            m_TotalEstimatedMovementRemaining -= 1f / m_StepsInADay;
+            m_TotalEstimatedMovementRemaining = (float)System.Math.Round(m_TotalEstimatedMovementRemaining, 1);
+            m_UIManager.UpdateWorldInfo(string.Format("Estimated Traversal Time: {0}", m_TotalEstimatedMovementRemaining));
+        }
+        else
+        {
+            // Player is officially in cell now
+            MovePlayerToCell(new Vector2Int(m_TargetCell.x, m_TargetCell.y));
+            m_MovementPerTick = Vector3.zero;
+            m_TargetCell = Vector3Int.zero;
+            m_CurrentTrueMovementRate = 0f;
+        }
     }
 
     // Input
@@ -193,7 +314,7 @@ public class CGameManager : MonoBehaviour
 
     public void OnMouseOverGrid(InputAction.CallbackContext context)
     {
-        if (!context.performed)
+        if (!context.performed || m_bStartMove)
         {
             return;
         }
@@ -202,17 +323,24 @@ public class CGameManager : MonoBehaviour
         Vector3 worldPosition = m_Camera.ScreenToWorldPoint(mousePosition);
         Vector3Int cellPosition = m_WorldGrid.WorldToCell(worldPosition);
 
+        if (!IsCellValid(cellPosition))
+        {
+            return;
+        }
+
         if (m_bPlayerSelected)
         {
             m_EffectsMap.ClearAllTiles();
 
             // Store the current path in case we wish to use it
-            m_CurrentPath = m_PathFinder.GetPath(m_CurrentPlayerPosition, cellPosition);
+            m_CurrentPath = m_PathFinder.GetPath(m_CurrentPlayerCell, cellPosition);
+            m_CurrentTruePathMovementRates = new Queue<float>();
+            m_CurrentEstimatedPathMovementRates = new Queue<float>();
 
-            float totalMovement = 0f;
+            m_TotalEstimatedMovementRemaining = 0f;
             float totalDanger = 0f;
 
-            Vector3Int previous = m_CurrentPlayerPosition;
+            Vector3Int previous = m_CurrentPlayerCell;
 
             // Keep the queue intact, we're just previewing 
             foreach (Vector3Int node in m_CurrentPath.AsEnumerable())
@@ -220,32 +348,40 @@ public class CGameManager : MonoBehaviour
                 m_EffectsMap.SetTile(node, m_PlayerSelectHighlightTile);
 
                 // Ignore the self tile
-                if (node == m_CurrentPlayerPosition)
+                if (node == m_CurrentPlayerCell)
                 {
                     continue;
                 }
 
                 bool bIsFogged = m_FogMap.HasTile(node) && m_bShowFog;
 
-                float traversalRate = bIsFogged ? 1f : m_TerrainTileMap[node.x, node.y].GetTraversalRate();
-                float dangerAmount = bIsFogged ? 0f : m_TerrainTileMap[node.x, node.y].GetDangerAmount();
+                float trueTraversalRate = m_TerrainTileMap[node.x, node.y].GetTraversalRate();
+
+                float displayTraversalRate = bIsFogged ? 1f : m_TerrainTileMap[node.x, node.y].GetTraversalRate();
+                float displayDangerAmount = bIsFogged ? 0f : m_TerrainTileMap[node.x, node.y].GetDangerAmount();
 
                 // If this is a diagonal, multiply movement cost by 1.4
                 if (Mathf.Abs(node.x - previous.x) == 1 && Mathf.Abs(node.y - previous.y) == 1)
                 {
-                    totalMovement += traversalRate * 1.4f;
-                    totalDanger += dangerAmount * 1.4f;
+                    m_CurrentTruePathMovementRates.Enqueue((float)System.Math.Round(trueTraversalRate * 1.4f, 1));
+                    m_CurrentEstimatedPathMovementRates.Enqueue((float)System.Math.Round(displayTraversalRate * 1.4f, 1));
+                    m_TotalEstimatedMovementRemaining += displayTraversalRate * 1.4f;
+                    totalDanger += displayDangerAmount * 1.4f;
                 }
                 else
                 {
-                    totalMovement += traversalRate;
-                    totalDanger += dangerAmount;
+                    m_CurrentTruePathMovementRates.Enqueue((float)System.Math.Round(trueTraversalRate, 1));
+                    m_CurrentEstimatedPathMovementRates.Enqueue((float)System.Math.Round(displayTraversalRate, 1));
+                    m_TotalEstimatedMovementRemaining += displayTraversalRate;
+                    totalDanger += displayDangerAmount;
                 }
 
                 previous = node;
             }
 
-            m_UIManager.UpdateWorldInfo(string.Format("Estimated Traversal Time: {0}d\nEstimated Danger Level: {1}", totalMovement, totalDanger));
+            m_TotalEstimatedMovementRemaining = (float)System.Math.Round(m_TotalEstimatedMovementRemaining, 1);
+            totalDanger = (float)System.Math.Round(totalDanger, 1);
+            m_UIManager.UpdateWorldInfo(string.Format("Estimated Traversal Time: {0}d\nEstimated Danger Level: {1}", m_TotalEstimatedMovementRemaining, totalDanger));
         }
         else
         {
@@ -275,16 +411,9 @@ public class CGameManager : MonoBehaviour
         {
             m_EffectsMap.ClearAllTiles();
         }
-        else if (m_CurrentPath.Count > 0)
+        else if (m_CurrentPath.Count > 0 && !m_bStartMove)
         {
-            while (m_CurrentPath.Count > 0)
-            {
-                Vector3Int node = m_CurrentPath.Dequeue();  
-                MovePlayerToCell(new Vector2Int(node.x, node.y));
-            }
-
-            m_EffectsMap.ClearAllTiles();
-            m_bPlayerSelected = false;
+            m_bStartMove = true;
         }
     }
 
@@ -318,7 +447,7 @@ public class CGameManager : MonoBehaviour
         m_PartyPlayerCharacter.CurrentLocation = cell;
 
         m_TerrainTileMap[cell.x, cell.y].SetPlayerOccupied(true);
-        m_CurrentPlayerPosition = cellVector3;
+        m_CurrentPlayerCell = cellVector3;
 
         // Update seen tiles (TEMP, no vision stat adjustments yet)
         for (int x = -1; x <= 1; ++x)

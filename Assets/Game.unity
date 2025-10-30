@@ -148,7 +148,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 87dbdd667fdf99f448aeb1b19d697862, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::GameManager
-  m_bUseSeed: 1
+  m_bUseSeed: 0
   m_RandomSeed: 47
   m_PartyPlayerCharacterPrefab: {fileID: 234909392250611176, guid: 12f91a7f2fa6cb6488c98fc9c73f4519, type: 3}
   m_LocationSelectHighlightTile: {fileID: 11400000, guid: 2917f8a7507d5714d8fc823a59443571, type: 2}
@@ -156,6 +156,8 @@ MonoBehaviour:
   m_bShowFog: 1
   m_bIgnoreTileRules: 0
   m_bPathFindDiagonals: 1
+  m_TickSpeed: 0.05
+  m_StepsInADay: 10
 --- !u!4 &86794079
 Transform:
   m_ObjectHideFlags: 0
