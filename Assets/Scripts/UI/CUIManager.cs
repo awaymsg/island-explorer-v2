@@ -1,14 +1,23 @@
+using System;
 using UnityEngine;
+using UnityEngine.UIElements;
 
 public class CUIManager : MonoBehaviour
 {
     private CCharacterListUI m_CharacterListUI;
     private CWorldInfoUI m_WorldInfoUI;
+    private CPopupsUI m_PopupsUI;
+
+    public CPopupsUI PopupsUI
+    {
+        get { return m_PopupsUI; }
+    }
 
     private void Awake()
     {
         m_CharacterListUI = FindFirstObjectByType<CCharacterListUI>();
         m_WorldInfoUI = FindFirstObjectByType<CWorldInfoUI>();
+        m_PopupsUI = FindFirstObjectByType<CPopupsUI>();
     }
 
     public void AddCharacterButton(CPartyMemberRuntime partyMember)

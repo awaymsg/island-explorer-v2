@@ -2,7 +2,9 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
+using System.Threading.Tasks;
 using Unity.Hierarchy;
+using Unity.Jobs;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -71,6 +73,8 @@ public class CGameManager : MonoBehaviour
     private Vector3 m_TargetPositionNextTick = Vector3.zero;
     private float m_OccurredMovement = 0f;
 
+    private bool m_bPauseGameplay = false;
+
     public CPartyPlayerCharacter PartyPlayerCharacter
     {
         get { return m_PartyPlayerCharacter; }
@@ -109,7 +113,7 @@ public class CGameManager : MonoBehaviour
 
     private void Update()
     {
-        if (m_bStartMove == false && m_PartyPlayerGameObject != null)
+        if ((m_bStartMove == false && m_PartyPlayerGameObject != null) || m_bPauseGameplay)
         {
             return;
         }
@@ -133,7 +137,7 @@ public class CGameManager : MonoBehaviour
         // Reset timer
         m_TimeCounter = 0f;
 
-        MoveCharacter();
+        MoveCharacterAsync();
     }
 
     private void CreatePlayerCharacter()
@@ -179,7 +183,7 @@ public class CGameManager : MonoBehaviour
         m_CameraManager.TargetPlayer = m_PartyPlayerGameObject;
     }
 
-    private void MoveCharacter()
+    private async void MoveCharacterAsync()
     {
         // If we do not have a target cell, try to obtain one. If there are no cells left, we're done moving!
         if (m_TargetCell == Vector3Int.zero)
@@ -204,6 +208,13 @@ public class CGameManager : MonoBehaviour
                 if (m_CurrentTrueMovementRate > estimatedNextMoveTime)
                 {
                     // TODO: show message to ask to continue moving or not
+                    bool continueMoving = await GetMovementConfirmationAsync(estimatedNextMoveTime, m_CurrentTrueMovementRate);
+
+                    if (!continueMoving)
+                    {
+                        CancelMove();
+                        return;
+                    }
                 }
 
                 // Update estimated move time remaining, account for 1 extra step
@@ -266,10 +277,40 @@ public class CGameManager : MonoBehaviour
         }
     }
 
+    private async Task<bool> GetMovementConfirmationAsync(float estimated, float actual)
+    {
+        TaskCompletionSource<bool> completionSource = new TaskCompletionSource<bool>();
+
+        m_UIManager.PopupsUI.CreateContinueMovementDialogue(estimated, actual, (response) =>
+        {
+            completionSource.SetResult(response);
+        });
+
+        m_bPauseGameplay = true;
+
+        bool result = await completionSource.Task;
+
+        m_bPauseGameplay = false;
+
+        return result;
+    }
+
+    private void CancelMove()
+    {
+        m_TargetCell = Vector3Int.zero;
+        m_MovementPerTick = Vector3.zero;
+        m_TargetCell = Vector3Int.zero;
+        m_CurrentTrueMovementRate = 0f;
+        m_TargetPositionNextTick = Vector3.zero;
+        m_EffectsMap.ClearAllTiles();
+        m_bPlayerSelected = false;
+        m_bStartMove = false;
+    }
+
     // Input
     public void OnClick(InputAction.CallbackContext context)
     {
-        if (!context.performed)
+        if (!context.performed || m_bPauseGameplay)
         {
             return;
         }
@@ -327,7 +368,7 @@ public class CGameManager : MonoBehaviour
 
     public void OnMouseOverGrid(InputAction.CallbackContext context)
     {
-        if (!context.performed || m_bStartMove)
+        if (!context.performed || m_bStartMove || m_bPauseGameplay)
         {
             return;
         }
@@ -415,7 +456,7 @@ public class CGameManager : MonoBehaviour
 
     public void OnRightClick(InputAction.CallbackContext context)
     {
-        if (!context.performed)
+        if (!context.performed || m_bPauseGameplay)
         {
             return;
         }
