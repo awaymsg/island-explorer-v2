@@ -60,10 +60,10 @@ public class CGameManager : MonoBehaviour
     // Gameplay important vars
     private float m_DayCount = 0;
     private bool m_bPlayerSelected = false;
-    private Vector3Int m_CurrentPlayerCell;
     private Queue<Vector3Int> m_CurrentPath;
     private Queue<float> m_CurrentTruePathMovementRates;
     private Queue<float> m_CurrentEstimatedPathMovementRates;
+    private float m_CurrentAcceptablePathMovementRate = 0f;
     private float m_TotalEstimatedMovementRemaining = 0f;
     private bool m_bStartMove = false;
     private Vector3Int m_TargetCell = Vector3Int.zero;
@@ -73,7 +73,7 @@ public class CGameManager : MonoBehaviour
     private Vector3 m_TargetPositionNextTick = Vector3.zero;
     private float m_OccurredMovement = 0f;
 
-    private bool m_bPauseGameplay = false;
+    private static bool m_bPauseGameplay = false;
 
     public CPartyPlayerCharacter PartyPlayerCharacter
     {
@@ -174,7 +174,7 @@ public class CGameManager : MonoBehaviour
         m_PartyPlayerCharacter = m_PartyManager.CreatePartyPlayerCharacter(m_PartyPlayerCharacter, partyLeader, partyMembers);
         m_PartyPlayerGameObject.GetComponent<SpriteRenderer>().sprite = defaultPartyLeader.m_OverworldSprite;
 
-        Vector2Int startingLocation = FindStartingLocation();
+        Vector3Int startingLocation = FindStartingLocation();
         m_PartyPlayerCharacter.CurrentLocation = startingLocation;
         MovePlayerToCell(startingLocation);
         MoveCameraToCell(startingLocation);
@@ -193,7 +193,7 @@ public class CGameManager : MonoBehaviour
                 m_TargetCell = m_CurrentPath.Dequeue();
 
                 // Ignore if tile is starting tile
-                if (m_TargetCell == m_CurrentPlayerCell)
+                if (m_TargetCell == m_PartyPlayerCharacter.CurrentLocation)
                 {
                     m_TargetCell = Vector3Int.zero;
                     return;
@@ -205,16 +205,18 @@ public class CGameManager : MonoBehaviour
                 // If the estimated tile movement rate is lower than the actual, update estimate
                 float estimatedNextMoveTime = m_CurrentEstimatedPathMovementRates.Dequeue();
 
-                if (m_CurrentTrueMovementRate > estimatedNextMoveTime)
+                if (m_CurrentTrueMovementRate > estimatedNextMoveTime && m_CurrentTrueMovementRate > m_CurrentAcceptablePathMovementRate)
                 {
                     // TODO: show message to ask to continue moving or not
-                    bool continueMoving = await GetMovementConfirmationAsync(estimatedNextMoveTime, m_CurrentTrueMovementRate);
+                    bool continueMoving = await GetMovementConfirmationAsync(m_CurrentTrueMovementRate);
 
                     if (!continueMoving)
                     {
                         CancelMove();
                         return;
                     }
+
+                    m_CurrentAcceptablePathMovementRate = m_CurrentTrueMovementRate;
                 }
 
                 // Update estimated move time remaining, account for 1 extra step
@@ -232,17 +234,18 @@ public class CGameManager : MonoBehaviour
                 m_EffectsMap.ClearAllTiles();
                 m_bPlayerSelected = false;
                 m_bStartMove = false;
+                m_CurrentAcceptablePathMovementRate = 0f;
 
                 return;
             }
         }
 
-        STerrainTile currentTile = m_TerrainTileMap[m_CurrentPlayerCell.x, m_CurrentPlayerCell.y];
+        STerrainTile currentTile = m_TerrainTileMap[m_PartyPlayerCharacter.CurrentLocation.x, m_PartyPlayerCharacter.CurrentLocation.y];
 
         // Find increment to move
         if (m_MovementPerTick == Vector3.zero)
         {
-            Vector3 currentPosition = m_WorldGrid.GetCellCenterWorld(m_CurrentPlayerCell);
+            Vector3 currentPosition = m_WorldGrid.GetCellCenterWorld(m_PartyPlayerCharacter.CurrentLocation);
             Vector3 targetPosition = m_WorldGrid.GetCellCenterWorld(m_TargetCell);
             m_MovementPerTick = (targetPosition - currentPosition) / (m_CurrentTrueMovementRate * m_StepsInADay);
 
@@ -269,7 +272,7 @@ public class CGameManager : MonoBehaviour
         else
         {
             // Player is officially in cell now
-            MovePlayerToCell(new Vector2Int(m_TargetCell.x, m_TargetCell.y));
+            MovePlayerToCell(m_TargetCell);
             m_MovementPerTick = Vector3.zero;
             m_TargetCell = Vector3Int.zero;
             m_CurrentTrueMovementRate = 0f;
@@ -277,11 +280,11 @@ public class CGameManager : MonoBehaviour
         }
     }
 
-    private async Task<bool> GetMovementConfirmationAsync(float estimated, float actual)
+    private async Task<bool> GetMovementConfirmationAsync(float actual)
     {
         TaskCompletionSource<bool> completionSource = new TaskCompletionSource<bool>();
 
-        m_UIManager.PopupsUI.CreateContinueMovementDialogue(estimated, actual, (response) =>
+        m_UIManager.PopupsUI.CreateContinueMovementDialogue(actual, (response) =>
         {
             completionSource.SetResult(response);
         });
@@ -297,12 +300,13 @@ public class CGameManager : MonoBehaviour
 
     private void CancelMove()
     {
+        m_EffectsMap.ClearAllTiles();
         m_TargetCell = Vector3Int.zero;
         m_MovementPerTick = Vector3.zero;
         m_TargetCell = Vector3Int.zero;
-        m_CurrentTrueMovementRate = 0f;
         m_TargetPositionNextTick = Vector3.zero;
-        m_EffectsMap.ClearAllTiles();
+        m_CurrentTrueMovementRate = 0f;
+        m_CurrentAcceptablePathMovementRate = 0f;
         m_bPlayerSelected = false;
         m_bStartMove = false;
     }
@@ -387,14 +391,14 @@ public class CGameManager : MonoBehaviour
             m_EffectsMap.ClearAllTiles();
 
             // Store the current path in case we wish to use it
-            m_CurrentPath = m_PathFinder.GetPath(m_CurrentPlayerCell, cellPosition);
+            m_CurrentPath = m_PathFinder.GetPath(m_PartyPlayerCharacter.CurrentLocation, cellPosition);
             m_CurrentTruePathMovementRates = new Queue<float>();
             m_CurrentEstimatedPathMovementRates = new Queue<float>();
 
             m_TotalEstimatedMovementRemaining = 0f;
             float totalDanger = 0f;
 
-            Vector3Int previous = m_CurrentPlayerCell;
+            Vector3Int previous = m_PartyPlayerCharacter.CurrentLocation;
 
             // Keep the queue intact, we're just previewing 
             foreach (Vector3Int node in m_CurrentPath.AsEnumerable())
@@ -402,7 +406,7 @@ public class CGameManager : MonoBehaviour
                 m_EffectsMap.SetTile(node, m_PlayerSelectHighlightTile);
 
                 // Ignore the self tile
-                if (node == m_CurrentPlayerCell)
+                if (node == m_PartyPlayerCharacter.CurrentLocation)
                 {
                     continue;
                 }
@@ -471,37 +475,34 @@ public class CGameManager : MonoBehaviour
         }
     }
 
-    private void PlaceObjectOnCell(GameObject objectToPlace, Vector2Int cell)
+    private void PlaceObjectOnCell(GameObject objectToPlace, Vector3Int cell)
     {
         cell = ClampCell(cell);
-        Vector3Int cellVector3 = new Vector3Int(cell.x, cell.y);
 
-        Vector3 worldPosition = m_WorldGrid.GetCellCenterWorld(cellVector3);
+        Vector3 worldPosition = m_WorldGrid.GetCellCenterWorld(cell);
         worldPosition.z = 0;
 
         objectToPlace.transform.position = worldPosition;
     }
 
-    private void MovePlayerToCell(Vector2Int cell)
+    private void MovePlayerToCell(Vector3Int cell)
     {
         cell = ClampCell(cell);
-        Vector3Int cellVector3 = new Vector3Int(cell.x, cell.y);
 
         // Try change occupied status of previous location
-        Vector3Int prevCell = m_WorldGrid.WorldToCell(m_PartyPlayerGameObject.transform.position);
+        Vector3Int prevCell = m_PartyPlayerCharacter.CurrentLocation;
         if (IsCellValid(prevCell))
         {
             m_TerrainTileMap[prevCell.x, prevCell.y].SetPlayerOccupied(false);
         }
 
-        Vector3 worldPosition = m_WorldGrid.GetCellCenterWorld(cellVector3);
+        Vector3 worldPosition = m_WorldGrid.GetCellCenterWorld(cell);
         worldPosition.z = 0;
 
         m_PartyPlayerGameObject.transform.position = worldPosition;
         m_PartyPlayerCharacter.CurrentLocation = cell;
 
         m_TerrainTileMap[cell.x, cell.y].SetPlayerOccupied(true);
-        m_CurrentPlayerCell = cellVector3;
 
         // Update seen tiles (TEMP, no vision stat adjustments yet)
         for (int x = -1; x <= 1; ++x)
@@ -519,16 +520,15 @@ public class CGameManager : MonoBehaviour
         }
     }
 
-    private void MoveCameraToCell(Vector2Int cell)
+    private void MoveCameraToCell(Vector3Int cell)
     {
         cell = ClampCell(cell);
-        Vector3Int cellVector3 = new Vector3Int(cell.x, cell.y);
 
-        Vector3 worldPosition = m_WorldGrid.GetCellCenterWorld(cellVector3);
+        Vector3 worldPosition = m_WorldGrid.GetCellCenterWorld(cell);
         m_CameraManager.MoveCameraToPosition(worldPosition);
     }
 
-    private Vector2Int ClampCell(Vector2Int cell)
+    private Vector3Int ClampCell(Vector3Int cell)
     {
         cell.x = Mathf.Clamp(cell.x, 0, m_TerrainTileMap.GetLength(0) - 1);
         cell.y = Mathf.Clamp(cell.y, 0, m_TerrainTileMap.GetLength(1) - 1);
@@ -549,12 +549,12 @@ public class CGameManager : MonoBehaviour
         return false;
     }
 
-    private Vector2Int FindStartingLocation()
+    private Vector3Int FindStartingLocation()
     {
         if (m_TerrainTileMap == null || m_TerrainTileMap.Length == 0)
         {
             Debug.Log("FindStartingLocation - map is null or empty!");
-            return new Vector2Int();
+            return new Vector3Int();
         }
 
         int direction = Random.Range(0, 2);        
@@ -577,7 +577,7 @@ public class CGameManager : MonoBehaviour
                 {
                     if (m_TerrainTileMap[i, y].GetBiomeType() == EBiomeType.Beach)
                     {
-                        return new Vector2Int(i, y);
+                        return new Vector3Int(i, y);
                     }
                 }
             }
@@ -587,7 +587,7 @@ public class CGameManager : MonoBehaviour
                 {
                     if (m_TerrainTileMap[i, y].GetBiomeType() == EBiomeType.Beach)
                     {
-                        return new Vector2Int(i, y);
+                        return new Vector3Int(i, y);
                     }
                 }
             }
@@ -602,7 +602,7 @@ public class CGameManager : MonoBehaviour
                 {
                     if (m_TerrainTileMap[x, i].GetBiomeType() == EBiomeType.Beach)
                     {
-                        return new Vector2Int(x, i);
+                        return new Vector3Int(x, i);
                     }
                 }
             }
@@ -612,7 +612,7 @@ public class CGameManager : MonoBehaviour
                 {
                     if (m_TerrainTileMap[x, i].GetBiomeType() == EBiomeType.Beach)
                     {
-                        return new Vector2Int(x, i);
+                        return new Vector3Int(x, i);
                     }
                 }
             }

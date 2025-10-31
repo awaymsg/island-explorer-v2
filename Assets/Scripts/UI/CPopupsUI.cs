@@ -17,7 +17,7 @@ public class CPopupsUI : MonoBehaviour
     }
 
     // TODO: we can make this generic actually, in retrospect
-    public void CreateContinueMovementDialogue(float estimated, float actual, Action<bool> bOnResponse)
+    public void CreateContinueMovementDialogue(float actual, Action<bool> bOnResponse)
     {
         // Create a new popup
         TemplateContainer continueDialogueInstance = m_ContinueMovementDialogueTemplate.Instantiate();
@@ -46,7 +46,7 @@ public class CPopupsUI : MonoBehaviour
         m_BlankCanvasUI.rootVisualElement.Add(blankCanvas);
         blankCanvas.Add(continueDialogueInstance);
 
-        continueMovementLabel.text = string.Format("The next tile is considerably harder to travel ({0}d) than our estimate ({1}d)! Continue?", actual, estimated);
+        continueMovementLabel.text = string.Format("The next tile will take considerably longer to travel ({0}d)!\nContinue?", actual);
 
         void CleanUp()
         {
