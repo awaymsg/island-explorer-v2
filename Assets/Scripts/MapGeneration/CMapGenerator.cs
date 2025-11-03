@@ -264,7 +264,7 @@ public class CMapGenerator : MonoBehaviour
                         else if (poiSetting.Likelihood == minLikelihood)
                         {
                             // If chances are the same, roll for stomping
-                            if (UnityEngine.Random.Range(0, 1) > 0.5f)
+                            if (UnityEngine.Random.Range(0, 2) == 0)
                             {
                                 selectedPOITile = poiSetting.Tile;
                             }
