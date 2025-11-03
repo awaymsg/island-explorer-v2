@@ -1,6 +1,6 @@
 update: 11/2/25 added concept of passage of time and intervals within days and movement over time. added some new terrain flair tiles courtesy of jack & kayleigh and now the generated island looks 150% better! also added a little more much needed UI
 -
-<img width="588" height="340" alt="image" src="https://github.com/user-attachments/assets/b4921413-b8dc-4f5e-ad2b-92a57b306e08" />
+<img width="1125" height="621" alt="image" src="https://github.com/user-attachments/assets/01cb63b8-5d32-4f50-a135-eeb7c6010d2e" />
 next: EVENTS SYSTEM, concept of resources & inventory, full stats ui
 
 update: 10/28/25 changed movement to select->right click based, and also added camera follow, updated tiles and some rules
