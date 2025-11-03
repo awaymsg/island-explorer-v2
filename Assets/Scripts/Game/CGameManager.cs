@@ -368,6 +368,8 @@ public class CGameManager : MonoBehaviour
                 m_EffectsMap.SetTile(cellPosition, m_LocationSelectHighlightTile);
             }
         }
+
+        Debug.Log(cellPosition);
     }
 
     public void OnMouseOverGrid(InputAction.CallbackContext context)

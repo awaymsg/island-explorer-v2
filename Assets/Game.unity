@@ -1217,6 +1217,15 @@ MonoBehaviour:
     - Name: Black Monolith
       Tile: {fileID: 11400000, guid: f56be1158e23af64f982865ba0ac718c, type: 2}
       Likelihood: 0.1
+    - Name: Palm Trees
+      Tile: {fileID: 11400000, guid: 4a181b6dab6ca6a4d9d496234c2b9073, type: 2}
+      Likelihood: 15
+    - Name: Shell
+      Tile: {fileID: 11400000, guid: ba0d8b4684ab5b04d999e9ab74906b42, type: 2}
+      Likelihood: 10
+    - Name: Starfish
+      Tile: {fileID: 11400000, guid: 10c0ab1c29dc27d4fa2e44a3e6955a32, type: 2}
+      Likelihood: 10
   - BiomeType: 4
     POISettings:
     - Name: Mysterious Mushroom
@@ -1231,6 +1240,12 @@ MonoBehaviour:
     - Name: Black Monolith
       Tile: {fileID: 11400000, guid: f56be1158e23af64f982865ba0ac718c, type: 2}
       Likelihood: 0.1
+    - Name: Flower Patch
+      Tile: {fileID: 11400000, guid: 37ad7d73ae19f434db52ef7505688f23, type: 2}
+      Likelihood: 10
+    - Name: Grass Patch
+      Tile: {fileID: 11400000, guid: d40aebe84e0dfce4c81427e16ef07c57, type: 2}
+      Likelihood: 10
   - BiomeType: 5
     POISettings:
     - Name: Mysterious Mushroom
@@ -1248,6 +1263,15 @@ MonoBehaviour:
     - Name: Ruins
       Tile: {fileID: 11400000, guid: 014de5a04971a6242a2f4091b5e4f324, type: 2}
       Likelihood: 5
+    - Name: Trees
+      Tile: {fileID: 11400000, guid: ba443367b1463c345bf3ee850c711848, type: 2}
+      Likelihood: 70
+    - Name: Grass Patch
+      Tile: {fileID: 11400000, guid: d40aebe84e0dfce4c81427e16ef07c57, type: 2}
+      Likelihood: 30
+    - Name: Flower Patch
+      Tile: {fileID: 11400000, guid: 37ad7d73ae19f434db52ef7505688f23, type: 2}
+      Likelihood: 30
   - BiomeType: 6
     POISettings:
     - Name: Goodie Hut
@@ -1262,6 +1286,11 @@ MonoBehaviour:
     - Name: Cave
       Tile: {fileID: 11400000, guid: 0ef3e268cd7369449be2655db5163209, type: 2}
       Likelihood: 5
+  - BiomeType: 2
+    POISettings:
+    - Name: Ship Wreck
+      Tile: {fileID: 11400000, guid: 08ae46af8e53d7a4e9f030d7dcc42e66, type: 2}
+      Likelihood: 0.3
 --- !u!1 &1653088789
 GameObject:
   m_ObjectHideFlags: 0
@@ -1574,7 +1603,7 @@ Transform:
   m_GameObject: {fileID: 2069730825}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: 0, y: 0.5, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -1631,7 +1660,7 @@ TilemapRenderer:
   m_ChunkCullingBounds: {x: 7.5, y: 6, z: 0}
   m_MaxChunkCount: 16
   m_MaxFrameAge: 16
-  m_SortOrder: 0
+  m_SortOrder: 3
   m_Mode: 0
   m_DetectChunkCullingBounds: 0
   m_MaskInteraction: 0
@@ -1654,7 +1683,7 @@ Tilemap:
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_Origin: {x: 0, y: 0, z: 0}
   m_Size: {x: 0, y: 0, z: 1}
-  m_TileAnchor: {x: 0.5, y: 0.5, z: 0}
+  m_TileAnchor: {x: 0, y: 0, z: 0}
   m_TileOrientation: 0
   m_TileOrientationMatrix:
     e00: 1
