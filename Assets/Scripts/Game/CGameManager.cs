@@ -402,9 +402,6 @@ public class CGameManager : MonoBehaviour
 
             Vector3Int previous = m_PartyPlayerCharacter.CurrentLocation;
 
-            // Set default fog traversal rate as value at player's current tile
-            float fogTraversalRate = m_TerrainTileMap[previous.x, previous.y].GetTraversalRate();
-
             // Keep the queue intact, we're just previewing 
             foreach (Vector3Int node in m_CurrentPath.AsEnumerable())
             {
@@ -415,6 +412,9 @@ public class CGameManager : MonoBehaviour
                 {
                     continue;
                 }
+
+                // Set default fog traversal rate as value previous tile
+                float fogTraversalRate = m_TerrainTileMap[previous.x, previous.y].GetTraversalRate();
 
                 bool bIsFogged = m_FogMap.HasTile(node) && m_bShowFog;
 
