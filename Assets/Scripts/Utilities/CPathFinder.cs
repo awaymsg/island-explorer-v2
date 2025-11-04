@@ -54,6 +54,9 @@ public class CPathFinder
         TileNode start = tileNodes[xPos, yPos];
         TileNode target = tileNodes[targetXPos, targetYPos];
 
+        // Use the current location traversal rate for fog
+        float currentTraversalRate = m_TileGrid[from.x, from.y].GetTraversalRate();
+
         List<TileNode> open = new List<TileNode>();
         HashSet<TileNode> closed = new HashSet<TileNode>();
         open.Add(start);
@@ -86,7 +89,7 @@ public class CPathFinder
 
                 // Only use movement mod if the tile has already been seen, if we have fog on
                 STerrainTile terrainTile = m_TileGrid[neighbor.X, neighbor.Y];
-                float mod = (!m_bHasFog || terrainTile.IsSeen()) ? terrainTile.GetTraversalRate() : 1f;
+                float mod = (!m_bHasFog || terrainTile.IsSeen()) ? terrainTile.GetTraversalRate() : currentTraversalRate;
 
                 float newMovementCost = current.gCost + GetDistance(current, neighbor) * mod;
                 if (newMovementCost < neighbor.gCost || !open.Contains(neighbor))
