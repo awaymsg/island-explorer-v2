@@ -1,3 +1,8 @@
+update: 11/5/25 added concept of inventory & items, cleaned up movement to be smoother, added popup to warn about dangerous unforeseen movement, added basic character full info UI
+-
+<img width="1111" height="631" alt="image" src="https://github.com/user-attachments/assets/9c22fe82-0174-4c2e-a3a8-03cc524e600b" />
+next: EVENTS SYSTEM, resource usage, improving full stats UI
+
 update: 11/2/25 added concept of passage of time and intervals within days and movement over time. added some new terrain flair tiles courtesy of jack & kayleigh and now the generated island looks 150% better! also added a little more much needed UI
 -
 <img width="1125" height="621" alt="image" src="https://github.com/user-attachments/assets/01cb63b8-5d32-4f50-a135-eeb7c6010d2e" />
