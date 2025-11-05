@@ -1470,6 +1470,7 @@ MonoBehaviour:
     Attached: 
   m_TraitPool:
   - {fileID: 11400000, guid: 0c5eb64850f2bbb4fb58c688b89594cc, type: 2}
+  - {fileID: 11400000, guid: d88e964db6c7e5f409e01bd21e63e972, type: 2}
   m_PersonalityTraitPool: []
   m_MaleNames:
   - John
@@ -1713,7 +1714,7 @@ GameObject:
   - component: {fileID: 2102219759}
   - component: {fileID: 2102219761}
   m_Layer: 5
-  m_Name: LeftUI
+  m_Name: CharacterUI
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

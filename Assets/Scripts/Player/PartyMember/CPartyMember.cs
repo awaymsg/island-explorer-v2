@@ -122,6 +122,22 @@ public class CPartyMemberRuntime
 
         m_PartyMemberStats = SetBaseStats();
 
+        // Initialize inventory
+        m_ItemInventory = new CInventory();
+
+        // Set inventory max weight and add callback when Fortitude changes
+        if (m_PartyMemberStats.ContainsKey(EPartyMemberStatType.Fortitude))
+        {
+            m_PartyMemberStats[EPartyMemberStatType.Fortitude].OnStatChanged += UpdateInventoryMaxWeight;
+            UpdateInventoryMaxWeight(0f, m_PartyMemberStats[EPartyMemberStatType.Fortitude].Value);
+        }
+        else
+        {
+            Debug.Log("InitializePartyMember - Party member missing Fortitude stat!");
+        }
+
+        AddDefaultItems();
+
         // make a deep copy of this array
         m_BodyParts = m_PartyManager.DefaultBodyParts?.Select(bodyPart => new CBodyPart(bodyPart)).ToArray() ?? Array.Empty<CBodyPart>();
 
@@ -208,21 +224,6 @@ public class CPartyMemberRuntime
             Debug.Log("InitializePartyMember - there are no traits in the pool!");
         }
 
-        m_ItemInventory = new CInventory();
-
-        // Set inventory max weight and add callback when Fortitude changes
-        if (m_PartyMemberStats.ContainsKey(EPartyMemberStatType.Fortitude))
-        {
-            m_PartyMemberStats[EPartyMemberStatType.Fortitude].OnStatChanged += UpdateInventoryMaxWeight;
-            UpdateInventoryMaxWeight(0f, m_PartyMemberStats[EPartyMemberStatType.Fortitude].Value);
-        }
-        else
-        {
-            Debug.Log("InitializePartyMember - Party member missing Fortitude stat!");
-        }
-
-        AddDefaultItems();
-
         CalculateCost();
     }
 
@@ -241,7 +242,7 @@ public class CPartyMemberRuntime
     {
         foreach (CInventoryItem item in m_PartyMemberSO.m_StartingItems)
         {
-            bool bSuccess = m_ItemInventory.TryAddItemToInventory(new CInventoryItemRuntime(item));
+            bool bSuccess = m_ItemInventory.TryAddItemToInventory(new CInventoryItemRuntime(item), this);
 
             if (!bSuccess)
             {
@@ -363,6 +364,11 @@ public class CPartyMemberRuntime
             }
 
             ApplyStatModifiers(traitEffect.StatModifiers);
+
+            foreach (SPartyMemberTraitItem traitItem in traitEffect.GrantedItems)
+            {
+                m_ItemInventory.TryAddItemToInventory(new CInventoryItemRuntime(traitItem.InventoryItem), this);
+            }
         }
 
         m_PartyMemberTraits.Add(runtimeTrait);

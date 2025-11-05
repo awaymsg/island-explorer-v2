@@ -32,7 +32,7 @@ public class CInventory
         return m_CurrentWeight + item.ItemWeight <= m_MaxWeight;
     }
 
-    public bool TryAddItemToInventory(CInventoryItemRuntime item)
+    public bool TryAddItemToInventory(CInventoryItemRuntime item, CPartyMemberRuntime owner)
     {
         if (item == null)
         {
@@ -54,17 +54,27 @@ public class CInventory
         {
             m_ItemsBook.Add(item.ItemName, item);
             m_ItemStacks.Add(item.ItemName, 1);
-            m_SortedItems.Add(item); // Add template reference ONLY ONCE
+            m_SortedItems.Add(item);
         }
 
         m_CurrentWeight += item.ItemWeight;
+
+        if ((item.ItemType & EItemType.Held) != 0)
+        {
+            if (owner == null)
+            {
+                Debug.Log("TryAddItemToInventory - owner is null!");
+            }
+
+            owner.ApplyStatModifiers(item.StatModifiers);
+        }
 
         m_bIsSortedListDirty = true;
 
         return true;
     }
 
-    public bool TryRemoveItemFromInventory(CInventoryItemRuntime item)
+    public bool TryRemoveItemFromInventory(CInventoryItemRuntime item, CPartyMemberRuntime owner)
     {
         if (item == null)
         {
@@ -88,12 +98,22 @@ public class CInventory
             m_SortedItems.Remove(item);
         }
 
+        if ((item.ItemType & EItemType.Held) != 0)
+        {
+            if (owner == null)
+            {
+                Debug.Log("TryRemoveItemToInventory - owner is null!");
+            }
+
+            owner.RemoveStatModifiers(item.StatModifiers);
+        }
+
         m_bIsSortedListDirty = true;
 
         return true;
     }
 
-    public bool TryUseItem(string itemName, CPartyMemberRuntime target)
+    public bool TryUseItem(string itemName, CPartyMemberRuntime owner, CPartyMemberRuntime target)
     {
         if (!m_ItemsBook.ContainsKey(itemName))
         {
@@ -118,9 +138,9 @@ public class CInventory
 
         target.ApplyStatModifiers(item.StatModifiers);
 
-        if (item.ItemType == EItemType.Consumable)
+        if ((item.ItemType & EItemType.Consumable) != 0)
         {
-            TryRemoveItemFromInventory(item);
+            TryRemoveItemFromInventory(item, owner);
         }
 
         return true;

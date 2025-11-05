@@ -1,11 +1,14 @@
+using System;
 using UnityEngine;
 
+[System.Flags]
 public enum EItemType
 {
-    Invalid,
-    Consumable,
-    Useable,
-    Equippable
+    Invalid = 0,
+    Consumable = 1 << 0,
+    Useable = 1 << 1,
+    Equippable = 1 << 2,
+    Held = 1 << 3
 }
 
 public enum EItemCategory

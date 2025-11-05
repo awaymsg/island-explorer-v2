@@ -1,8 +1,9 @@
 using System.Linq;
+using System.ComponentModel;
 using UnityEngine;
 using static UnityEditor.Progress;
 
-[CreateAssetMenu(fileName = "CItem", menuName = "Scriptable Objects/CItem")]
+[CreateAssetMenu(fileName = "CInventoryItem", menuName = "Scriptable Objects/CItem")]
 public class CInventoryItem : ScriptableObject
 {
     [Tooltip("Item name (player-facing)")]
@@ -19,6 +20,26 @@ public class CInventoryItem : ScriptableObject
     public SPartyMemberStatModifier[] m_StatModifiers;
 
     public float m_ItemWeight;
+
+    [ReadOnly(true)]
+    public float m_TotalCost;
+
+    public void CalculateCosts()
+    {
+        float totalCost = 0f;
+
+        foreach (SPartyMemberStatModifier statMod in m_StatModifiers)
+        {
+            totalCost += statMod.Cost;
+        }
+
+        m_TotalCost = totalCost;
+    }
+
+    private void OnValidate()
+    {
+        CalculateCosts();
+    }
 }
 
 public class CInventoryItemRuntime
