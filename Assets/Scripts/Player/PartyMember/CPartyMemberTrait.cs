@@ -41,6 +41,11 @@ public class CPartyMemberTrait : ScriptableObject
             {
                 totalCost += statMod.Cost;
             }
+
+            foreach (SPartyMemberTraitItem grantedItem in traitEffect.GrantedItems)
+            {
+                totalCost += grantedItem.Cost;
+            }
         }
 
         m_TotalCost = totalCost;
@@ -92,6 +97,8 @@ public class CPartyMemberTraitRuntime
             StatModifiers = original.StatModifiers?
                 .Select(statMod => new SPartyMemberStatModifier(statMod))
                 .ToArray(),
+
+            GrantedItems = original.GrantedItems?.ToList()
         };
     }
 
@@ -109,6 +116,11 @@ public class CPartyMemberTraitRuntime
             foreach (SPartyMemberStatModifier statMod in traitEffect.StatModifiers)
             {
                 totalCost += statMod.Cost;
+            }
+
+            foreach (SPartyMemberTraitItem grantedItem in traitEffect.GrantedItems)
+            {
+                totalCost += grantedItem.Cost;
             }
         }
 

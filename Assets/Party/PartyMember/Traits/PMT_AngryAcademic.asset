@@ -29,13 +29,20 @@ MonoBehaviour:
       Cost: -3
       ModificationContext: Anger and resentment gnaw at their being.
     StatModifiers:
-    - StatType: 7
+    - StatModName: Disgruntled
+      StatType: 7
       bMultiplicative: 0
       ModAmount: -10
+      bIsPermanent: 0
+      RemovalTimeInDays: 0
       Cost: -3
-    - StatType: 6
+    - StatModName: Science Savvy
+      StatType: 6
       bMultiplicative: 0
       ModAmount: 10
+      bIsPermanent: 0
+      RemovalTimeInDays: 0
       Cost: 3
+    GrantedItems: []
   m_bIsGenerationOnly: 1
   m_TotalCost: -3

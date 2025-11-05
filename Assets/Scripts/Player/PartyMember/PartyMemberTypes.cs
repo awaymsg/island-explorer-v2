@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using static UnityEngine.Rendering.DebugUI;
 
 [Serializable]
 public enum EPartyMemberType
@@ -18,6 +19,7 @@ public enum EPartyMemberSkillType
 {
     Invalid = 0,
     None,
+    Action,
     Buff,
     Event
 }
@@ -90,7 +92,9 @@ public enum EPartyMemberStatType
     Vision,
     Stamina,
     Magic,
-    Fortitude
+    Fortitude,
+    Hunger,
+    Attitude
 }
 
 [Serializable]
@@ -100,44 +104,62 @@ public struct SPartyMemberDefaultStat
     public float Value;
 }
 
-public struct SPartyMemberStat
+public class CPartyMemberStat
 {
-    public SPartyMemberStat(float value)
+    private float m_Value;
+    private readonly List<SPartyMemberStatModifier> m_CurrentModifiers;
+
+    public event Action<float, float> OnStatChanged; // oldValue, newValue
+
+    public float Value
     {
-        Value = value;
-        CurrentModifiers = new List<SPartyMemberStatModifier>();
+        get { return m_Value; }
+        private set
+        {
+            if (m_Value != value)
+            {
+                float oldValue = m_Value;
+                m_Value = value;
+                OnStatChanged?.Invoke(oldValue, m_Value);
+            }
+        }
+    }
+
+    public IReadOnlyList<SPartyMemberStatModifier> CurrentModifiers => m_CurrentModifiers;
+
+    public CPartyMemberStat(float value)
+    {
+        m_Value = value;
+        m_CurrentModifiers = new List<SPartyMemberStatModifier>();
     }
 
     public void AddMod(SPartyMemberStatModifier modifier)
     {
         if (modifier.bMultiplicative)
         {
-            Value *= modifier.ModAmount;
+            m_Value *= modifier.ModAmount;
         }
         else
         {
-            Value += modifier.ModAmount;
+            m_Value += modifier.ModAmount;
         }
 
-        CurrentModifiers.Add(modifier);
+        m_CurrentModifiers.Add(modifier);
     }
 
     public void RemoveMod(SPartyMemberStatModifier modifier)
     {
         if (modifier.bMultiplicative)
         {
-            Value /= modifier.ModAmount;
+            m_Value /= modifier.ModAmount;
         }
         else
         {
-            Value -= modifier.ModAmount;
+            m_Value -= modifier.ModAmount;
         }
 
-        CurrentModifiers.Remove(modifier);
+        m_CurrentModifiers.Remove(modifier);
     }
-
-    public float Value;
-    public List<SPartyMemberStatModifier> CurrentModifiers;
 }
 
 [Serializable]
@@ -274,8 +296,8 @@ public class CBodyPart
         MaxHealth = other.MaxHealth;
         Health = other.Health;
         bIsVital = other.bIsVital;
-        AttachedTo = other.AttachedTo;
-
+        
+        Attached = other.Attached != null ? other.Attached?.ToArray() : null;
         StatModifiers = other.StatModifiers?.Select(mod => new SBodyPartStatModifier(mod)).ToArray();
         Modifications = other.Modifications?.Select(mod => new CBodyPartModification(mod)).ToList();
     }
@@ -291,7 +313,7 @@ public class CBodyPart
     [Tooltip("If this is a vital body part, party member would die if it was destroyed")]
     public bool bIsVital = false;
     [Header("Attachment")]
-    public EBodyPart AttachedTo;
+    public EBodyPart[] Attached;
 }
 
 [Serializable]
@@ -299,4 +321,12 @@ public struct SPartyMemberTraitEffect
 {
     public List<CBodyPartModification> BodyPartModifications;
     public SPartyMemberStatModifier[] StatModifiers;
+    public List<SPartyMemberTraitItem> GrantedItems;
+}
+
+[Serializable]
+public struct SPartyMemberTraitItem
+{
+    public CInventoryItem InventoryItem;
+    public float Cost;
 }

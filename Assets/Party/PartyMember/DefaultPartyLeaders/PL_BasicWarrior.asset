@@ -45,7 +45,18 @@ MonoBehaviour:
     Value: 20
   - StatType: 16
     Value: 50
+  - StatType: 17
+    Value: 60
+  - StatType: 18
+    Value: 10
+  - StatType: 19
+    Value: 80
+  - StatType: 20
+    Value: 0
+  - StatType: 21
+    Value: 30
+  m_StartingItems: []
   m_PartyMemberSkills: []
-  m_TraitTypeBais: 1
+  m_TraitTypeBias: 0
   m_TraitBiasAmount: 0
   m_OverworldSprite: {fileID: -8574539851516715941, guid: 3a209ae74e55e2b439e3095c04020f42, type: 3}

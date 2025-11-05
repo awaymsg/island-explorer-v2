@@ -15,11 +15,14 @@ public class CPartyMember : ScriptableObject
     [Tooltip("Default stats for this party member")]
     public SPartyMemberDefaultStat[] m_BaseStats;
 
+    [Tooltip("Default Starting items")]
+    public CInventoryItem[] m_StartingItems;
+
     [Tooltip("Special default skills of this party member type")]
     public List<CPartyMemberSkill> m_PartyMemberSkills;
 
     [Tooltip("Trait type bias for this party member type")]
-    public EPartyMemberTraitType m_TraitTypeBais;
+    public EPartyMemberTraitType m_TraitTypeBias;
 
     [Tooltip("Trait bias amount, 0 is none, 1.0 is 100%")]
     public float m_TraitBiasAmount = 0f;
@@ -40,7 +43,8 @@ public class CPartyMemberRuntime
     protected List<CPartyMemberPersonalityTrait> m_PartyMemberPersonalityTraits = new List<CPartyMemberPersonalityTrait>();
     protected CBodyPart[] m_BodyParts;
 
-    protected Dictionary<EPartyMemberStatType, SPartyMemberStat> m_PartyMemberStats;
+    protected Dictionary<EPartyMemberStatType, CPartyMemberStat> m_PartyMemberStats;
+    protected CInventory m_ItemInventory;
 
     // player-facing
     private Dictionary<EBodyPart, List<string>> m_BodyPartConditions = new Dictionary<EBodyPart, List<string>>();
@@ -90,7 +94,7 @@ public class CPartyMemberRuntime
             Debug.Log("InitializePartyMember - PartyManager is null!");
         }
 
-        m_PartyMemberStats = GetBaseStats();
+        m_PartyMemberStats = SetBaseStats();
 
         // make a deep copy of this array
         m_BodyParts = m_PartyManager.DefaultBodyParts?.Select(bodyPart => new CBodyPart(bodyPart)).ToArray() ?? Array.Empty<CBodyPart>();
@@ -178,18 +182,57 @@ public class CPartyMemberRuntime
             Debug.Log("InitializePartyMember - there are no traits in the pool!");
         }
 
+        m_ItemInventory = new CInventory();
+
+        // Set inventory max weight and add callback when Fortitude changes
+        if (m_PartyMemberStats.ContainsKey(EPartyMemberStatType.Fortitude))
+        {
+            UpdateInventoryMaxWeight(0f, m_PartyMemberStats[EPartyMemberStatType.Fortitude].Value);
+            m_PartyMemberStats[EPartyMemberStatType.Fortitude].OnStatChanged += UpdateInventoryMaxWeight;
+        }
+        else
+        {
+            Debug.Log("InitializePartyMember - Party member missing Fortitude stat!");
+        }
+
+        AddDefaultItems();
+
         CalculateCost();
     }
 
-    private Dictionary<EPartyMemberStatType, SPartyMemberStat> GetBaseStats()
+    private void UpdateInventoryMaxWeight(float oldValue, float newValue)
+    {
+        if (m_ItemInventory == null)
+        {
+            Debug.Log("ItemInventory is null!");
+            return;
+        }
+
+        m_ItemInventory.MaxWeight = m_PartyMemberStats[EPartyMemberStatType.Fortitude].Value;
+    }
+
+    private void AddDefaultItems()
+    {
+        foreach (CInventoryItem item in m_PartyMemberSO.m_StartingItems)
+        {
+            bool bSuccess = m_ItemInventory.TryAddItemToInventory(new CInventoryItemRuntime(item));
+
+            if (!bSuccess)
+            {
+                Debug.Log("AddDefaultItems - default item failed to be added!");
+            }
+        }
+    }
+
+    private Dictionary<EPartyMemberStatType, CPartyMemberStat> SetBaseStats()
     {
         SPartyMemberDefaultStat[] defaultStats = m_PartyMemberSO.m_BaseStats;
 
-        Dictionary<EPartyMemberStatType, SPartyMemberStat> defaultStatsBook = new Dictionary<EPartyMemberStatType, SPartyMemberStat>();
+        Dictionary<EPartyMemberStatType, CPartyMemberStat> defaultStatsBook = new Dictionary<EPartyMemberStatType, CPartyMemberStat>();
 
         foreach (SPartyMemberDefaultStat defaultStat in defaultStats)
         {
-            SPartyMemberStat stat = new SPartyMemberStat(defaultStat.Value);
+            CPartyMemberStat stat = new CPartyMemberStat(defaultStat.Value);
             defaultStatsBook[defaultStat.StatType] = stat;
         }
 
@@ -293,11 +336,7 @@ public class CPartyMemberRuntime
                 traitEffect.BodyPartModifications.Remove(bodyModToRemove);
             }
 
-            // apply stat modifiers
-            foreach (SPartyMemberStatModifier statMod in traitEffect.StatModifiers)
-            {
-                m_PartyMemberStats[statMod.StatType].AddMod(statMod);
-            }
+            ApplyStatModifiers(traitEffect.StatModifiers);
         }
 
         m_PartyMemberTraits.Add(runtimeTrait);
@@ -311,16 +350,30 @@ public class CPartyMemberRuntime
         foreach (SPartyMemberTraitEffect traitEffect in trait.TraitEffects)
         {
             // revert stat modifiers
-            foreach (SPartyMemberStatModifier statMod in traitEffect.StatModifiers)
-            {
-                m_PartyMemberStats[statMod.StatType].RemoveMod(statMod);
-            }
+            RemoveStatModifiers(traitEffect.StatModifiers);
         }
 
         m_PartyMemberTraits.Remove(trait);
 
         // remove player facing details
         m_TraitDetails.Remove(trait.TraitName);
+    }
+
+    public void ApplyStatModifiers(SPartyMemberStatModifier[] statMods)
+    {
+        // apply stat modifiers
+        foreach (SPartyMemberStatModifier statMod in statMods)
+        {
+            m_PartyMemberStats[statMod.StatType].AddMod(statMod);
+        }
+    }
+
+    public void RemoveStatModifiers(SPartyMemberStatModifier[] statMods)
+    {
+        foreach (SPartyMemberStatModifier statMod in statMods)
+        {
+            m_PartyMemberStats[statMod.StatType].RemoveMod(statMod);
+        }
     }
 
     public float CalculateCost()
