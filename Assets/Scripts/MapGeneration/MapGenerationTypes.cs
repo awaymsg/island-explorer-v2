@@ -64,7 +64,6 @@ public struct STerrainTile
     }
 }
 
-[Serializable]
 public enum EBiomeType : UInt16
 {
     Invalid,

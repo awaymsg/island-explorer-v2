@@ -5,7 +5,6 @@ using System.Linq;
 using UnityEngine;
 using static UnityEngine.Rendering.DebugUI;
 
-[Serializable]
 public enum EPartyMemberType
 {
     Invalid = 0,
@@ -16,7 +15,6 @@ public enum EPartyMemberType
     Occult
 }
 
-[Serializable]
 public enum EPartyMemberSkillType
 {
     Invalid = 0,
@@ -26,7 +24,6 @@ public enum EPartyMemberSkillType
     Event
 }
 
-[Serializable]
 public enum EPartyMemberTraitType
 {
     Invalid = 0,
@@ -38,7 +35,6 @@ public enum EPartyMemberTraitType
     Occult
 }
 
-[Serializable]
 public enum EPartyMemberGender
 {
     Invalid = 0,
@@ -71,7 +67,6 @@ public struct SPartyMemberStatModifier
     public float Cost;
 }
 
-[Serializable]
 public enum EPartyMemberStatType
 {
     Invalid = 0,
@@ -164,7 +159,6 @@ public class CPartyMemberStat
     }
 }
 
-[Serializable]
 public enum EBodyPart
 {
     Invalid = 0,
@@ -207,7 +201,6 @@ public enum EBodyPart
     RightFoot
 }
 
-[Serializable]
 public enum EBodyPartModification
 {
     Invalid = 0,
