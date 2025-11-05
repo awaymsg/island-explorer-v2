@@ -142,7 +142,8 @@ public class CPartyMemberStat
         }
         else
         {
-            m_Value += modifier.ModAmount;
+            // Don't go below 0
+            m_Value = Math.Max(m_Value + modifier.ModAmount, 0f);
         }
 
         m_CurrentModifiers.Add(modifier);

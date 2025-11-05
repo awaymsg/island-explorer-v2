@@ -135,7 +135,7 @@ public class CCharacterListUI : MonoBehaviour
             return;
         }
 
-        nameInfo.text = partyMember.CharacterName;
+        nameInfo.text = string.Format("{0}\n({1})", partyMember.CharacterName, partyMember.PartyMemberClassName);
 
         foreach (var trait in partyMember.TraitDetails)
         {
@@ -173,7 +173,7 @@ public class CCharacterListUI : MonoBehaviour
         }
         inventoryInfo.style.fontSize = 12;
 
-        string inventoryString = "Inventory:\n";
+        string inventoryString = string.Format("Inventory: {0}/{1}\n", partyMember.ItemInventory.CurrentWeight, partyMember.ItemInventory.MaxWeight);
         Dictionary<CInventoryItemRuntime, int> items = partyMember.ItemInventory.GetItemsWithCounts();
         foreach (var item in items)
         {

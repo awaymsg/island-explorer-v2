@@ -10,8 +10,11 @@ public class CPartyMember : ScriptableObject
     [Tooltip("The overworld sprite of this character if they are party leader")]
     public Sprite m_OverworldSprite;
 
-    [Tooltip("Name of this party member type")]
+    [Tooltip("Party member type")]
     public EPartyMemberType m_PartyMemberClass;
+
+    [Tooltip("Player facing class name")]
+    public string m_PartyMemberClassName;
 
     public EPartyMemberGender m_PartyMemberGender;
 
@@ -102,6 +105,11 @@ public class CPartyMemberRuntime
     public CInventory ItemInventory
     {
         get { return m_ItemInventory; }
+    }
+
+    public string PartyMemberClassName
+    {
+        get { return m_PartyMemberSO.m_PartyMemberClassName; }
     }
     //--
 

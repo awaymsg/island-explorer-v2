@@ -14,6 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::CPartyMember
   m_OverworldSprite: {fileID: -8574539851516715941, guid: 3a209ae74e55e2b439e3095c04020f42, type: 3}
   m_PartyMemberClass: 1
+  m_PartyMemberClassName: Mercenary
   m_PartyMemberGender: 1
   m_BaseStats:
   - StatType: 2
