@@ -14,7 +14,10 @@ public class CInventory
     // Getters
     public float CurrentWeight => m_CurrentWeight;
 
-    public float MaxWeight { get; set; }
+    public float MaxWeight {
+        get { return m_MaxWeight; }
+        set { m_MaxWeight = value; }
+    }
     //--
 
     public bool CanAddItemToInventory(CInventoryItemRuntime item)

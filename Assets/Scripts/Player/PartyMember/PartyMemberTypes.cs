@@ -10,8 +10,10 @@ public enum EPartyMemberType
 {
     Invalid = 0,
     Warrior,
+    Social,
+    Academic,
     Scout,
-    Hunter
+    Occult
 }
 
 [Serializable]
@@ -32,7 +34,8 @@ public enum EPartyMemberTraitType
     Warrior,
     Social,
     Scientific,
-    Exploration
+    Exploration,
+    Occult
 }
 
 [Serializable]
@@ -50,7 +53,6 @@ public struct SPartyMemberStatModifier
     // copy constructor
     public SPartyMemberStatModifier(SPartyMemberStatModifier other)
     {
-        StatModName = other.StatModName;
         StatType = other.StatType;
         bMultiplicative = other.bMultiplicative;
         ModAmount = other.ModAmount;
@@ -59,7 +61,6 @@ public struct SPartyMemberStatModifier
         Cost = other.Cost;
     }
 
-    public string StatModName;
     public EPartyMemberStatType StatType;
     public bool bMultiplicative;
     public float ModAmount;

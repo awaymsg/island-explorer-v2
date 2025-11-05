@@ -1,0 +1,14 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" editor-extension-mode="False">
+    <ui:VisualElement name="FullCharacterPanel" style="flex-grow: 1; background-color: rgba(0, 0, 0, 0.43); height: 100%;">
+        <ui:VisualElement name="PortraitPanel" style="flex-grow: 1;">
+            <ui:VisualElement name="Portrait" style="width: auto; height: auto;" />
+            <ui:Label text="Label" name="NameInfo" style="color: rgb(255, 255, 255);" />
+        </ui:VisualElement>
+        <ui:VisualElement name="StatsPanel" style="flex-grow: 1; position: absolute; right: 50%;">
+            <ui:Label text="Label" name="StatsInfo" style="color: rgb(255, 255, 255); position: absolute" />
+        </ui:VisualElement>
+        <ui:VisualElement name="InventoryPanel" style="flex-grow: 1;">
+            <ui:Label text="Label" name="InventoryInfo" style="color: rgb(255, 255, 255);" />
+        </ui:VisualElement>
+    </ui:VisualElement>
+</ui:UXML>

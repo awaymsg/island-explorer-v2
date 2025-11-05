@@ -4,12 +4,12 @@ using System.Linq;
 
 public class CPartyPlayerCharacter : MonoBehaviour
 {
-    private CPartyLeaderRuntime m_PartyLeader;
+    private CPartyMemberRuntime m_PartyLeader;
     private List<CPartyMemberRuntime> m_PartyMembers;
     private Vector3Int m_CurrentLocation;
 
     //-- getters
-    public CPartyLeaderRuntime PartyLeader
+    public CPartyMemberRuntime PartyLeader
     {  
         get { return m_PartyLeader; }
     }
@@ -26,10 +26,10 @@ public class CPartyPlayerCharacter : MonoBehaviour
     }
     //--
 
-    public void InitializePartyPlayerCharacter(CPartyLeaderRuntime partyLeader, List<CPartyMemberRuntime> partyMembers)
+    public void InitializePartyPlayerCharacter(CPartyMemberRuntime partyLeader, Queue<CPartyMemberRuntime> partyMembers)
     {
         m_PartyLeader = partyLeader;
-        m_PartyMembers = partyMembers;
+        m_PartyMembers = partyMembers.ToList();
     }
 
     public void AddPartyMember(CPartyMemberRuntime partyMember)

@@ -31,4 +31,14 @@ public class CWorldInfoUI : MonoBehaviour
     {
         m_WorldInfoLabel.text = worldInfo;
     }
+
+    public void HideWorldInfo()
+    {
+        m_WorldInfoPanel.style.visibility = Visibility.Hidden;
+    }
+
+    public void ShowWorldInfo()
+    {
+        m_WorldInfoPanel.style.visibility = Visibility.Visible;
+    }
 }

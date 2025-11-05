@@ -142,37 +142,30 @@ public class CGameManager : MonoBehaviour
 
     private void CreatePlayerCharacter()
     {
-        if (m_PartyManager.DefaultPartyLeadersPool.Length == 0)
-        {
-            Debug.Log("CreatePlayerCharacter - There are no DefaultPartyLeaders in the pool!");
-            return;
-        }
-
         if (m_PartyManager.DefaultPartyMembersPool.Length == 0)
         {
             Debug.Log("CreatePlayerCharacter - There are no DefaultPartyMembers in the pool!");
             return;
         }
 
-        int leaderIndex = Random.Range(0, m_PartyManager.DefaultPartyLeadersPool.Length);
-        CPartyLeader defaultPartyLeader = m_PartyManager.DefaultPartyLeadersPool[leaderIndex];
-
-        int memberindex = Random.Range(0, m_PartyManager.DefaultPartyMembersPool.Length);
-        CPartyMember defaultPartyMember = m_PartyManager.DefaultPartyMembersPool[memberindex];
-
         // Instantiate and initialize the player
         m_PartyPlayerGameObject = Instantiate(m_PartyPlayerCharacterPrefab);
         m_PartyPlayerCharacter = m_PartyPlayerGameObject.GetComponent<CPartyPlayerCharacter>();
 
         // TEMP: initialize default party members. later they will be created and selected from a menu
-        CPartyLeaderRuntime partyLeader = m_PartyManager.CreatePartyLeader(defaultPartyLeader);
-        CPartyMemberRuntime partyMember = m_PartyManager.CreatePartyMember(defaultPartyMember);
+        Queue<CPartyMemberRuntime> partyMembers = new Queue<CPartyMemberRuntime>();
+        for (int i = 0; i < 2; ++i)
+        {
+            int memberindex = Random.Range(0, m_PartyManager.DefaultPartyMembersPool.Length);
+            CPartyMember defaultPartyMember = m_PartyManager.DefaultPartyMembersPool[memberindex];
 
-        List<CPartyMemberRuntime> partyMembers = new List<CPartyMemberRuntime>();
-        partyMembers.Add(partyMember);
+            CPartyMemberRuntime partyMember = m_PartyManager.CreatePartyMember(defaultPartyMember);
 
-        m_PartyPlayerCharacter = m_PartyManager.CreatePartyPlayerCharacter(m_PartyPlayerCharacter, partyLeader, partyMembers);
-        m_PartyPlayerGameObject.GetComponent<SpriteRenderer>().sprite = defaultPartyLeader.m_OverworldSprite;
+            partyMembers.Enqueue(partyMember);
+        }
+
+        m_PartyPlayerCharacter = m_PartyManager.CreatePartyPlayerCharacter(m_PartyPlayerCharacter, partyMembers);
+        m_PartyPlayerGameObject.GetComponent<SpriteRenderer>().sprite = m_PartyPlayerCharacter.PartyLeader.OverworldSprite;
 
         Vector3Int startingLocation = FindStartingLocation();
         m_PartyPlayerCharacter.CurrentLocation = startingLocation;

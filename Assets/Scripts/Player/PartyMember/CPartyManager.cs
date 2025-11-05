@@ -6,10 +6,7 @@ using UnityEngine;
 
 public class CPartyManager : MonoBehaviour
 {
-    [SerializeField, Tooltip("Premade default party leaders by class")]
-    private CPartyLeader[] m_DefaultPartyLeadersPool;
-
-    [SerializeField, Tooltip("Premade default party members by class")]
+    [SerializeField, Tooltip("Premade default party members")]
     private CPartyMember[] m_DefaultPartyMembersPool;
 
     [SerializeField, Tooltip("All body parts base stats")]
@@ -47,11 +44,6 @@ public class CPartyManager : MonoBehaviour
     private CCharacterListUI m_CharacterListUI;
 
     //-- getters
-    public CPartyLeader[] DefaultPartyLeadersPool
-    {
-        get { return m_DefaultPartyLeadersPool; }
-    }
-
     public CPartyMember[] DefaultPartyMembersPool
     {
         get { return m_DefaultPartyMembersPool; }
@@ -131,18 +123,11 @@ public class CPartyManager : MonoBehaviour
 
         return newPartyMember;
     }
-    
-    public CPartyLeaderRuntime CreatePartyLeader(CPartyLeader defaultPartyLeader)
+
+    public CPartyPlayerCharacter CreatePartyPlayerCharacter(CPartyPlayerCharacter defaultPlayerCharacter, Queue<CPartyMemberRuntime> partyMembers)
     {
-        CPartyLeaderRuntime newPartyLeader = new CPartyLeaderRuntime(defaultPartyLeader, this);
+        CPartyMemberRuntime partyLeader = partyMembers.Dequeue();
 
-        newPartyLeader.InitializePartyMember();
-
-        return newPartyLeader;
-    }
-
-    public CPartyPlayerCharacter CreatePartyPlayerCharacter(CPartyPlayerCharacter defaultPlayerCharacter, CPartyLeaderRuntime partyLeader, List<CPartyMemberRuntime> partyMembers)
-    {
         defaultPlayerCharacter.InitializePartyPlayerCharacter(partyLeader, partyMembers);
         m_PartyPlayerCharacter = defaultPlayerCharacter;
 

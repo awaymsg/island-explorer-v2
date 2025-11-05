@@ -7,6 +7,9 @@ using UnityEngine;
 [CreateAssetMenu(fileName = "PartyMember", menuName = "Scriptable Objects/PartyMember")]
 public class CPartyMember : ScriptableObject
 {
+    [Tooltip("The overworld sprite of this character if they are party leader")]
+    public Sprite m_OverworldSprite;
+
     [Tooltip("Name of this party member type")]
     public EPartyMemberType m_PartyMemberClass;
 
@@ -66,6 +69,11 @@ public class CPartyMemberRuntime
         get { return m_CharacterName; }
     }
 
+    public Sprite OverworldSprite
+    {
+        get { return m_PartyMemberSO.m_OverworldSprite; }
+    }
+
     public EPartyMemberGender PartyMemberGender
     {
         get { return m_PartyMemberSO.m_PartyMemberGender; }
@@ -84,6 +92,16 @@ public class CPartyMemberRuntime
     public Dictionary<string, string> TraitDetails
     {
         get { return m_TraitDetails; }
+    }
+
+    public Dictionary<EPartyMemberStatType, CPartyMemberStat> PartyMemberStats
+    {
+        get { return m_PartyMemberStats; }
+    }
+
+    public CInventory ItemInventory
+    {
+        get { return m_ItemInventory; }
     }
     //--
 
@@ -187,8 +205,8 @@ public class CPartyMemberRuntime
         // Set inventory max weight and add callback when Fortitude changes
         if (m_PartyMemberStats.ContainsKey(EPartyMemberStatType.Fortitude))
         {
-            UpdateInventoryMaxWeight(0f, m_PartyMemberStats[EPartyMemberStatType.Fortitude].Value);
             m_PartyMemberStats[EPartyMemberStatType.Fortitude].OnStatChanged += UpdateInventoryMaxWeight;
+            UpdateInventoryMaxWeight(0f, m_PartyMemberStats[EPartyMemberStatType.Fortitude].Value);
         }
         else
         {
