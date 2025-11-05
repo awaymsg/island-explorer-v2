@@ -245,6 +245,7 @@ public class CMapGenerator : MonoBehaviour
         {
             SPOIMapping poiMapping = Array.Find(m_POIMappings, p => p.BiomeType == terrainTile.GetBiomeType());
 
+            // TODO: make likelihood rolls more accurate / better (currently takes lowest likelihood success)
             float minLikelihood = 100f;
 
             if (poiMapping.BiomeType != EBiomeType.Invalid)
@@ -255,7 +256,7 @@ public class CMapGenerator : MonoBehaviour
                 {
                     if (random < poiSetting.Likelihood)
                     {
-                        // TODO: set POI on tile
+                        // TODO: set POI settings on tile
                         if (poiSetting.Likelihood < minLikelihood)
                         {
                             minLikelihood = poiSetting.Likelihood;

@@ -198,9 +198,10 @@ public class CGameManager : MonoBehaviour
                 // If the estimated tile movement rate is lower than the actual, update estimate
                 float estimatedNextMoveTime = m_CurrentEstimatedPathMovementRates.Dequeue();
 
+                // Our next move is above our estimated threshold!
                 if (m_CurrentTrueMovementRate > estimatedNextMoveTime && m_CurrentTrueMovementRate > m_CurrentAcceptablePathMovementRate)
                 {
-                    // TODO: show message to ask to continue moving or not
+                    // Pause and show message to ask to continue moving or not
                     bool continueMoving = await GetMovementConfirmationAsync(m_CurrentTrueMovementRate);
 
                     if (!continueMoving)
