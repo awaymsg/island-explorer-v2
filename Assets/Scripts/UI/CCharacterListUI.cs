@@ -173,7 +173,7 @@ public class CCharacterListUI : MonoBehaviour
         }
         inventoryInfo.style.fontSize = 12;
 
-        string inventoryString = "";
+        string inventoryString = "Inventory:\n";
         Dictionary<CInventoryItemRuntime, int> items = partyMember.ItemInventory.GetItemsWithCounts();
         foreach (var item in items)
         {
