@@ -6,6 +6,10 @@ next: EVENTS SYSTEM, resource usage, improving full stats UI
 update: 11/2/25 added concept of passage of time and intervals within days and movement over time. added some new terrain flair tiles courtesy of jack & kayleigh, and water-land corner tile rules, and now the generated island looks 150% better! also added a little more much needed UI
 -
 <img width="1125" height="621" alt="image" src="https://github.com/user-attachments/assets/01cb63b8-5d32-4f50-a135-eeb7c6010d2e" />
+
+water-land corner tiles highlighted
+<img width="1114" height="607" alt="image" src="https://github.com/user-attachments/assets/0db51461-2bce-48c3-affc-65e0994739e1" />
+
 next: EVENTS SYSTEM, concept of resources & inventory, full stats ui
 
 update: 10/28/25 changed movement to select->right click based, and also added camera follow, updated tiles and some rules
