@@ -7,7 +7,7 @@ update: 11/2/25 added concept of passage of time and intervals within days and m
 -
 <img width="1125" height="621" alt="image" src="https://github.com/user-attachments/assets/01cb63b8-5d32-4f50-a135-eeb7c6010d2e" />
 
-water-land corner tiles highlighted
+some water-land corner tiles highlighted
 <img width="1114" height="607" alt="image" src="https://github.com/user-attachments/assets/0db51461-2bce-48c3-affc-65e0994739e1" />
 
 next: EVENTS SYSTEM, concept of resources & inventory, full stats ui
