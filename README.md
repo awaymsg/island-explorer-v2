@@ -3,7 +3,7 @@ update: 11/5/25 added concept of inventory & items, cleaned up movement to be sm
 <img width="1112" height="626" alt="image" src="https://github.com/user-attachments/assets/20b66623-86fa-4078-84ad-65a202ffe65b" />
 next: EVENTS SYSTEM, resource usage, improving full stats UI
 
-update: 11/2/25 added concept of passage of time and intervals within days and movement over time. added some new terrain flair tiles courtesy of jack & kayleigh and now the generated island looks 150% better! also added a little more much needed UI
+update: 11/2/25 added concept of passage of time and intervals within days and movement over time. added some new terrain flair tiles courtesy of jack & kayleigh, and water-land corner tile rules, and now the generated island looks 150% better! also added a little more much needed UI
 -
 <img width="1125" height="621" alt="image" src="https://github.com/user-attachments/assets/01cb63b8-5d32-4f50-a135-eeb7c6010d2e" />
 next: EVENTS SYSTEM, concept of resources & inventory, full stats ui
