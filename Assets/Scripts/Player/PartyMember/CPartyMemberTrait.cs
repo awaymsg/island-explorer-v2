@@ -23,6 +23,9 @@ public class CPartyMemberTrait : ScriptableObject
     [Tooltip("If true, this trait can only be assigned when a new party member is generated.")]
     public bool m_bIsGenerationOnly = true;
 
+    [Tooltip("If true, this trait is hidden, until it is discovered later")]
+    public bool m_bIsHidden = false;
+
     [ReadOnly(true)]
     public float m_TotalCost = 0f;
 
@@ -62,6 +65,7 @@ public class CPartyMemberTraitRuntime
 {
     private CPartyMemberTrait m_PartyMemberTraitSO;
     private SPartyMemberTraitEffect[] m_TraitEffects;
+    private bool m_bIsHidden = false;
 
     //-- getters
     public string TraitName
@@ -73,6 +77,12 @@ public class CPartyMemberTraitRuntime
     {
         get { return m_TraitEffects; }
     }
+
+    public bool bIsHidden
+    {
+        get { return m_bIsHidden; }
+        set { m_bIsHidden = value; }
+    }
     //--
 
     public CPartyMemberTraitRuntime(CPartyMemberTrait partyMemberTraitSO)
@@ -83,6 +93,8 @@ public class CPartyMemberTraitRuntime
         m_TraitEffects = m_PartyMemberTraitSO.m_TraitEffects
             .Select(effect => DeepCopyTraitEffect(effect))
             .ToArray();
+
+        m_bIsHidden = partyMemberTraitSO.m_bIsHidden;
     }
 
     private SPartyMemberTraitEffect DeepCopyTraitEffect(SPartyMemberTraitEffect original)

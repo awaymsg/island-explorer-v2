@@ -1,17 +1,16 @@
-using System.Collections;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net;
+using System.Threading;
 using System.Threading.Tasks;
-using Unity.Hierarchy;
-using Unity.Jobs;
-using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.Tilemaps;
 
 public class CGameManager : MonoBehaviour
 {
+    private static CGameManager m_Instance;
+
     [Header("Generation")]
     [SerializeField]
     private bool m_bUseSeed = false;
@@ -19,6 +18,8 @@ public class CGameManager : MonoBehaviour
     private int m_RandomSeed = 0;
 
     [Header("Character & Refs")]
+    [SerializeField]
+    private Camera m_Camera;
     [SerializeField, Tooltip("Player party character prefab")]
     private GameObject m_PartyPlayerCharacterPrefab;
     [SerializeField, Tooltip("Effect tile when a location is selected")]
@@ -48,14 +49,13 @@ public class CGameManager : MonoBehaviour
     private Tilemap m_FogMap;
     private Tilemap m_EffectsMap;
 
-    private Camera m_Camera;
     private CCameraManager m_CameraManager;
     private CUIManager m_UIManager;
 
     private GameObject m_PartyPlayerGameObject;
     private CPartyPlayerCharacter m_PartyPlayerCharacter;
 
-    private CPathFinder m_PathFinder;
+    private static CPathFinder m_PathFinder;
 
     // Gameplay important vars
     private float m_DayCount = 0;
@@ -75,26 +75,45 @@ public class CGameManager : MonoBehaviour
 
     private static bool m_bPauseGameplay = false;
 
+    //-- Events
+    public event Action<string> m_OnDayInfoChanged;
+    public event Action<string> m_OnWorldInfoChanged;
+    //--
+
+    //-- Getters
     public CPartyPlayerCharacter PartyPlayerCharacter
     {
         get { return m_PartyPlayerCharacter; }
     }
 
+    public static CGameManager Instance
+    {
+        get
+        {
+            if (m_Instance == null)
+            {
+                m_Instance = FindFirstObjectByType<CGameManager>();
+            }
+
+            return m_Instance;
+        }
+    }
+    //--
+
     private void Start()
     {
         if (m_bUseSeed)
         {
-            Random.InitState(m_RandomSeed);
+            UnityEngine.Random.InitState(m_RandomSeed);
         }
 
-        Debug.Log(string.Format("RandomSeed: {0}", Random.seed));
+        Debug.Log(string.Format("RandomSeed: {0}", UnityEngine.Random.seed));
 
         m_WorldGrid = FindFirstObjectByType<Grid>();
-        m_MapGenerator = FindFirstObjectByType<CMapGenerator>();
-        m_PartyManager = FindFirstObjectByType<CPartyManager>();
-        m_Camera = FindFirstObjectByType<Camera>();
+        m_MapGenerator = CMapGenerator.Instance;
+        m_PartyManager = CPartyManager.Instance;
         m_CameraManager = m_Camera.GetComponent<CCameraManager>();
-        m_UIManager = FindFirstObjectByType<CUIManager>();
+        m_UIManager = CUIManager.Instance;
 
         m_MapGenerator.IgnoreTileRules = m_bIgnoreTileRules;
         m_TerrainTileMap = m_MapGenerator.GenerateMap();
@@ -156,7 +175,7 @@ public class CGameManager : MonoBehaviour
         Queue<CPartyMemberRuntime> partyMembers = new Queue<CPartyMemberRuntime>();
         for (int i = 0; i < 2; ++i)
         {
-            int memberindex = Random.Range(0, m_PartyManager.DefaultPartyMembersPool.Length);
+            int memberindex = UnityEngine.Random.Range(0, m_PartyManager.DefaultPartyMembersPool.Length);
             CPartyMember defaultPartyMember = m_PartyManager.DefaultPartyMembersPool[memberindex];
 
             CPartyMemberRuntime partyMember = m_PartyManager.CreatePartyMember(defaultPartyMember);
@@ -220,7 +239,7 @@ public class CGameManager : MonoBehaviour
                     m_TotalEstimatedMovementRemaining += estimatedMoveTime;
                 }
 
-                m_UIManager.UpdateWorldInfo(string.Format("Estimated Traversal Time: {0}", m_TotalEstimatedMovementRemaining));
+                m_OnWorldInfoChanged?.Invoke(string.Format("Estimated Traversal Time: {0}", m_TotalEstimatedMovementRemaining));
             }
             else
             {
@@ -256,12 +275,12 @@ public class CGameManager : MonoBehaviour
             // We moved, so increment day
             m_DayCount += 1f / m_StepsInADay;
             m_DayCount = (float)System.Math.Round(m_DayCount, 1);
-            m_UIManager.UpdateDayInfo(string.Format("Day: {0}", m_DayCount));
+            m_OnDayInfoChanged?.Invoke(string.Format("Day: {0}", m_DayCount));
 
             // Decrement estimated move time remaining
             m_TotalEstimatedMovementRemaining -= 1f / m_StepsInADay;
             m_TotalEstimatedMovementRemaining = (float)System.Math.Round(m_TotalEstimatedMovementRemaining, 1);
-            m_UIManager.UpdateWorldInfo(string.Format("Estimated Traversal Time: {0}", m_TotalEstimatedMovementRemaining));
+            m_OnWorldInfoChanged?.Invoke(string.Format("Estimated Traversal Time: {0}", m_TotalEstimatedMovementRemaining));
         }
         else
         {
@@ -276,20 +295,47 @@ public class CGameManager : MonoBehaviour
 
     private async Task<bool> GetMovementConfirmationAsync(float actual)
     {
+        // We should be entering here from the main thread
+        SynchronizationContext mainThreadContext = SynchronizationContext.Current;
+
         TaskCompletionSource<bool> completionSource = new TaskCompletionSource<bool>();
 
         m_UIManager.PopupsUI.CreateContinueMovementDialogue(actual, (response) =>
         {
-            completionSource.SetResult(response);
+            // Try to ensure we are on the main thread
+            if (mainThreadContext != null && SynchronizationContext.Current != mainThreadContext)
+            {
+                mainThreadContext.Post(p =>
+                {
+                    completionSource.SetResult(response);
+                }, null);
+            }
+            else
+            {
+                completionSource.SetResult(response);
+            }
         });
 
         m_bPauseGameplay = true;
 
-        bool result = await completionSource.Task;
+        bool result = await completionSource.Task.ConfigureAwait(true);
+
+        // Seriously, make sure we are on the main thread
+        if (SynchronizationContext.Current != mainThreadContext && mainThreadContext != null)
+        {
+            await DispatchToMainThread(mainThreadContext);
+        }
 
         m_bPauseGameplay = false;
 
         return result;
+    }
+
+    private async Task DispatchToMainThread(SynchronizationContext context)
+    {
+        TaskCompletionSource<bool> tcs = new TaskCompletionSource<bool>();
+        context.Post(p => tcs.SetResult(true), null);
+        await tcs.Task;
     }
 
     private void CancelMove()
@@ -438,7 +484,7 @@ public class CGameManager : MonoBehaviour
 
             m_TotalEstimatedMovementRemaining = (float)System.Math.Round(m_TotalEstimatedMovementRemaining, 1);
             totalDanger = (float)System.Math.Round(totalDanger, 1);
-            m_UIManager.UpdateWorldInfo(string.Format("Estimated Traversal Time: {0}d\nEstimated Danger Level: {1}", m_TotalEstimatedMovementRemaining, totalDanger));
+            m_OnWorldInfoChanged?.Invoke(string.Format("Estimated Traversal Time: {0}d\nEstimated Danger Level: {1}", m_TotalEstimatedMovementRemaining, totalDanger));
         }
         else
         {
@@ -446,14 +492,14 @@ public class CGameManager : MonoBehaviour
 
             if (bIsFogged)
             {
-                m_UIManager.UpdateWorldInfo("Biome: ???\nTraversal Time: ???\nDanger Level: ???");
+                m_OnWorldInfoChanged?.Invoke("Biome: ???\nTraversal Time: ???\nDanger Level: ???");
 
                 return;
             }
 
             STerrainTile currentTile = m_TerrainTileMap[cellPosition.x, cellPosition.y];
 
-            m_UIManager.UpdateWorldInfo(string.Format("Biome: {0}\nTraversal Time: {1}d\nDanger Level: {2}", currentTile.GetBiomeType().ToString(), currentTile.GetTraversalRate(), currentTile.GetDangerAmount()));
+            m_OnWorldInfoChanged?.Invoke(string.Format("Biome: {0}\nTraversal Time: {1}d\nDanger Level: {2}", currentTile.GetBiomeType().ToString(), currentTile.GetTraversalRate(), currentTile.GetDangerAmount()));
         }
     }
 
@@ -556,10 +602,10 @@ public class CGameManager : MonoBehaviour
             return new Vector3Int();
         }
 
-        int direction = Random.Range(0, 2);        
+        int direction = UnityEngine.Random.Range(0, 2);        
 
         bool bNearSide = true;
-        int side = Random.Range(0, 2);
+        int side = UnityEngine.Random.Range(0, 2);
 
         if (side == 1)
         {
@@ -568,7 +614,7 @@ public class CGameManager : MonoBehaviour
 
         if (direction == 0)
         {
-            int y = Random.Range(0, m_MapGenerator.MapSize.y);
+            int y = UnityEngine.Random.Range(0, m_MapGenerator.MapSize.y);
 
             if (bNearSide)
             {
@@ -593,7 +639,7 @@ public class CGameManager : MonoBehaviour
         }
         else
         {
-            int x = Random.Range(0, m_MapGenerator.MapSize.x);
+            int x = UnityEngine.Random.Range(0, m_MapGenerator.MapSize.x);
 
             if (bNearSide)
             {

@@ -1,14 +1,13 @@
 using System;
 using System.Collections.Generic;
-using System.Data;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.Tilemaps;
-using static Unity.Collections.Unicode;
-using static UnityEngine.EventSystems.EventTrigger;
 
 public class CMapGenerator : MonoBehaviour
 {
+    private static CMapGenerator m_Instance;
+
     [Header("TilemapRefs")]
     [SerializeField]
     private Tilemap m_TerrainMap;
@@ -121,6 +120,19 @@ public class CMapGenerator : MonoBehaviour
     public bool IgnoreTileRules
     {
         set { m_bIgnoreTileRules = value; }
+    }
+
+    public static CMapGenerator Instance
+    {
+        get
+        {
+            if (m_Instance == null)
+            {
+                m_Instance = FindFirstObjectByType<CMapGenerator>();
+            }
+
+            return m_Instance;
+        }
     }
     //--
 

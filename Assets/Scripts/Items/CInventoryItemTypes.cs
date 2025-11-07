@@ -1,6 +1,3 @@
-using System;
-using UnityEngine;
-
 [System.Flags]
 public enum EItemType
 {

@@ -1,7 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Dynamic;
-using System.Linq;
 using UnityEngine;
 
 public class CPartyManager : MonoBehaviour
@@ -41,7 +39,12 @@ public class CPartyManager : MonoBehaviour
 
     private CPartyPlayerCharacter m_PartyPlayerCharacter;
 
-    private CCharacterListUI m_CharacterListUI;
+    private static CPartyManager m_Instance;
+
+    //-- Events
+    public event Action<CPartyMemberRuntime> m_OnCharacterAdded;
+    public event Action<CPartyMemberRuntime> m_OnCharacterRemoved;
+    //--
 
     //-- getters
     public CPartyMember[] DefaultPartyMembersPool
@@ -103,17 +106,20 @@ public class CPartyManager : MonoBehaviour
     {
         get { return m_FemalePortraits; }
     }
-    //--
 
-    public void Awake()
+    public static CPartyManager Instance
     {
-        m_CharacterListUI = FindFirstObjectByType<CCharacterListUI>();
-
-        if (m_CharacterListUI == null)
+        get
         {
-            Debug.Log("CPartyManager::Start - m_CharacterListUI is null!");
+            if (m_Instance == null)
+            {
+                m_Instance = FindFirstObjectByType<CPartyManager>();
+            }
+
+            return m_Instance;
         }
     }
+    //--
 
     public CPartyMemberRuntime CreatePartyMember(CPartyMember defaultMember)
     {
@@ -131,14 +137,11 @@ public class CPartyManager : MonoBehaviour
         defaultPlayerCharacter.InitializePartyPlayerCharacter(partyLeader, partyMembers);
         m_PartyPlayerCharacter = defaultPlayerCharacter;
 
-        if (m_CharacterListUI != null)
+        m_OnCharacterAdded?.Invoke(partyLeader);
+        
+        foreach (CPartyMemberRuntime partyMember in partyMembers)
         {
-            m_CharacterListUI.AddCharacterButton(partyLeader);
-
-            foreach (CPartyMemberRuntime partyMember in partyMembers)
-            {
-                m_CharacterListUI.AddCharacterButton(partyMember);
-            }
+            m_OnCharacterAdded?.Invoke(partyMember);
         }
 
         return defaultPlayerCharacter;
@@ -148,9 +151,6 @@ public class CPartyManager : MonoBehaviour
     {
         m_PartyPlayerCharacter.AddPartyMember(partyMember);
 
-        if (m_CharacterListUI != null)
-        {
-            m_CharacterListUI.AddCharacterButton(partyMember);
-        }
+        m_OnCharacterAdded?.Invoke(partyMember);
     }
 }

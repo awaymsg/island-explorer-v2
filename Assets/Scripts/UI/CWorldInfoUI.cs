@@ -14,6 +14,15 @@ public class CWorldInfoUI : MonoBehaviour
         m_WorldInfoPanel = m_WorldInfoUI.rootVisualElement.Q<VisualElement>("WorldInfoPanel");
         m_DayInfoLabel = m_WorldInfoPanel.Q<Label>("DayInfo");
         m_WorldInfoLabel = m_WorldInfoPanel.Q<Label>("WorldInfo");
+
+        CGameManager.Instance.m_OnDayInfoChanged += UpdateDayInfo;
+        CGameManager.Instance.m_OnWorldInfoChanged += UpdateWorldInfo;
+    }
+
+    private void OnDisable()
+    {
+        CGameManager.Instance.m_OnDayInfoChanged -= UpdateDayInfo;
+        CGameManager.Instance.m_OnWorldInfoChanged -= UpdateWorldInfo;
     }
 
     public void InitializeWorldInfoPanel()

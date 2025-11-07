@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using UnityEditor.Search;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -19,15 +18,25 @@ public class CCharacterListUI : MonoBehaviour
     private CPartyMemberRuntime m_CurrentCharacterFullPanelCharacter;
     private CWorldInfoUI m_WorldInfoUI;
 
-    private void Awake()
+    private void OnEnable()
     {
         m_CharacterListUI = GetComponent<UIDocument>();
         m_CharacterPanel = m_CharacterListUI.rootVisualElement.Q<VisualElement>("CharacterPanel");
-        m_WorldInfoUI = FindFirstObjectByType<CWorldInfoUI>();
+        m_WorldInfoUI = CUIManager.Instance.WorldInfoUI;
+
+        CPartyManager.Instance.m_OnCharacterAdded += AddCharacterButton;
+        CPartyManager.Instance.m_OnCharacterRemoved += RemoveCharacterButton;
+
         if (m_WorldInfoUI == null)
         {
             Debug.Log("CCharacterListUI::Awake - WorldInfoUI is null!");
         }
+    }
+
+    private void OnDisable()
+    {
+        CPartyManager.Instance.m_OnCharacterAdded -= AddCharacterButton;
+        CPartyManager.Instance.m_OnCharacterRemoved -= RemoveCharacterButton;
     }
 
     public void AddCharacterButton(CPartyMemberRuntime partyMember)
@@ -48,13 +57,13 @@ public class CCharacterListUI : MonoBehaviour
         m_CharacterPanel.Add(buttonInstance);
     }
 
-    public void RemoveCharacterButton(string partyMemberName)
+    public void RemoveCharacterButton(CPartyMemberRuntime partyMember)
     {
-        Button buttonToRemove = m_CharacterPanel.Q<Button>(partyMemberName + "Button");
+        Button buttonToRemove = m_CharacterPanel.Q<Button>(partyMember.CharacterName + "Button");
 
         if (buttonToRemove == null)
         {
-            Debug.Log(string.Format("RemoveCharacterButton - character {0} button not found!", partyMemberName));
+            Debug.Log(string.Format("RemoveCharacterButton - character {0} button not found!", partyMember.CharacterName));
             return;
         }
 
