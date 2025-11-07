@@ -130,6 +130,12 @@ public class CGameManager : MonoBehaviour
         CreatePlayerCharacter();
     }
 
+    private void OnDestroy()
+    {
+        m_OnDayInfoChanged = null;
+        m_OnWorldInfoChanged = null;
+    }
+
     private void Update()
     {
         if ((m_bStartMove == false && m_PartyPlayerGameObject != null) || m_bPauseGameplay)

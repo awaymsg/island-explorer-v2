@@ -153,4 +153,10 @@ public class CPartyManager : MonoBehaviour
 
         m_OnCharacterAdded?.Invoke(partyMember);
     }
+
+    public void OnDestroy()
+    {
+        m_OnCharacterAdded = null;
+        m_OnCharacterRemoved = null;
+    }
 }

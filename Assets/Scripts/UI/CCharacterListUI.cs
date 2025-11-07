@@ -35,6 +35,11 @@ public class CCharacterListUI : MonoBehaviour
 
     private void OnDisable()
     {
+        if (CPartyManager.Instance == null)
+        {
+            return;
+        }
+
         CPartyManager.Instance.m_OnCharacterAdded -= AddCharacterButton;
         CPartyManager.Instance.m_OnCharacterRemoved -= RemoveCharacterButton;
     }
