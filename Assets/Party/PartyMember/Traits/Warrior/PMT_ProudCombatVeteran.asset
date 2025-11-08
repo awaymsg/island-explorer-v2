@@ -39,7 +39,7 @@ MonoBehaviour:
       RemovalTimeInDays: 0
       Cost: -4
     - StatType: 15
-      bMultiplicative: 1
+      bMultiplicative: 0
       ModAmount: 10
       bIsPermanent: 1
       RemovalTimeInDays: 0

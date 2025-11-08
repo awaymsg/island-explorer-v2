@@ -272,6 +272,7 @@ public class CPartyMemberRuntime : IDisposable
         {
             // Should be okay to be recursive given number of combinations of names and limited number of party members
             GenerateName();
+            return;
         }
 
         CPartyManager.ExistingNames.Add(name);
