@@ -32,9 +32,15 @@ public class CPartyMember : ScriptableObject
 
     [Tooltip("Trait bias amount, 0 is none, 1.0 is 100%")]
     public float m_TraitBiasAmount = 0f;
+
+    [Tooltip("Default amount of attitude toward other party members")]
+    public float m_DefaultAttitude = 0f;
+
+    [Tooltip("Default amount of attitude toward self")]
+    public float m_DefaultSelfAttitude = 0f;
 }
 
-public class CPartyMemberRuntime
+public class CPartyMemberRuntime : IDisposable
 {
     protected CPartyMember m_PartyMemberSO;
     protected CPartyManager m_PartyManager;
@@ -55,8 +61,12 @@ public class CPartyMemberRuntime
     // player-facing
     private Dictionary<EBodyPart, List<string>> m_BodyPartConditions = new Dictionary<EBodyPart, List<string>>();
     private Dictionary<string, string> m_TraitDetails = new Dictionary<string, string>();
+    private Dictionary<string, float> m_AttitudesBook = new Dictionary<string, float>();
 
     protected UInt16 m_SkillLevel = 0;
+
+    private float m_DefaultAttitude = 0f;
+    private float m_DefaultSelfAttitude = 0f;
 
     private float m_TotalCost = 0f;
 
@@ -102,6 +112,11 @@ public class CPartyMemberRuntime
         get { return m_PartyMemberStats; }
     }
 
+    public Dictionary<string, float> AttitudesBook
+    {
+        get { return m_AttitudesBook; }
+    }
+
     public CInventory ItemInventory
     {
         get { return m_ItemInventory; }
@@ -121,6 +136,8 @@ public class CPartyMemberRuntime
         }
 
         m_PartyMemberStats = SetBaseStats();
+        m_DefaultAttitude = m_PartyMemberSO.m_DefaultAttitude;
+        m_DefaultSelfAttitude = m_PartyMemberSO.m_DefaultSelfAttitude;
 
         // Initialize inventory
         m_ItemInventory = new CInventory();
@@ -141,74 +158,8 @@ public class CPartyMemberRuntime
         // make a deep copy of this array
         m_BodyParts = m_PartyManager.DefaultBodyParts?.Select(bodyPart => new CBodyPart(bodyPart)).ToArray() ?? Array.Empty<CBodyPart>();
 
-        // todo: prefixes
-
-        if (m_PartyMemberSO.m_PartyMemberGender == EPartyMemberGender.Invalid)
-        {
-            Debug.Log("InitializePartyMember - party member gender is not set!");
-        }
-
-        if (m_PartyMemberSO.m_PartyMemberGender == EPartyMemberGender.Male)
-        {
-            string[] maleNames = m_PartyManager.MaleNamesPool;
-            if (maleNames.Length > 0)
-            {
-                int index = UnityEngine.Random.Range(0, maleNames.Length);
-                m_CharacterName = maleNames[index];
-            }
-            else
-            {
-                Debug.Log("InitializePartyMember - there are no names in the male names pool!");
-            }
-
-            Sprite[] malePortraits = m_PartyManager.MalePortraitsPool;
-            if (malePortraits.Length > 0)
-            {
-                int index = UnityEngine.Random.Range(0, malePortraits.Length);
-                m_PartyMemberPortrait = malePortraits[index];
-            }
-            else
-            {
-                Debug.Log("InitializePartyMember - male portraits pool is empty!");
-            }
-        }
-        else if (m_PartyMemberSO.m_PartyMemberGender == EPartyMemberGender.Female)
-        {
-            string[] femaleNames = m_PartyManager.FemaleNamesPool;
-            if (femaleNames.Length > 0)
-            {
-                int index = UnityEngine.Random.Range(0, femaleNames.Length);
-                m_CharacterName = femaleNames[index];
-            }
-            else
-            {
-                Debug.Log("InitializePartyMember - there are no names in the female names pool!");
-            }
-
-            Sprite[] femalePortraits = m_PartyManager.FemalePortraitsPool;
-            if (femalePortraits.Length > 0)
-            {
-                int index = UnityEngine.Random.Range(0, femalePortraits.Length);
-                m_PartyMemberPortrait = femalePortraits[index];
-            }
-            else
-            {
-                Debug.Log("InitializePartyMember - female portraits pool is empty!");
-            }
-        }
-
-        string[] surnames = m_PartyManager.Surnames;
-        if (surnames.Length > 0)
-        {
-            int index = UnityEngine.Random.Range(0, surnames.Length);
-            m_CharacterName += " " + surnames[index];
-        }
-        else
-        {
-            Debug.Log("InitializePartyMember - there are no names in the surnames pool!");
-        }
-
-        // todo: suffixes
+        GenerateName();
+        GeneratePortrait();
 
         CPartyMemberTrait[] traitPool = m_PartyManager.TraitPool;
 
@@ -224,7 +175,136 @@ public class CPartyMemberRuntime
             Debug.Log("InitializePartyMember - there are no traits in the pool!");
         }
 
+        CPartyManager.Instance.m_OnCharacterAdded += AddPartyMemberAttitude;
+        CPartyManager.Instance.m_OnCharacterRemoved += RemovePartyMemberAttitude;
+
         CalculateCost();
+    }
+
+    public void Dispose()
+    {
+        if (CPartyManager.Instance == null)
+        {
+            return;
+        }
+
+        CPartyManager.Instance.m_OnCharacterAdded -= AddPartyMemberAttitude;
+        CPartyManager.Instance.m_OnCharacterRemoved -= RemovePartyMemberAttitude;
+    }
+
+    private void GenerateName()
+    {
+        string name = string.Empty;
+
+        // todo: prefixes
+
+        if (m_PartyMemberSO.m_PartyMemberGender == EPartyMemberGender.Invalid)
+        {
+            Debug.Log("InitializePartyMember - party member gender is not set!");
+        }
+
+        if (m_PartyMemberSO.m_PartyMemberGender == EPartyMemberGender.Male)
+        {
+            string[] maleNames = m_PartyManager.MaleNamesPool;
+            if (maleNames.Length > 0)
+            {
+                int index = UnityEngine.Random.Range(0, maleNames.Length);
+                name = maleNames[index];
+            }
+            else
+            {
+                Debug.Log("InitializePartyMember - there are no names in the male names pool!");
+            }
+        }
+        else if (m_PartyMemberSO.m_PartyMemberGender == EPartyMemberGender.Female)
+        {
+            string[] femaleNames = m_PartyManager.FemaleNamesPool;
+            if (femaleNames.Length > 0)
+            {
+                int index = UnityEngine.Random.Range(0, femaleNames.Length);
+                name = femaleNames[index];
+            }
+            else
+            {
+                Debug.Log("InitializePartyMember - there are no names in the female names pool!");
+            }
+        }
+
+        string[] surnames = m_PartyManager.Surnames;
+        if (surnames.Length > 0)
+        {
+            int index = UnityEngine.Random.Range(0, surnames.Length);
+            name += " " + surnames[index];
+        }
+        else
+        {
+            Debug.Log("InitializePartyMember - there are no names in the surnames pool!");
+        }
+
+        // todo: suffixes
+
+        if (CPartyManager.ExistingNames.Contains(name))
+        {
+            // Should be okay to be recursive given number of combinations of names and limited number of party members
+            GenerateName();
+        }
+
+        m_CharacterName = name;
+    }
+
+    private void GeneratePortrait()
+    {
+        // TODO: actually generate portraits
+
+        if (m_PartyMemberSO.m_PartyMemberGender == EPartyMemberGender.Male)
+        {
+            Sprite[] malePortraits = m_PartyManager.MalePortraitsPool;
+            if (malePortraits.Length > 0)
+            {
+                int index = UnityEngine.Random.Range(0, malePortraits.Length);
+                m_PartyMemberPortrait = malePortraits[index];
+            }
+            else
+            {
+                Debug.Log("InitializePartyMember - male portraits pool is empty!");
+            }
+        }
+        else if (m_PartyMemberSO.m_PartyMemberGender == EPartyMemberGender.Female)
+        {
+            Sprite[] femalePortraits = m_PartyManager.FemalePortraitsPool;
+            if (femalePortraits.Length > 0)
+            {
+                int index = UnityEngine.Random.Range(0, femalePortraits.Length);
+                m_PartyMemberPortrait = femalePortraits[index];
+            }
+            else
+            {
+                Debug.Log("InitializePartyMember - female portraits pool is empty!");
+            }
+        }
+    }
+
+    private void AddPartyMemberAttitude(CPartyMemberRuntime partyMember)
+    {
+        if (partyMember == null)
+        {
+            Debug.Log("AddPartyMemberAttitude - partyMember is null!");
+            return;
+        }
+
+        // Party members can have attitudes toward themselves
+        m_AttitudesBook.Add(partyMember.CharacterName, (partyMember == this) ? m_DefaultSelfAttitude : m_DefaultAttitude);
+    }
+
+    private void RemovePartyMemberAttitude(CPartyMemberRuntime partyMember)
+    {
+        if (partyMember == null)
+        {
+            Debug.Log("RemovePartyMemberAttitude - partyMember is null!");
+            return;
+        }
+
+        m_AttitudesBook.Remove(partyMember.CharacterName);
     }
 
     private void UpdateInventoryMaxWeight(float oldValue, float newValue)
@@ -308,7 +388,7 @@ public class CPartyMemberRuntime
     public void RemoveBodyMod(CBodyPartModification bodyMod)
     {
         CBodyPart bodyPart = Array.Find(m_BodyParts, p => p.BodyPart == bodyMod.ModLocation);
-        if (bodyPart != null)
+        if (bodyPart == null)
         {
             Debug.Log("RemoveBodyMod - bodymod does not correspond to a bodypart!");
             return;

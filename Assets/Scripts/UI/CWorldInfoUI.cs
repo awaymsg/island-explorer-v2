@@ -21,6 +21,11 @@ public class CWorldInfoUI : MonoBehaviour
 
     private void OnDisable()
     {
+        if (CGameManager.Instance == null)
+        {
+            return;
+        }
+
         CGameManager.Instance.m_OnDayInfoChanged -= UpdateDayInfo;
         CGameManager.Instance.m_OnWorldInfoChanged -= UpdateWorldInfo;
     }

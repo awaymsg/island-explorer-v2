@@ -88,7 +88,7 @@ public enum EPartyMemberStatType
     Magic,
     Fortitude,
     Hunger,
-    Attitude
+    Disposition
 }
 
 [Serializable]

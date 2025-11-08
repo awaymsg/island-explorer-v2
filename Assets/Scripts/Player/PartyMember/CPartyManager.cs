@@ -4,6 +4,8 @@ using UnityEngine;
 
 public class CPartyManager : MonoBehaviour
 {
+    private static CPartyManager m_Instance;
+
     [SerializeField, Tooltip("Premade default party members")]
     private CPartyMember[] m_DefaultPartyMembersPool;
 
@@ -39,7 +41,7 @@ public class CPartyManager : MonoBehaviour
 
     private CPartyPlayerCharacter m_PartyPlayerCharacter;
 
-    private static CPartyManager m_Instance;
+    private static HashSet<string> m_ExistingNames = new HashSet<string>();
 
     //-- Events
     public event Action<CPartyMemberRuntime> m_OnCharacterAdded;
@@ -119,10 +121,21 @@ public class CPartyManager : MonoBehaviour
             return m_Instance;
         }
     }
+
+    public static HashSet<string> ExistingNames
+    {
+        get { return m_ExistingNames; }
+    }
     //--
 
     public CPartyMemberRuntime CreatePartyMember(CPartyMember defaultMember)
     {
+        if (defaultMember == null)
+        {
+            Debug.Log("CreatePartyMember - defaultMember is null!");
+            return null;
+        }
+
         CPartyMemberRuntime newPartyMember = new CPartyMemberRuntime(defaultMember, this);
 
         newPartyMember.InitializePartyMember();
@@ -132,9 +145,26 @@ public class CPartyManager : MonoBehaviour
 
     public CPartyPlayerCharacter CreatePartyPlayerCharacter(CPartyPlayerCharacter defaultPlayerCharacter, Queue<CPartyMemberRuntime> partyMembers)
     {
+        if (defaultPlayerCharacter == null)
+        {
+            Debug.Log("CreatePartyPlayerCharacter - defaultPlayerCharacter is null!");
+            return null;
+        }
+
+        if (partyMembers == null || partyMembers.Count == 0)
+        {
+            Debug.Log("CreatePartyPlayerCharacter - partyMembers is null or count is 0!");
+            return null;
+        }
+
         CPartyMemberRuntime partyLeader = partyMembers.Dequeue();
+        if (partyLeader == null)
+        {
+            Debug.Log("CreatePartyPlayerCharacter - partyLeader is null!");
+        }
 
         defaultPlayerCharacter.InitializePartyPlayerCharacter(partyLeader, partyMembers);
+
         m_PartyPlayerCharacter = defaultPlayerCharacter;
 
         m_OnCharacterAdded?.Invoke(partyLeader);
@@ -149,9 +179,29 @@ public class CPartyManager : MonoBehaviour
 
     public void AddMemberToParty(CPartyMemberRuntime partyMember)
     {
+        if (partyMember == null)
+        {
+            Debug.Log("AddMemberToParty - partyMember is null!");
+            return;
+        }
+
         m_PartyPlayerCharacter.AddPartyMember(partyMember);
 
         m_OnCharacterAdded?.Invoke(partyMember);
+    }
+
+    public void RemoveMemberFromParty(CPartyMemberRuntime partyMember)
+    {
+        if (partyMember == null)
+        {
+            Debug.Log("RemoveMemberFromParty - partyMember is null!");
+            return;
+        }
+
+        m_PartyPlayerCharacter.RemovePartyMember(partyMember);
+        m_ExistingNames.Remove(partyMember.CharacterName);
+
+        m_OnCharacterRemoved?.Invoke(partyMember);
     }
 
     public void OnDestroy()

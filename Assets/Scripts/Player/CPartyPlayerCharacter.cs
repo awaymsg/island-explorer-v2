@@ -36,4 +36,9 @@ public class CPartyPlayerCharacter : MonoBehaviour
     {
         m_PartyMembers.Add(partyMember);
     }
+
+    public void RemovePartyMember(CPartyMemberRuntime partyMember)
+    {
+        m_PartyMembers.Remove(partyMember);
+    }
 }

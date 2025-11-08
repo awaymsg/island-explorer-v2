@@ -57,6 +57,7 @@ public class CGameManager : MonoBehaviour
 
     private static CPathFinder m_PathFinder;
 
+    // TODO: change the following bools to a simple state machine
     // Gameplay important vars
     private float m_DayCount = 0;
     private bool m_bPlayerSelected = false;

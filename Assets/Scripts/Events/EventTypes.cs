@@ -37,6 +37,7 @@ public struct SEventModifiers
     public SPartyMemberStatModifier[] StatModifiers;
     public CBodyPartModification[] BodyPartModifications;
     public SEventModifierTarget ModifierTarget;
+    public float AttitudeModifier;
 }
 
 public enum SEventModifierTarget
