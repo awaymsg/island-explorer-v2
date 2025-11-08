@@ -92,24 +92,24 @@ public enum EPartyMemberStatType
 public struct SPartyMemberDefaultStat
 {
     public EPartyMemberStatType StatType;
-    public float Value;
+    public int Value;
 }
 
 public class CPartyMemberStat
 {
-    private float m_Value;
+    private int m_Value;
     private readonly List<SPartyMemberStatModifier> m_CurrentModifiers;
 
-    public event Action<float, float> OnStatChanged; // oldValue, newValue
+    public event Action<int, int> OnStatChanged; // oldValue, newValue
 
-    public float Value
+    public int Value
     {
         get { return m_Value; }
         private set
         {
             if (m_Value != value)
             {
-                float oldValue = m_Value;
+                int oldValue = m_Value;
                 m_Value = value;
                 OnStatChanged?.Invoke(oldValue, m_Value);
             }
@@ -118,7 +118,7 @@ public class CPartyMemberStat
 
     public IReadOnlyList<SPartyMemberStatModifier> CurrentModifiers => m_CurrentModifiers;
 
-    public CPartyMemberStat(float value)
+    public CPartyMemberStat(int value)
     {
         m_Value = value;
         m_CurrentModifiers = new List<SPartyMemberStatModifier>();
@@ -128,12 +128,12 @@ public class CPartyMemberStat
     {
         if (modifier.bMultiplicative)
         {
-            m_Value *= modifier.ModAmount;
+            m_Value *= (int)modifier.ModAmount;
         }
         else
         {
             // Don't go below 0
-            m_Value = Math.Max(m_Value + modifier.ModAmount, 0f);
+            m_Value = (int)Math.Max(m_Value + modifier.ModAmount, 0f);
         }
 
         m_CurrentModifiers.Add(modifier);
@@ -143,11 +143,11 @@ public class CPartyMemberStat
     {
         if (modifier.bMultiplicative)
         {
-            m_Value /= modifier.ModAmount;
+            m_Value /= (int)modifier.ModAmount;
         }
         else
         {
-            m_Value -= modifier.ModAmount;
+            m_Value -= (int)modifier.ModAmount;
         }
 
         m_CurrentModifiers.Remove(modifier);

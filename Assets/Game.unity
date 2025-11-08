@@ -581,6 +581,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 302648c7fc148f547a63d848fa0694f0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: '::'
+  m_PopupMouseOffset: {x: 30, y: 0}
 --- !u!1 &970083613
 GameObject:
   m_ObjectHideFlags: 0
@@ -1777,6 +1778,7 @@ MonoBehaviour:
   m_CharacterButtonTemplate: {fileID: 9197481963319205126, guid: 1e8a4b9b1be57014b80b83bc7495cfdf, type: 3}
   m_CharacterShortInfoPanelTemplate: {fileID: 9197481963319205126, guid: 31b1a569527c971409023a1438032774, type: 3}
   m_CharacterFullInfoPanelTemplate: {fileID: 9197481963319205126, guid: 4c330cef95a706f4c9307f6d5666ec41, type: 3}
+  m_SmallTextPopupTemplate: {fileID: 9197481963319205126, guid: 93fa2a19969e5f140b392ebbb6de682d, type: 3}
 --- !u!1 &2112288919
 GameObject:
   m_ObjectHideFlags: 0

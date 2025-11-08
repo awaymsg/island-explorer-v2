@@ -13,7 +13,8 @@ MonoBehaviour:
   m_Name: PMT_ProudCombatVeteran
   m_EditorClassIdentifier: Assembly-CSharp::CPartyMemberTrait
   m_TraitName: Proud Combat Veteran
-  m_TraitDescription: They have done terrible things to people who deserved it.
+  m_TraitDescription: They have done terrible things to people who totally deserved
+    it.
   m_TraitType: 2
   m_InvalidatedTraits: []
   m_TraitEffect:
@@ -38,11 +39,11 @@ MonoBehaviour:
       RemovalTimeInDays: 0
       Cost: -4
     - StatType: 15
-      bMultiplicative: 0
-      ModAmount: -20
+      bMultiplicative: 1
+      ModAmount: 10
       bIsPermanent: 1
       RemovalTimeInDays: 0
-      Cost: -5
+      Cost: 3
     GrantedItems: []
     SelfAttitudeModifier:
       Value: 10
@@ -52,4 +53,4 @@ MonoBehaviour:
       Cost: 0
   m_bIsGenerationOnly: 1
   m_bIsHidden: 0
-  m_TotalCost: 2
+  m_TotalCost: 10

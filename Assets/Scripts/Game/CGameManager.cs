@@ -7,6 +7,14 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.Tilemaps;
 
+public enum EGameState
+{
+    Idle,
+    Paused,
+    PreMoving,
+    Moving
+}
+
 public class CGameManager : MonoBehaviour
 {
     private static CGameManager m_Instance;
@@ -34,6 +42,8 @@ public class CGameManager : MonoBehaviour
     private int m_StepsInADay = 10;
     [SerializeField, Tooltip("Base hunger rate (per tick)")]
     private float m_HungerRatePerTick = 0.5f;
+    [SerializeField, Tooltip("Diagonal movement multipler")]
+    private float m_DiagonalMovementScalar = 1.4f;
 
     [Header("Important values")]
     [SerializeField, Tooltip("Maximum stat value")]
@@ -44,6 +54,8 @@ public class CGameManager : MonoBehaviour
     [Header("Debug")]
     [SerializeField]
     private bool m_bShowFog = true;
+    [SerializeField]
+    private bool m_bDebugHighlight = false;
     [SerializeField]
     private bool m_bIgnoreTileRules = false;
     [SerializeField]
@@ -65,24 +77,20 @@ public class CGameManager : MonoBehaviour
 
     private static CPathFinder m_PathFinder;
 
-    // TODO: change the following bools to a simple state machine
     // Gameplay important vars
+    private EGameState m_GameState = EGameState.Idle; // TODO: add proper state machine with defined transitions
     private float m_DayCount = 0;
-    private bool m_bPlayerSelected = false;
     private Queue<Vector3Int> m_CurrentPath;
     private Queue<float> m_CurrentTruePathMovementRates;
     private Queue<float> m_CurrentEstimatedPathMovementRates;
     private float m_CurrentAcceptablePathMovementRate = 0f;
     private float m_TotalEstimatedMovementRemaining = 0f;
-    private bool m_bStartMove = false;
     private Vector3Int m_TargetCell = Vector3Int.zero;
     private float m_TimeCounter = 0f;
     private float m_CurrentTrueMovementRate = 0f;
     private Vector3 m_MovementPerTick = Vector3.zero;
     private Vector3 m_TargetPositionNextTick = Vector3.zero;
     private float m_OccurredMovement = 0f;
-
-    private static bool m_bPauseGameplay = false;
 
     //-- Events
     public event Action<string> m_OnDayInfoChanged;
@@ -167,9 +175,34 @@ public class CGameManager : MonoBehaviour
         m_OnWorldInfoChanged = null;
     }
 
+    private bool IsIdleState()
+    {
+        return m_GameState == EGameState.Idle;
+    }
+
+    private bool IsPausedState()
+    {
+        return m_GameState == EGameState.Paused;
+    }
+
+    private bool IsMovingState()
+    {
+        return m_GameState == EGameState.Moving;
+    }
+
+    private bool IsPreMovingState()
+    {
+        return m_GameState == EGameState.PreMoving;
+    }
+
+    private bool CanMove()
+    {
+        return IsMovingState() && !IsPausedState();
+    }
+
     private void Update()
     {
-        if ((m_bStartMove == false && m_PartyPlayerGameObject != null) || m_bPauseGameplay)
+        if (!CanMove() || m_PartyPlayerGameObject == null)
         {
             return;
         }
@@ -282,8 +315,7 @@ public class CGameManager : MonoBehaviour
             {
                 // We are out of paths, so we're done moving! Reset to able to move state!
                 m_EffectsMap.ClearAllTiles();
-                m_bPlayerSelected = false;
-                m_bStartMove = false;
+                m_GameState = EGameState.Idle;
                 m_CurrentAcceptablePathMovementRate = 0f;
 
                 return;
@@ -335,39 +367,19 @@ public class CGameManager : MonoBehaviour
 
     private async Task<bool> GetMovementConfirmationAsync(float actual)
     {
-        // We should be entering here from the main thread
-        SynchronizationContext mainThreadContext = SynchronizationContext.Current;
+        m_GameState = EGameState.Paused;
 
         TaskCompletionSource<bool> completionSource = new TaskCompletionSource<bool>();
 
+        // UI callbacks should always execute on main thread in unity allegedly
         m_UIManager.PopupsUI.CreateContinueMovementDialogue(actual, (response) =>
         {
-            // Try to ensure we are on the main thread
-            if (mainThreadContext != null && SynchronizationContext.Current != mainThreadContext)
-            {
-                mainThreadContext.Post(p =>
-                {
-                    completionSource.SetResult(response);
-                }, null);
-            }
-            else
-            {
-                completionSource.SetResult(response);
-            }
+            completionSource.SetResult(response);
         });
 
-        m_bPauseGameplay = true;
+        bool result = await completionSource.Task;
 
-        bool result = await completionSource.Task.ConfigureAwait(true);
-
-        // Seriously, make sure we are on the main thread
-        if (SynchronizationContext.Current != mainThreadContext && mainThreadContext != null)
-        {
-            await DispatchToMainThread(mainThreadContext);
-        }
-
-        m_bPauseGameplay = false;
-
+        m_GameState = EGameState.Moving;
         return result;
     }
 
@@ -383,18 +395,16 @@ public class CGameManager : MonoBehaviour
         m_EffectsMap.ClearAllTiles();
         m_TargetCell = Vector3Int.zero;
         m_MovementPerTick = Vector3.zero;
-        m_TargetCell = Vector3Int.zero;
         m_TargetPositionNextTick = Vector3.zero;
         m_CurrentTrueMovementRate = 0f;
         m_CurrentAcceptablePathMovementRate = 0f;
-        m_bPlayerSelected = false;
-        m_bStartMove = false;
+        m_GameState = EGameState.Idle;
     }
 
     // Input
     public void OnClick(InputAction.CallbackContext context)
     {
-        if (!context.performed || m_bPauseGameplay)
+        if (!context.performed || IsPausedState())
         {
             return;
         }
@@ -408,11 +418,12 @@ public class CGameManager : MonoBehaviour
             return;
         }
 
-        // Deselect if we have player selected
-        if (m_bPlayerSelected)
+        // Deselect if we are in PreMoving state
+        if (IsPreMovingState())
         {
             m_EffectsMap.ClearAllTiles();
-            m_bPlayerSelected = false;
+            m_GameState = EGameState.Idle;
+            UpdateTileInfo(cellPosition);
 
             return;
         }
@@ -420,21 +431,13 @@ public class CGameManager : MonoBehaviour
         STerrainTile selectedTile = m_TerrainTileMap[cellPosition.x, cellPosition.y];
         if (selectedTile.IsPlayerOccupied())
         {
-            if (m_EffectsMap.HasTile(cellPosition))
-            {
-                m_EffectsMap.ClearAllTiles();
-                m_bPlayerSelected = false;
-            }
-            else
-            {
-                m_EffectsMap.ClearAllTiles();
-                m_EffectsMap.SetTile(cellPosition, m_PlayerSelectHighlightTile);
-                m_bPlayerSelected = true;
-            }
+            m_EffectsMap.ClearAllTiles();
+            m_EffectsMap.SetTile(cellPosition, m_PlayerSelectHighlightTile);
+            m_GameState = EGameState.PreMoving;
         }
         else
         {
-            if (m_bPlayerSelected)
+            if (IsPreMovingState() || !m_bDebugHighlight)
             {
                 return;
             }
@@ -454,7 +457,7 @@ public class CGameManager : MonoBehaviour
 
     public void OnMouseOverGrid(InputAction.CallbackContext context)
     {
-        if (!context.performed || m_bStartMove || m_bPauseGameplay)
+        if (!context.performed || IsMovingState() || IsPausedState())
         {
             return;
         }
@@ -468,95 +471,105 @@ public class CGameManager : MonoBehaviour
             return;
         }
 
-        if (m_bPlayerSelected)
+        if (IsPreMovingState())
         {
-            m_EffectsMap.ClearAllTiles();
-
-            // Store the current path in case we wish to use it
-            m_CurrentPath = m_PathFinder.GetPath(m_PartyPlayerCharacter.CurrentLocation, cellPosition);
-            m_CurrentTruePathMovementRates = new Queue<float>();
-            m_CurrentEstimatedPathMovementRates = new Queue<float>();
-
-            m_TotalEstimatedMovementRemaining = 0f;
-            float totalForage = 0f;
-
-            Vector3Int previous = m_PartyPlayerCharacter.CurrentLocation;
-
-            // Keep the queue intact, we're just previewing 
-            foreach (Vector3Int node in m_CurrentPath.AsEnumerable())
-            {
-                m_EffectsMap.SetTile(node, m_PlayerSelectHighlightTile);
-
-                // Ignore the self tile
-                if (node == m_PartyPlayerCharacter.CurrentLocation)
-                {
-                    continue;
-                }
-
-                // Set default fog traversal rate as value previous tile
-                float fogTraversalRate = m_TerrainTileMap[previous.x, previous.y].GetTraversalRate();
-
-                bool bIsFogged = m_FogMap.HasTile(node) && m_bShowFog;
-
-                float trueTraversalRate = m_TerrainTileMap[node.x, node.y].GetTraversalRate();
-
-                float displayTraversalRate = bIsFogged ? fogTraversalRate : m_TerrainTileMap[node.x, node.y].GetTraversalRate();
-                float displayForageAmount = bIsFogged ? 0f : m_TerrainTileMap[node.x, node.y].GetForageAmount();
-
-                // If this is a diagonal, multiply movement cost by 1.4
-                if (Mathf.Abs(node.x - previous.x) == 1 && Mathf.Abs(node.y - previous.y) == 1)
-                {
-                    m_CurrentTruePathMovementRates.Enqueue((float)Math.Round(trueTraversalRate * 1.4f, 1));
-                    m_CurrentEstimatedPathMovementRates.Enqueue((float)Math.Round(displayTraversalRate * 1.4f, 1));
-                    m_TotalEstimatedMovementRemaining += displayTraversalRate * 1.4f;
-                    totalForage += displayForageAmount * 1.4f;
-                }
-                else
-                {
-                    m_CurrentTruePathMovementRates.Enqueue((float)Math.Round(trueTraversalRate, 1));
-                    m_CurrentEstimatedPathMovementRates.Enqueue((float)Math.Round(displayTraversalRate, 1));
-                    m_TotalEstimatedMovementRemaining += displayTraversalRate;
-                    totalForage += displayForageAmount;
-                }
-
-                previous = node;
-            }
-
-            m_TotalEstimatedMovementRemaining = (float)Math.Round(m_TotalEstimatedMovementRemaining, 1);
-            totalForage = (float)Math.Round(totalForage, 1);
-            m_OnWorldInfoChanged?.Invoke(string.Format("Estimated Traversal Time: {0}d\nEstimated Forage Amount: {1}", m_TotalEstimatedMovementRemaining, totalForage));
+            CreateVisualPath(cellPosition);
         }
         else
         {
-            bool bIsFogged = m_FogMap.HasTile(cellPosition) && m_bShowFog;
+            UpdateTileInfo(cellPosition);
+        }
+    }
 
-            if (bIsFogged)
+    private void CreateVisualPath(Vector3Int cellPosition)
+    {
+        m_EffectsMap.ClearAllTiles();
+
+        // Store the current path in case we wish to use it
+        m_CurrentPath = m_PathFinder.GetPath(m_PartyPlayerCharacter.CurrentLocation, cellPosition);
+        m_CurrentTruePathMovementRates = new Queue<float>();
+        m_CurrentEstimatedPathMovementRates = new Queue<float>();
+
+        m_TotalEstimatedMovementRemaining = 0f;
+        float totalForage = 0f;
+
+        Vector3Int previous = m_PartyPlayerCharacter.CurrentLocation;
+
+        // Keep the queue intact, we're just previewing 
+        foreach (Vector3Int node in m_CurrentPath.AsEnumerable())
+        {
+            m_EffectsMap.SetTile(node, m_PlayerSelectHighlightTile);
+
+            // Ignore the self tile
+            if (node == m_PartyPlayerCharacter.CurrentLocation)
             {
-                m_OnWorldInfoChanged?.Invoke("Biome: ???\nTraversal Time: ???\nBase Forage Amount: ???");
-
-                return;
+                continue;
             }
 
-            STerrainTile currentTile = m_TerrainTileMap[cellPosition.x, cellPosition.y];
+            // Set default fog traversal rate as value previous tile
+            float fogTraversalRate = m_TerrainTileMap[previous.x, previous.y].GetTraversalRate();
 
-            m_OnWorldInfoChanged?.Invoke(string.Format("Biome: {0}\nTraversal Time: {1}d\nEstimated Forage Amount: {2}", currentTile.GetBiomeType().ToString(), currentTile.GetTraversalRate(), currentTile.GetForageAmount()));
+            bool bIsFogged = m_FogMap.HasTile(node) && m_bShowFog;
+
+            float trueTraversalRate = m_TerrainTileMap[node.x, node.y].GetTraversalRate();
+
+            float displayTraversalRate = bIsFogged ? fogTraversalRate : m_TerrainTileMap[node.x, node.y].GetTraversalRate();
+            float displayForageAmount = bIsFogged ? 0f : m_TerrainTileMap[node.x, node.y].GetForageAmount();
+
+            // If this is a diagonal, multiply movement cost by multiplier
+            if (Mathf.Abs(node.x - previous.x) == 1 && Mathf.Abs(node.y - previous.y) == 1)
+            {
+                m_CurrentTruePathMovementRates.Enqueue((float)Math.Round(trueTraversalRate * m_DiagonalMovementScalar, 1));
+                m_CurrentEstimatedPathMovementRates.Enqueue((float)Math.Round(displayTraversalRate * m_DiagonalMovementScalar, 1));
+                m_TotalEstimatedMovementRemaining += displayTraversalRate * m_DiagonalMovementScalar;
+                totalForage += displayForageAmount * m_DiagonalMovementScalar;
+            }
+            else
+            {
+                m_CurrentTruePathMovementRates.Enqueue((float)Math.Round(trueTraversalRate, 1));
+                m_CurrentEstimatedPathMovementRates.Enqueue((float)Math.Round(displayTraversalRate, 1));
+                m_TotalEstimatedMovementRemaining += displayTraversalRate;
+                totalForage += displayForageAmount;
+            }
+
+            previous = node;
         }
+
+        m_TotalEstimatedMovementRemaining = (float)Math.Round(m_TotalEstimatedMovementRemaining, 1);
+        totalForage = (float)Math.Round(totalForage, 1);
+        m_OnWorldInfoChanged?.Invoke(string.Format("Estimated Traversal Time: {0}d\nEstimated Forage Amount: {1}", m_TotalEstimatedMovementRemaining, totalForage));
+    }
+
+    private void UpdateTileInfo(Vector3Int cellPosition)
+    {
+        bool bIsFogged = m_FogMap.HasTile(cellPosition) && m_bShowFog;
+
+        if (bIsFogged)
+        {
+            m_OnWorldInfoChanged?.Invoke("Biome: ???\nTraversal Time: ???\nBase Forage Amount: ???");
+
+            return;
+        }
+
+        STerrainTile currentTile = m_TerrainTileMap[cellPosition.x, cellPosition.y];
+
+        m_OnWorldInfoChanged?.Invoke(string.Format("Biome: {0}\nTraversal Time: {1}d\nEstimated Forage Amount: {2}", currentTile.GetBiomeType().ToString(), currentTile.GetTraversalRate(), currentTile.GetForageAmount()));
     }
 
     public void OnRightClick(InputAction.CallbackContext context)
     {
-        if (!context.performed || m_bPauseGameplay)
+        if (!context.performed || IsPausedState())
         {
             return;
         }
 
-        if (!m_bPlayerSelected)
+        if (!IsPreMovingState())
         {
             m_EffectsMap.ClearAllTiles();
         }
-        else if (m_CurrentPath.Count > 0 && !m_bStartMove)
+        else if (m_CurrentPath.Count > 0 && !IsMovingState())
         {
-            m_bStartMove = true;
+            m_GameState = EGameState.Moving;
         }
     }
 

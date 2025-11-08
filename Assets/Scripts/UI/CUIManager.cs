@@ -4,6 +4,9 @@ public class CUIManager : MonoBehaviour
 {
     private static CUIManager m_Instance;
 
+    [SerializeField, Tooltip("Offset for all mouseover popups")]
+    private Vector2 m_PopupMouseOffset;
+
     private CCharacterListUI m_CharacterListUI;
     private CWorldInfoUI m_WorldInfoUI;
     private CPopupsUI m_PopupsUI;
@@ -34,6 +37,11 @@ public class CUIManager : MonoBehaviour
 
             return m_Instance;
         }
+    }
+
+    public Vector2 PopupMouseOffset
+    {
+        get { return m_PopupMouseOffset; }
     }
     //--
 

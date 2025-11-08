@@ -1,0 +1,5 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" editor-extension-mode="False">
+    <ui:VisualElement name="SmallTextPopup" style="flex-grow: 1; background-color: rgb(0, 0, 0); position: absolute; max-width: 10%;">
+        <ui:Label text="Label" name="SmallTextPopupLabel" style="font-size: 10px; color: rgb(255, 255, 255); white-space: normal; max-width: none;" />
+    </ui:VisualElement>
+</ui:UXML>

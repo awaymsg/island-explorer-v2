@@ -162,11 +162,11 @@ public class CPartyMemberRuntime : IDisposable
         // Initialize inventory
         m_ItemInventory = new CInventory();
 
-        // Set inventory max weight and add callback when Fortitude changes
+        // Set inventory max weight and add callback for when Fortitude changes
         if (m_PartyMemberStats.ContainsKey(EPartyMemberStatType.Fortitude))
         {
             m_PartyMemberStats[EPartyMemberStatType.Fortitude].OnStatChanged += UpdateInventoryMaxWeight;
-            UpdateInventoryMaxWeight(0f, m_PartyMemberStats[EPartyMemberStatType.Fortitude].Value);
+            UpdateInventoryMaxWeight(0, m_PartyMemberStats[EPartyMemberStatType.Fortitude].Value);
         }
         else
         {
@@ -274,6 +274,8 @@ public class CPartyMemberRuntime : IDisposable
             GenerateName();
         }
 
+        CPartyManager.ExistingNames.Add(name);
+
         m_CharacterName = name;
     }
 
@@ -334,7 +336,7 @@ public class CPartyMemberRuntime : IDisposable
         CalculateHappiness();
     }
 
-    private void UpdateInventoryMaxWeight(float oldValue, float newValue)
+    private void UpdateInventoryMaxWeight(int oldValue, int newValue)
     {
         if (m_ItemInventory == null)
         {
@@ -366,7 +368,9 @@ public class CPartyMemberRuntime : IDisposable
 
         foreach (SPartyMemberDefaultStat defaultStat in defaultStats)
         {
-            CPartyMemberStat stat = new CPartyMemberStat(defaultStat.Value);
+            int randomVariation = UnityEngine.Random.Range(-10, 11);
+            CPartyMemberStat stat = new CPartyMemberStat(defaultStat.Value + randomVariation);
+
             defaultStatsBook[defaultStat.StatType] = stat;
         }
 

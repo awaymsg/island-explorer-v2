@@ -11,6 +11,8 @@ public class CCharacterListUI : MonoBehaviour
     private VisualTreeAsset m_CharacterShortInfoPanelTemplate;
     [SerializeField]
     private VisualTreeAsset m_CharacterFullInfoPanelTemplate;
+    [SerializeField]
+    private VisualTreeAsset m_SmallTextPopupTemplate;
 
     private UIDocument m_CharacterListUI;
     private VisualElement m_CharacterPanel;
@@ -18,6 +20,8 @@ public class CCharacterListUI : MonoBehaviour
     private VisualElement m_CharacterFullInfoPanel;
     private CPartyMemberRuntime m_CurrentCharacterFullPanelCharacter;
     private CWorldInfoUI m_WorldInfoUI;
+
+    private VisualElement m_CurrentSmallPopup;
 
     private void OnEnable()
     {
@@ -156,10 +160,10 @@ public class CCharacterListUI : MonoBehaviour
         {
             Label traitLabel = new Label();
             portraitPanel.Add(traitLabel);
-            traitLabel.style.color = new StyleColor(new Color(255f, 255f, 255f));
+            traitLabel.style.color = Color.white;
             traitLabel.style.fontSize = 12;
             traitLabel.text = trait.Key;
-            traitLabel.RegisterCallback<MouseEnterEvent>(evt => OnMouseEnterTraitLabel(evt, trait.Value));
+            traitLabel.RegisterCallback<MouseEnterEvent>(evt => OnMouseEnterCreateDescriptionLabel(evt, traitLabel, trait.Value));
             traitLabel.RegisterCallback<MouseLeaveEvent>(OnMouseLeaveTraitLabel);
         }
 
@@ -274,13 +278,47 @@ public class CCharacterListUI : MonoBehaviour
         return statsString;
     }
 
-    private void OnMouseEnterTraitLabel(MouseEnterEvent mouseEnterEvent, string descriptionText)
+    private void OnMouseEnterCreateDescriptionLabel(MouseEnterEvent mouseEnterEvent, VisualElement currentMousedOverElement, string descriptionText)
     {
+        m_CurrentSmallPopup = m_SmallTextPopupTemplate.Instantiate();
+        m_CharacterFullInfoPanel.Add(m_CurrentSmallPopup);
 
+        Label textLabel = m_CurrentSmallPopup.Q<Label>("SmallTextPopupLabel");
+
+        if (textLabel == null)
+        {
+            Debug.Log("OnMouseEnterCreateDescriptionLabel - text label is still null!");
+            return;
+        }
+
+        UpdateCurrentSmallPopupPosition(mouseEnterEvent.mousePosition);
+        currentMousedOverElement.RegisterCallback<MouseMoveEvent>(OnMouseMoveUpdateSmallPopupPosition);
+
+        textLabel.text = descriptionText;
+
+        m_CharacterListUI.rootVisualElement.Add(m_CurrentSmallPopup);
+    }
+
+    private void OnMouseMoveUpdateSmallPopupPosition(MouseMoveEvent mouseMoveEvent)
+    {
+        if (m_CurrentSmallPopup != null)
+        {
+            UpdateCurrentSmallPopupPosition(mouseMoveEvent.mousePosition);
+        }
+    }
+
+    private void UpdateCurrentSmallPopupPosition(Vector2 position)
+    {
+        m_CurrentSmallPopup.style.left = position.x + CUIManager.Instance.PopupMouseOffset.x;
+        m_CurrentSmallPopup.style.top = position.y + CUIManager.Instance.PopupMouseOffset.y;
     }
 
     private void OnMouseLeaveTraitLabel(MouseLeaveEvent moustLeaveEvent)
     {
-
+        if (m_CurrentSmallPopup != null)
+        {
+            m_CurrentSmallPopup.RemoveFromHierarchy();
+            m_CurrentSmallPopup = null;
+        }
     }
 }
