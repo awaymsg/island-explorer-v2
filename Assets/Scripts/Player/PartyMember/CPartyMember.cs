@@ -42,31 +42,41 @@ public class CPartyMember : ScriptableObject
 
 public class CPartyMemberRuntime : IDisposable
 {
-    protected CPartyMember m_PartyMemberSO;
+    protected readonly CPartyMember m_PartyMemberSO;
     protected CPartyManager m_PartyManager;
 
-    // name of the character
+    // Name of the character
     protected string m_CharacterName;
 
-    // portrait for UI
+    // Portrait for UI
     private Sprite m_PartyMemberPortrait;
 
     protected List<CPartyMemberTraitRuntime> m_PartyMemberTraits = new List<CPartyMemberTraitRuntime>();
-    protected List<CPartyMemberPersonalityTrait> m_PartyMemberPersonalityTraits = new List<CPartyMemberPersonalityTrait>();
     protected CBodyPart[] m_BodyParts;
 
     protected Dictionary<EPartyMemberStatType, CPartyMemberStat> m_PartyMemberStats;
     protected CInventory m_ItemInventory;
 
-    // player-facing
+    // Player-facing and also used for internal data / counts
     private Dictionary<EBodyPart, List<string>> m_BodyPartConditions = new Dictionary<EBodyPart, List<string>>();
     private Dictionary<string, string> m_TraitDetails = new Dictionary<string, string>();
     private Dictionary<string, float> m_AttitudesBook = new Dictionary<string, float>();
+    private List<SPartyMemberMoodlet> m_Moodlets = new List<SPartyMemberMoodlet>();
+    // TODO: Memories
+    private Dictionary<string, string[]> m_BadMemories = new Dictionary<string, string[]>();
+    private Dictionary<string, string[]> m_GoodMemories = new Dictionary<string, string[]>();
 
     protected UInt16 m_SkillLevel = 0;
 
+    // Important non-stat values
     private float m_DefaultAttitude = 0f;
     private float m_DefaultSelfAttitude = 0f;
+    private float m_HungerRateScalar = 1f;
+    private float m_Hunger = 0f;
+    private float m_Happiness = 0f;
+    private float m_Angst = 0f;
+    private float m_Sanity = 0f;
+    private float m_DaysOnIsland = 0f;
 
     private float m_TotalCost = 0f;
 
@@ -126,6 +136,16 @@ public class CPartyMemberRuntime : IDisposable
     {
         get { return m_PartyMemberSO.m_PartyMemberClassName; }
     }
+
+    public float Hunger
+    {
+        get { return m_Hunger; }
+    }
+
+    public float Happiness
+    {
+        get { return m_Happiness; }
+    }
     //--
 
     public void InitializePartyMember()
@@ -177,19 +197,24 @@ public class CPartyMemberRuntime : IDisposable
 
         CPartyManager.Instance.m_OnCharacterAdded += AddPartyMemberAttitude;
         CPartyManager.Instance.m_OnCharacterRemoved += RemovePartyMemberAttitude;
+        CGameManager.Instance.m_OnTick += OnTick;
 
         CalculateCost();
     }
 
     public void Dispose()
     {
-        if (CPartyManager.Instance == null)
+        if (CPartyManager.Instance != null)
         {
-            return;
+            CPartyManager.Instance.m_OnCharacterAdded -= AddPartyMemberAttitude;
+            CPartyManager.Instance.m_OnCharacterRemoved -= RemovePartyMemberAttitude;
         }
 
-        CPartyManager.Instance.m_OnCharacterAdded -= AddPartyMemberAttitude;
-        CPartyManager.Instance.m_OnCharacterRemoved -= RemovePartyMemberAttitude;
+        if (CGameManager.Instance != null)
+        {
+            CGameManager.Instance.m_OnTick -= OnTick;
+        }
+
     }
 
     private void GenerateName()
@@ -294,6 +319,7 @@ public class CPartyMemberRuntime : IDisposable
 
         // Party members can have attitudes toward themselves
         m_AttitudesBook.Add(partyMember.CharacterName, (partyMember == this) ? m_DefaultSelfAttitude : m_DefaultAttitude);
+        CalculateHappiness();
     }
 
     private void RemovePartyMemberAttitude(CPartyMemberRuntime partyMember)
@@ -305,6 +331,7 @@ public class CPartyMemberRuntime : IDisposable
         }
 
         m_AttitudesBook.Remove(partyMember.CharacterName);
+        CalculateHappiness();
     }
 
     private void UpdateInventoryMaxWeight(float oldValue, float newValue)
@@ -387,6 +414,12 @@ public class CPartyMemberRuntime : IDisposable
 
     public void RemoveBodyMod(CBodyPartModification bodyMod)
     {
+        if (bodyMod == null || bodyMod.bPermanent)
+        {
+            Debug.Log("RemoveBodyMod - tried to remove null or permanent bodymod!");
+            return;
+        }
+
         CBodyPart bodyPart = Array.Find(m_BodyParts, p => p.BodyPart == bodyMod.ModLocation);
         if (bodyPart == null)
         {
@@ -426,43 +459,42 @@ public class CPartyMemberRuntime : IDisposable
     {
         CPartyMemberTraitRuntime runtimeTrait = new CPartyMemberTraitRuntime(trait);
 
-        foreach (SPartyMemberTraitEffect traitEffect in runtimeTrait.TraitEffects)
+        foreach (CBodyPartModification bodyMod in runtimeTrait.TraitEffect.BodyPartModifications)
         {
-            // essentially move the bodymod from the trait to the actual bodypart
-            List<CBodyPartModification> bodyModsToRemove = new List<CBodyPartModification>();
-
-            foreach (CBodyPartModification bodyMod in traitEffect.BodyPartModifications)
-            {
-                AddBodyMod(bodyMod);
-
-                bodyModsToRemove.Add(bodyMod);
-            }
-
-            foreach (CBodyPartModification bodyModToRemove in bodyModsToRemove)
-            {
-                traitEffect.BodyPartModifications.Remove(bodyModToRemove);
-            }
-
-            ApplyStatModifiers(traitEffect.StatModifiers);
-
-            foreach (SPartyMemberTraitItem traitItem in traitEffect.GrantedItems)
-            {
-                m_ItemInventory.TryAddItemToInventory(new CInventoryItemRuntime(traitItem.InventoryItem), this);
-            }
+            AddBodyMod(bodyMod);
         }
+
+        ApplyStatModifiers(runtimeTrait.TraitEffect.StatModifiers);
+
+        foreach (CInventoryItem traitItem in runtimeTrait.TraitEffect.GrantedItems)
+        {
+            m_ItemInventory.TryAddItemToInventory(new CInventoryItemRuntime(traitItem), this);
+        }
+
+        m_DefaultAttitude += runtimeTrait.TraitEffect.AttitudeModifier.Value;
+        m_DefaultSelfAttitude += runtimeTrait.TraitEffect.SelfAttitudeModifier.Value;
 
         m_PartyMemberTraits.Add(runtimeTrait);
 
         // add player facing details
-        m_TraitDetails.Add(trait.m_TraitName, trait.m_TraitDescription);
+        if (!runtimeTrait.bIsHidden)
+        {
+            m_TraitDetails.Add(trait.m_TraitName, trait.m_TraitDescription);
+        }
     }
 
     public void RemoveTrait(CPartyMemberTraitRuntime trait)
     {
-        foreach (SPartyMemberTraitEffect traitEffect in trait.TraitEffects)
+        // revert stat modifiers
+        RemoveStatModifiers(trait.TraitEffect.StatModifiers);
+
+        // revert non-permanent bodypart modifications
+        foreach (CBodyPartModification bodyMod in trait.TraitEffect.BodyPartModifications)
         {
-            // revert stat modifiers
-            RemoveStatModifiers(traitEffect.StatModifiers);
+            if (!bodyMod.bPermanent)
+            {
+                RemoveBodyMod(bodyMod);
+            }
         }
 
         m_PartyMemberTraits.Remove(trait);
@@ -478,6 +510,9 @@ public class CPartyMemberRuntime : IDisposable
         {
             m_PartyMemberStats[statMod.StatType].AddMod(statMod);
         }
+
+        CalculateHappiness();
+        CalculateHungerRateScalar();
     }
 
     public void RemoveStatModifiers(SPartyMemberStatModifier[] statMods)
@@ -486,6 +521,73 @@ public class CPartyMemberRuntime : IDisposable
         {
             m_PartyMemberStats[statMod.StatType].RemoveMod(statMod);
         }
+
+        CalculateHappiness();
+        CalculateHungerRateScalar();
+    }
+
+    // TEMP: happiness and hunger rate calculations should be reworked
+    private void CalculateHappiness()
+    {
+        // For now, relationshipSatisfaction is simply the average of all attitudes toward other party members
+        float relationshipSatisfaction = 0f;
+        
+        foreach (var attitude in m_AttitudesBook)
+        {
+            relationshipSatisfaction += attitude.Value;
+        }
+
+        relationshipSatisfaction /= m_AttitudesBook.Count == 0 ? 1f : m_AttitudesBook.Count;
+
+        // Happiness is max at 100, affected by moodlets, reduced by hunger, but helped by relationship satisfaction and serenity stat
+        float maxStatValue = CGameManager.Instance.MaxStatValue;
+        m_Happiness = maxStatValue * 0.5f;
+
+        foreach (SPartyMemberMoodlet moodlet in m_Moodlets)
+        {
+            if (moodlet.MoodletType == EMoodletType.Happiness)
+            {
+                m_Happiness += moodlet.AdditiveHappinessAmount;
+            }
+        }
+
+        m_Happiness *= 1f - m_Hunger / maxStatValue;
+        m_Happiness *= 1f + relationshipSatisfaction / maxStatValue;
+
+        if (m_PartyMemberStats.ContainsKey(EPartyMemberStatType.Serenity))
+        {
+            m_Happiness *= 1f + m_PartyMemberStats[EPartyMemberStatType.Serenity].Value / maxStatValue;
+        }
+
+        // Selfworth counts twice as much
+        if (m_AttitudesBook.ContainsKey(m_CharacterName))
+        {
+            m_Happiness *= 1f + (m_AttitudesBook[m_CharacterName] / maxStatValue) * 2f;
+        }
+
+        // Spending too much time on the island reduces happiness (should introduce sanity later)
+        m_Happiness *= Math.Max(1f - m_DaysOnIsland / CGameManager.Instance.DaysOnIslandMaxValue, 0.5f);
+
+        m_Happiness = Math.Min(m_Happiness, maxStatValue);
+    }
+
+    private void CalculateHungerRateScalar()
+    {
+        m_HungerRateScalar = 1f * (1f - m_PartyMemberStats[EPartyMemberStatType.Stamina].Value / CGameManager.Instance.MaxStatValue);
+        m_HungerRateScalar *= 1f - m_Happiness / CGameManager.Instance.MaxStatValue;
+    }
+
+    private void OnTick()
+    {
+        m_DaysOnIsland += 1f /CGameManager.Instance.StepsInADay;
+
+        IncrementHunger();
+    }
+
+    private void IncrementHunger()
+    {
+        m_Hunger += CGameManager.Instance.HungerRatePerTick * m_HungerRateScalar;
+        CalculateHappiness();
     }
 
     public float CalculateCost()
@@ -503,7 +605,6 @@ public class CPartyMemberRuntime : IDisposable
                 totalCost += bodyMod.CalculateCost();
             }
         }
-        // todo: personality trait
 
         m_TotalCost = totalCost;
         return totalCost;

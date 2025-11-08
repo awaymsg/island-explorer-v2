@@ -150,11 +150,15 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::GameManager
   m_bUseSeed: 0
   m_RandomSeed: 47
+  m_Camera: {fileID: 519420031}
   m_PartyPlayerCharacterPrefab: {fileID: 234909392250611176, guid: 12f91a7f2fa6cb6488c98fc9c73f4519, type: 3}
   m_LocationSelectHighlightTile: {fileID: 11400000, guid: 2917f8a7507d5714d8fc823a59443571, type: 2}
   m_PlayerSelectHighlightTile: {fileID: 11400000, guid: 9c39fd6e1e0a28c488131ef85c41cae6, type: 2}
   m_TickSpeed: 0.01
   m_StepsInADay: 10
+  m_HungerRatePerTick: 0.5
+  m_MaxStatValue: 100
+  m_DaysOnIslandMaxValue: 1000
   m_bShowFog: 1
   m_bIgnoreTileRules: 0
   m_bPathFindDiagonals: 1
@@ -1192,22 +1196,22 @@ MonoBehaviour:
   m_BiomeSettings:
   - BiomeType: 1
     MovementTime: 20
-    DangerAmount: 50
+    ForageAmount: 0
   - BiomeType: 2
     MovementTime: 10
-    DangerAmount: 20
+    ForageAmount: 0
   - BiomeType: 3
     MovementTime: 1
-    DangerAmount: 2
+    ForageAmount: 0
   - BiomeType: 4
     MovementTime: 3
-    DangerAmount: 5
+    ForageAmount: 0
   - BiomeType: 5
     MovementTime: 7
-    DangerAmount: 8
+    ForageAmount: 0
   - BiomeType: 6
     MovementTime: 14
-    DangerAmount: 15
+    ForageAmount: 0
   m_POIMappings:
   - BiomeType: 3
     POISettings:
@@ -1471,7 +1475,7 @@ MonoBehaviour:
   m_TraitPool:
   - {fileID: 11400000, guid: 0c5eb64850f2bbb4fb58c688b89594cc, type: 2}
   - {fileID: 11400000, guid: d88e964db6c7e5f409e01bd21e63e972, type: 2}
-  m_PersonalityTraitPool: []
+  - {fileID: 11400000, guid: 1ba8ef1fb42ce75499eed3b31e6334d2, type: 2}
   m_MaleNames:
   - John
   - Lenny

@@ -17,8 +17,8 @@ MonoBehaviour:
     but deep in their heart they know they were right.
   m_TraitType: 4
   m_InvalidatedTraits: []
-  m_TraitEffects:
-  - BodyPartModifications:
+  m_TraitEffect:
+    BodyPartModifications:
     - ModName: Affliction of the Soul
       ModLocation: 2
       InjuryType: 1
@@ -26,23 +26,22 @@ MonoBehaviour:
       HealTimeInDays: 0
       bMultiplicative: 1
       ModAmount: 0.9
-      Cost: -3
-      ModificationContext: Anger and resentment gnaw at their being.
+      Cost: -5
+      ModificationContext: Anger and bitterness gnaw at their being
     StatModifiers:
-    - StatModName: Disgruntled
-      StatType: 7
-      bMultiplicative: 0
-      ModAmount: -10
-      bIsPermanent: 0
-      RemovalTimeInDays: 0
-      Cost: -3
-    - StatModName: Science Savvy
-      StatType: 6
+    - StatType: 9
       bMultiplicative: 0
       ModAmount: 10
       bIsPermanent: 0
       RemovalTimeInDays: 0
       Cost: 3
     GrantedItems: []
+    SelfAttitudeModifier:
+      Value: -10
+      Cost: -3
+    AttitudeModifier:
+      Value: 0
+      Cost: 0
   m_bIsGenerationOnly: 1
-  m_TotalCost: -3
+  m_bIsHidden: 0
+  m_TotalCost: -5

@@ -1,3 +1,4 @@
+using JetBrains.Annotations;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -62,33 +63,29 @@ public struct SPartyMemberStatModifier
     public float RemovalTimeInDays;
 
     [Tooltip("How valuable this modifier is")]
-    public float Cost;
+    public int Cost;
 }
 
 public enum EPartyMemberStatType
 {
     Invalid = 0,
-    None,
     Attack,
     Defense,
     Hunting,
+    Stamina,
+    Fortitude,
+    Vision,
+    Mobility,
     Nutrition,
     Science,
-    Social,
     History,
-    Occult,
-    Serenity,
-    Morale,
-    Attractiveness,
-    Gayness,
-    Happiness,
     Medicine,
-    Vision,
-    Stamina,
+    Occult,
     Magic,
-    Fortitude,
-    Hunger,
-    Disposition
+    Social,
+    Serenity,
+    Attractiveness,
+    Gayness
 }
 
 [Serializable]
@@ -249,7 +246,7 @@ public class CBodyPartModification
     public float ModAmount;
 
     [Tooltip("Overall cost of this modification")]
-    public float Cost;
+    public int Cost;
 
     [Tooltip("Player facing description of this modification")]
     public string ModificationContext;
@@ -314,12 +311,34 @@ public struct SPartyMemberTraitEffect
 {
     public List<CBodyPartModification> BodyPartModifications;
     public SPartyMemberStatModifier[] StatModifiers;
-    public List<SPartyMemberTraitItem> GrantedItems;
+    public List<CInventoryItem> GrantedItems;
+    [Tooltip("Additive")]
+    public SPartyMemberAttitudeModifier SelfAttitudeModifier;
+    [Tooltip("Additive")]
+    public SPartyMemberAttitudeModifier AttitudeModifier;
 }
 
 [Serializable]
-public struct SPartyMemberTraitItem
+public struct SPartyMemberAttitudeModifier
 {
-    public CInventoryItem InventoryItem;
-    public float Cost;
+    public float Value;
+    public int Cost;
+}
+
+public enum EMoodletType
+{
+    None = 0,
+    Happiness,
+    Angst,
+    Sanity
+}
+
+[Serializable]
+public struct SPartyMemberMoodlet
+{
+    public EMoodletType MoodletType;
+    public float Duration;
+    public float AdditiveHappinessAmount;
+    public string Name;
+    public string Description;
 }

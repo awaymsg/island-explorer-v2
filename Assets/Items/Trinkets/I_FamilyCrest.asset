@@ -17,19 +17,19 @@ MonoBehaviour:
   m_ItemType: 8
   m_ItemCategory: 5
   m_StatModifiers:
-  - StatType: 18
+  - StatType: 13
     bMultiplicative: 0
     ModAmount: 10
     bIsPermanent: 1
     RemovalTimeInDays: 0
     Cost: 5
-  - StatType: 21
+  - StatType: 15
     bMultiplicative: 0
-    ModAmount: 10
+    ModAmount: -10
     bIsPermanent: 1
     RemovalTimeInDays: 0
     Cost: -3
-  - StatType: 9
+  - StatType: 12
     bMultiplicative: 0
     ModAmount: 5
     bIsPermanent: 1

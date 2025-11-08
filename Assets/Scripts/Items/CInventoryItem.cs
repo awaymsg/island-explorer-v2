@@ -44,7 +44,7 @@ public class CInventoryItem : ScriptableObject
 
 public class CInventoryItemRuntime
 {
-    private CInventoryItem m_InventoryItemSO;
+    private readonly CInventoryItem m_InventoryItemSO;
     private string m_ItemName;
     private string m_ItemDescription;
     private EItemType m_ItemType;

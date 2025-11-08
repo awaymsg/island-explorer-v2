@@ -7,6 +7,7 @@ public class CPartyPlayerCharacter : MonoBehaviour
     private CPartyMemberRuntime m_PartyLeader;
     private List<CPartyMemberRuntime> m_PartyMembers;
     private Vector3Int m_CurrentLocation;
+    private float m_PartyMorale = 0f;
 
     //-- getters
     public CPartyMemberRuntime PartyLeader
@@ -24,6 +25,11 @@ public class CPartyPlayerCharacter : MonoBehaviour
         get { return m_CurrentLocation; }
         set { m_CurrentLocation = value; }
     }
+
+    public float PartyMorale
+    {
+        get { return m_PartyMorale; }
+    }
     //--
 
     public void InitializePartyPlayerCharacter(CPartyMemberRuntime partyLeader, Queue<CPartyMemberRuntime> partyMembers)
@@ -40,5 +46,18 @@ public class CPartyPlayerCharacter : MonoBehaviour
     public void RemovePartyMember(CPartyMemberRuntime partyMember)
     {
         m_PartyMembers.Remove(partyMember);
+    }
+
+    public void CalculatePartyMorale()
+    {
+        foreach (CPartyMemberRuntime partyMember in m_PartyMembers)
+        {
+
+        }
+    }
+
+    private float CalculatePartyMemberMorale(bool bIsLeader)
+    {
+        return 100f;
     }
 }

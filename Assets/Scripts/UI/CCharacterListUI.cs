@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UIElements;
@@ -247,19 +248,28 @@ public class CCharacterListUI : MonoBehaviour
 
     private string GetShortStatsString(CPartyMemberRuntime partyMember)
     {
-        string statsString = "Traits: ";
-        int index = 0;
+        string statsString = "Mood: ";
 
-        foreach (string trait in partyMember.TraitDetails.Keys)
+        switch (partyMember.Happiness)
         {
-            statsString += trait;
-            if (index < partyMember.TraitDetails.Count - 1)
-            {
-                statsString += ", ";
-            }
-
-            index++;
+            case > 90f:
+                statsString += "Immaculate\n";
+                break;
+            case > 75f:
+                statsString += "Great\n";
+                break;
+            case > 50f:
+                statsString += "Good\n";
+                break;
+            case > 25:
+                statsString += "Bad\n";
+                break;
+            default:
+                statsString += "Awful\n";
+                break;
         }
+
+        statsString += "Hunger: " + (float)Math.Round(partyMember.Hunger, 1) + "\n";
 
         return statsString;
     }

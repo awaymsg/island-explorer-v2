@@ -353,7 +353,7 @@ public class CMapGenerator : MonoBehaviour
                     /*bExplored*/ false,
                     biomeType,
                     (biomeMovement.BiomeType == EBiomeType.Invalid) ? 1f : biomeMovement.MovementTime,
-                    (biomeMovement.BiomeType == EBiomeType.Invalid) ? 1f : biomeMovement.DangerAmount
+                    (biomeMovement.BiomeType == EBiomeType.Invalid) ? 1f : biomeMovement.ForageAmount
                 );
             }
         }

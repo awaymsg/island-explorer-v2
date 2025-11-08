@@ -18,7 +18,7 @@ public class CPartyMemberTrait : ScriptableObject
     public CPartyMemberTrait[] m_InvalidatedTraits;
 
     [Tooltip("Effects of this trait")]
-    public SPartyMemberTraitEffect[] m_TraitEffects;
+    public SPartyMemberTraitEffect m_TraitEffect;
 
     [Tooltip("If true, this trait can only be assigned when a new party member is generated.")]
     public bool m_bIsGenerationOnly = true;
@@ -33,29 +33,29 @@ public class CPartyMemberTrait : ScriptableObject
     {
         float totalCost = 0f;
 
-        foreach (SPartyMemberTraitEffect traitEffect in m_TraitEffects)
+        foreach (CBodyPartModification bodyMod in m_TraitEffect.BodyPartModifications)
         {
-            foreach (CBodyPartModification bodyMod in traitEffect.BodyPartModifications)
-            {
-                totalCost += bodyMod.CalculateCost();
-            }
-
-            foreach (SPartyMemberStatModifier statMod in traitEffect.StatModifiers)
-            {
-                totalCost += statMod.Cost;
-            }
-
-            foreach (SPartyMemberTraitItem grantedItem in traitEffect.GrantedItems)
-            {
-                totalCost += grantedItem.Cost;
-            }
+            totalCost += bodyMod.CalculateCost();
         }
+
+        foreach (SPartyMemberStatModifier statMod in m_TraitEffect.StatModifiers)
+        {
+            totalCost += statMod.Cost;
+        }
+
+        foreach (CInventoryItem grantedItem in m_TraitEffect.GrantedItems)
+        {
+            totalCost += grantedItem.m_TotalCost;
+        }
+
+        totalCost += m_TraitEffect.SelfAttitudeModifier.Cost;
+        totalCost += m_TraitEffect.AttitudeModifier.Cost;
 
         m_TotalCost = totalCost;
         return totalCost;
     }
 
-    private void OnValidate()
+    public void OnValidate()
     {
         CalculateCosts();
     }
@@ -63,8 +63,7 @@ public class CPartyMemberTrait : ScriptableObject
 
 public class CPartyMemberTraitRuntime
 {
-    private CPartyMemberTrait m_PartyMemberTraitSO;
-    private SPartyMemberTraitEffect[] m_TraitEffects;
+    private readonly CPartyMemberTrait m_PartyMemberTraitSO;
     private bool m_bIsHidden = false;
 
     //-- getters
@@ -73,9 +72,9 @@ public class CPartyMemberTraitRuntime
         get { return m_PartyMemberTraitSO.m_TraitName; }
     }
 
-    public SPartyMemberTraitEffect[] TraitEffects
+    public SPartyMemberTraitEffect TraitEffect
     {
-        get { return m_TraitEffects; }
+        get { return m_PartyMemberTraitSO.m_TraitEffect; }
     }
 
     public bool bIsHidden
@@ -89,53 +88,11 @@ public class CPartyMemberTraitRuntime
     {
         m_PartyMemberTraitSO = partyMemberTraitSO;
 
-        // todo: it would be better if we didn't have to deep copy, think about how
-        m_TraitEffects = m_PartyMemberTraitSO.m_TraitEffects
-            .Select(effect => DeepCopyTraitEffect(effect))
-            .ToArray();
-
         m_bIsHidden = partyMemberTraitSO.m_bIsHidden;
-    }
-
-    private SPartyMemberTraitEffect DeepCopyTraitEffect(SPartyMemberTraitEffect original)
-    {
-        return new SPartyMemberTraitEffect
-        {
-            // Copy all properties
-            BodyPartModifications = original.BodyPartModifications?
-                .Select(mod => new CBodyPartModification(mod))
-                .ToList() ?? new List<CBodyPartModification>(),
-
-            StatModifiers = original.StatModifiers?
-                .Select(statMod => new SPartyMemberStatModifier(statMod))
-                .ToArray(),
-
-            GrantedItems = original.GrantedItems?.ToList()
-        };
     }
 
     public float CalculateCosts()
     {
-        float totalCost = 0f;
-
-        foreach (SPartyMemberTraitEffect traitEffect in m_TraitEffects)
-        {
-            foreach (CBodyPartModification bodyMod in traitEffect.BodyPartModifications)
-            {
-                totalCost += bodyMod.CalculateCost();
-            }
-
-            foreach (SPartyMemberStatModifier statMod in traitEffect.StatModifiers)
-            {
-                totalCost += statMod.Cost;
-            }
-
-            foreach (SPartyMemberTraitItem grantedItem in traitEffect.GrantedItems)
-            {
-                totalCost += grantedItem.Cost;
-            }
-        }
-
-        return totalCost;
+        return m_PartyMemberTraitSO.CalculateCosts();
     }
 }

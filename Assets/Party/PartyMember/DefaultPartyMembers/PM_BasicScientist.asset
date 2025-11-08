@@ -17,46 +17,40 @@ MonoBehaviour:
   m_PartyMemberClassName: Scientician
   m_PartyMemberGender: 2
   m_BaseStats:
+  - StatType: 1
+    Value: 20
   - StatType: 2
     Value: 20
   - StatType: 3
-    Value: 20
+    Value: 10
   - StatType: 4
-    Value: 10
+    Value: 15
   - StatType: 5
-    Value: 40
+    Value: 30
   - StatType: 6
-    Value: 60
-  - StatType: 7
-    Value: 20
-  - StatType: 8
-    Value: 40
-  - StatType: 9
-    Value: 30
-  - StatType: 10
-    Value: 20
-  - StatType: 11
-    Value: 30
-  - StatType: 12
-    Value: 10
-  - StatType: 13
-    Value: 30
-  - StatType: 14
     Value: 50
-  - StatType: 15
+  - StatType: 7
+    Value: 50
+  - StatType: 8
+    Value: 50
+  - StatType: 9
+    Value: 70
+  - StatType: 10
     Value: 40
+  - StatType: 11
+    Value: 40
+  - StatType: 12
+    Value: 20
+  - StatType: 13
+    Value: 15
+  - StatType: 14
+    Value: 40
+  - StatType: 15
+    Value: 30
   - StatType: 16
     Value: 30
   - StatType: 17
-    Value: 40
-  - StatType: 18
-    Value: 10
-  - StatType: 19
-    Value: 40
-  - StatType: 20
-    Value: 0
-  - StatType: 21
-    Value: 20
+    Value: 30
   m_StartingItems:
   - {fileID: 11400000, guid: 366df77859acc914d8fe78e5fb642bdf, type: 2}
   - {fileID: 11400000, guid: 366df77859acc914d8fe78e5fb642bdf, type: 2}
@@ -66,3 +60,5 @@ MonoBehaviour:
   m_PartyMemberSkills: []
   m_TraitTypeBias: 4
   m_TraitBiasAmount: 0
+  m_DefaultAttitude: 0
+  m_DefaultSelfAttitude: 0

@@ -32,6 +32,14 @@ public class CGameManager : MonoBehaviour
     private float m_TickSpeed = 0.1f;
     [SerializeField, Tooltip("Division of days into steps")]
     private int m_StepsInADay = 10;
+    [SerializeField, Tooltip("Base hunger rate (per tick)")]
+    private float m_HungerRatePerTick = 0.5f;
+
+    [Header("Important values")]
+    [SerializeField, Tooltip("Maximum stat value")]
+    private float m_MaxStatValue = 100f;
+    [SerializeField, Tooltip("Days on island value to calculate character sanity debuff against (days / threshold)")]
+    private float m_DaysOnIslandMaxValue = 1000f;
 
     [Header("Debug")]
     [SerializeField]
@@ -79,6 +87,7 @@ public class CGameManager : MonoBehaviour
     //-- Events
     public event Action<string> m_OnDayInfoChanged;
     public event Action<string> m_OnWorldInfoChanged;
+    public event Action m_OnTick;
     //--
 
     //-- Getters
@@ -86,6 +95,27 @@ public class CGameManager : MonoBehaviour
     {
         get { return m_PartyPlayerCharacter; }
     }
+
+    public float StepsInADay
+    {
+        get { return m_StepsInADay; }
+    }
+
+    public float MaxStatValue
+    {
+        get { return m_MaxStatValue; }
+    }
+
+    public float DaysOnIslandMaxValue
+    {
+        get { return m_DaysOnIslandMaxValue; }
+    }
+
+    public float HungerRatePerTick
+    {
+        get { return m_HungerRatePerTick; }
+    }
+    //--
 
     public static CGameManager Instance
     {
@@ -275,19 +305,22 @@ public class CGameManager : MonoBehaviour
         // Move player in increments
         if (m_OccurredMovement < m_CurrentTrueMovementRate)
         {
+            float dayIncrement = 1f / m_StepsInADay;
+
             m_TargetPositionNextTick = m_PartyPlayerGameObject.transform.position + m_MovementPerTick;
-            m_OccurredMovement += 1f / m_StepsInADay;
-            m_OccurredMovement = (float)System.Math.Round(m_OccurredMovement, 1);
+            m_OccurredMovement += dayIncrement;
+            m_OccurredMovement = (float)Math.Round(m_OccurredMovement, 1);
 
             // We moved, so increment day
-            m_DayCount += 1f / m_StepsInADay;
-            m_DayCount = (float)System.Math.Round(m_DayCount, 1);
+            m_DayCount += dayIncrement;
+            m_DayCount = (float)Math.Round(m_DayCount, 1);
             m_OnDayInfoChanged?.Invoke(string.Format("Day: {0}", m_DayCount));
 
             // Decrement estimated move time remaining
-            m_TotalEstimatedMovementRemaining -= 1f / m_StepsInADay;
-            m_TotalEstimatedMovementRemaining = (float)System.Math.Round(m_TotalEstimatedMovementRemaining, 1);
+            m_TotalEstimatedMovementRemaining -= dayIncrement;
+            m_TotalEstimatedMovementRemaining = (float)Math.Round(m_TotalEstimatedMovementRemaining, 1);
             m_OnWorldInfoChanged?.Invoke(string.Format("Estimated Traversal Time: {0}", m_TotalEstimatedMovementRemaining));
+            m_OnTick?.Invoke();
         }
         else
         {
@@ -445,7 +478,7 @@ public class CGameManager : MonoBehaviour
             m_CurrentEstimatedPathMovementRates = new Queue<float>();
 
             m_TotalEstimatedMovementRemaining = 0f;
-            float totalDanger = 0f;
+            float totalForage = 0f;
 
             Vector3Int previous = m_PartyPlayerCharacter.CurrentLocation;
 
@@ -468,30 +501,30 @@ public class CGameManager : MonoBehaviour
                 float trueTraversalRate = m_TerrainTileMap[node.x, node.y].GetTraversalRate();
 
                 float displayTraversalRate = bIsFogged ? fogTraversalRate : m_TerrainTileMap[node.x, node.y].GetTraversalRate();
-                float displayDangerAmount = bIsFogged ? 0f : m_TerrainTileMap[node.x, node.y].GetDangerAmount();
+                float displayForageAmount = bIsFogged ? 0f : m_TerrainTileMap[node.x, node.y].GetForageAmount();
 
                 // If this is a diagonal, multiply movement cost by 1.4
                 if (Mathf.Abs(node.x - previous.x) == 1 && Mathf.Abs(node.y - previous.y) == 1)
                 {
-                    m_CurrentTruePathMovementRates.Enqueue((float)System.Math.Round(trueTraversalRate * 1.4f, 1));
-                    m_CurrentEstimatedPathMovementRates.Enqueue((float)System.Math.Round(displayTraversalRate * 1.4f, 1));
+                    m_CurrentTruePathMovementRates.Enqueue((float)Math.Round(trueTraversalRate * 1.4f, 1));
+                    m_CurrentEstimatedPathMovementRates.Enqueue((float)Math.Round(displayTraversalRate * 1.4f, 1));
                     m_TotalEstimatedMovementRemaining += displayTraversalRate * 1.4f;
-                    totalDanger += displayDangerAmount * 1.4f;
+                    totalForage += displayForageAmount * 1.4f;
                 }
                 else
                 {
-                    m_CurrentTruePathMovementRates.Enqueue((float)System.Math.Round(trueTraversalRate, 1));
-                    m_CurrentEstimatedPathMovementRates.Enqueue((float)System.Math.Round(displayTraversalRate, 1));
+                    m_CurrentTruePathMovementRates.Enqueue((float)Math.Round(trueTraversalRate, 1));
+                    m_CurrentEstimatedPathMovementRates.Enqueue((float)Math.Round(displayTraversalRate, 1));
                     m_TotalEstimatedMovementRemaining += displayTraversalRate;
-                    totalDanger += displayDangerAmount;
+                    totalForage += displayForageAmount;
                 }
 
                 previous = node;
             }
 
-            m_TotalEstimatedMovementRemaining = (float)System.Math.Round(m_TotalEstimatedMovementRemaining, 1);
-            totalDanger = (float)System.Math.Round(totalDanger, 1);
-            m_OnWorldInfoChanged?.Invoke(string.Format("Estimated Traversal Time: {0}d\nEstimated Danger Level: {1}", m_TotalEstimatedMovementRemaining, totalDanger));
+            m_TotalEstimatedMovementRemaining = (float)Math.Round(m_TotalEstimatedMovementRemaining, 1);
+            totalForage = (float)Math.Round(totalForage, 1);
+            m_OnWorldInfoChanged?.Invoke(string.Format("Estimated Traversal Time: {0}d\nEstimated Forage Amount: {1}", m_TotalEstimatedMovementRemaining, totalForage));
         }
         else
         {
@@ -499,14 +532,14 @@ public class CGameManager : MonoBehaviour
 
             if (bIsFogged)
             {
-                m_OnWorldInfoChanged?.Invoke("Biome: ???\nTraversal Time: ???\nDanger Level: ???");
+                m_OnWorldInfoChanged?.Invoke("Biome: ???\nTraversal Time: ???\nBase Forage Amount: ???");
 
                 return;
             }
 
             STerrainTile currentTile = m_TerrainTileMap[cellPosition.x, cellPosition.y];
 
-            m_OnWorldInfoChanged?.Invoke(string.Format("Biome: {0}\nTraversal Time: {1}d\nDanger Level: {2}", currentTile.GetBiomeType().ToString(), currentTile.GetTraversalRate(), currentTile.GetDangerAmount()));
+            m_OnWorldInfoChanged?.Invoke(string.Format("Biome: {0}\nTraversal Time: {1}d\nEstimated Forage Amount: {2}", currentTile.GetBiomeType().ToString(), currentTile.GetTraversalRate(), currentTile.GetForageAmount()));
         }
     }
 

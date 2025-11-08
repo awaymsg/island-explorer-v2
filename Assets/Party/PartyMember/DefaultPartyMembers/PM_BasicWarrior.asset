@@ -17,46 +17,40 @@ MonoBehaviour:
   m_PartyMemberClassName: Mercenary
   m_PartyMemberGender: 1
   m_BaseStats:
-  - StatType: 2
+  - StatType: 1
     Value: 60
+  - StatType: 2
+    Value: 45
   - StatType: 3
     Value: 30
   - StatType: 4
-    Value: 30
+    Value: 50
   - StatType: 5
-    Value: 20
+    Value: 50
   - StatType: 6
-    Value: 5
+    Value: 50
   - StatType: 7
-    Value: 10
+    Value: 50
   - StatType: 8
-    Value: 5
+    Value: 60
   - StatType: 9
     Value: 10
   - StatType: 10
-    Value: 30
-  - StatType: 11
-    Value: 40
-  - StatType: 12
-    Value: 20
-  - StatType: 13
     Value: 10
-  - StatType: 14
-    Value: 60
-  - StatType: 15
-    Value: 15
-  - StatType: 16
-    Value: 50
-  - StatType: 17
-    Value: 60
-  - StatType: 18
+  - StatType: 11
+    Value: 20
+  - StatType: 12
     Value: 5
-  - StatType: 19
-    Value: 60
-  - StatType: 20
+  - StatType: 13
     Value: 0
-  - StatType: 21
+  - StatType: 14
     Value: 30
+  - StatType: 15
+    Value: 40
+  - StatType: 16
+    Value: 30
+  - StatType: 17
+    Value: 10
   m_StartingItems:
   - {fileID: 11400000, guid: 366df77859acc914d8fe78e5fb642bdf, type: 2}
   - {fileID: 11400000, guid: 366df77859acc914d8fe78e5fb642bdf, type: 2}
@@ -64,5 +58,7 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 366df77859acc914d8fe78e5fb642bdf, type: 2}
   - {fileID: 11400000, guid: 366df77859acc914d8fe78e5fb642bdf, type: 2}
   m_PartyMemberSkills: []
-  m_TraitTypeBias: 0
+  m_TraitTypeBias: 2
   m_TraitBiasAmount: 0
+  m_DefaultAttitude: 0
+  m_DefaultSelfAttitude: 0

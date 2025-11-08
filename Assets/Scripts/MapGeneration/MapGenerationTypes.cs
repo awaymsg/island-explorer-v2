@@ -8,16 +8,16 @@ public struct STerrainTile
     private bool bSeen;
     private EBiomeType BiomeType;
     private float TraversalRate;
-    private float DangerAmount;
+    private float ForageAmount;
     private bool bPlayerOccupied;
 
-    public STerrainTile(float elevation, bool _bExplored, EBiomeType biomeType, float traversalRate, float dangerAmount, bool _bPlayerOccupied = false)
+    public STerrainTile(float elevation, bool _bExplored, EBiomeType biomeType, float traversalRate, float forageAmount, bool _bPlayerOccupied = false)
     {
         Elevation = elevation;
         bSeen = _bExplored;
         BiomeType = biomeType;
         TraversalRate = traversalRate;
-        DangerAmount = dangerAmount;
+        ForageAmount = forageAmount;
         bPlayerOccupied = _bPlayerOccupied;
     }
 
@@ -56,9 +56,9 @@ public struct STerrainTile
         bPlayerOccupied = _bPlayerOccupied;
     }
 
-    public float GetDangerAmount()
+    public float GetForageAmount()
     {
-        return DangerAmount;
+        return ForageAmount;
     }
 }
 
@@ -89,7 +89,7 @@ public struct SBiomeSettings
 {
     public EBiomeType BiomeType;
     public float MovementTime;
-    public float DangerAmount;
+    public float ForageAmount;
 }
 
 [Serializable]

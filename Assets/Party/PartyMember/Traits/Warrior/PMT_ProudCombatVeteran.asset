@@ -1,0 +1,55 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0889e8d3bb7140d4789834abdffe3ce7, type: 3}
+  m_Name: PMT_ProudCombatVeteran
+  m_EditorClassIdentifier: Assembly-CSharp::CPartyMemberTrait
+  m_TraitName: Proud Combat Veteran
+  m_TraitDescription: They have done terrible things to people who deserved it.
+  m_TraitType: 2
+  m_InvalidatedTraits: []
+  m_TraitEffect:
+    BodyPartModifications: []
+    StatModifiers:
+    - StatType: 1
+      bMultiplicative: 0
+      ModAmount: 20
+      bIsPermanent: 1
+      RemovalTimeInDays: 0
+      Cost: 4
+    - StatType: 2
+      bMultiplicative: 0
+      ModAmount: 20
+      bIsPermanent: 1
+      RemovalTimeInDays: 0
+      Cost: 4
+    - StatType: 14
+      bMultiplicative: 0
+      ModAmount: -20
+      bIsPermanent: 1
+      RemovalTimeInDays: 0
+      Cost: -4
+    - StatType: 15
+      bMultiplicative: 0
+      ModAmount: -20
+      bIsPermanent: 1
+      RemovalTimeInDays: 0
+      Cost: -5
+    GrantedItems: []
+    SelfAttitudeModifier:
+      Value: 10
+      Cost: 3
+    AttitudeModifier:
+      Value: 0
+      Cost: 0
+  m_bIsGenerationOnly: 1
+  m_bIsHidden: 0
+  m_TotalCost: 2

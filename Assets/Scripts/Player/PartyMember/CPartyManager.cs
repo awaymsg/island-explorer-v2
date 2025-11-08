@@ -15,9 +15,6 @@ public class CPartyManager : MonoBehaviour
     [SerializeField, Tooltip("All available traits")]
     private CPartyMemberTrait[] m_TraitPool;
 
-    [SerializeField, Tooltip("All available personality traits")]
-    private CPartyMemberPersonalityTrait[] m_PersonalityTraitPool;
-
     [SerializeField, Tooltip("Male names pool")]
     private string[] m_MaleNames;
 
@@ -64,11 +61,6 @@ public class CPartyManager : MonoBehaviour
         get { return m_TraitPool; }
     }
 
-    public CPartyMemberPersonalityTrait[] PersonalityTraitPool
-    {
-        get { return m_PersonalityTraitPool; }
-    }
-
     public CPartyPlayerCharacter PartyPlayerCharacter
     {
         get { return m_PartyPlayerCharacter; }
@@ -108,6 +100,7 @@ public class CPartyManager : MonoBehaviour
     {
         get { return m_FemalePortraits; }
     }
+    //--
 
     public static CPartyManager Instance
     {
@@ -143,6 +136,7 @@ public class CPartyManager : MonoBehaviour
         return newPartyMember;
     }
 
+    // TODO: rework this part of the code so it's not separate from AddMemberToParty
     public CPartyPlayerCharacter CreatePartyPlayerCharacter(CPartyPlayerCharacter defaultPlayerCharacter, Queue<CPartyMemberRuntime> partyMembers)
     {
         if (defaultPlayerCharacter == null)
