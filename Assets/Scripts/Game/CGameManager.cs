@@ -55,7 +55,7 @@ public class CGameManager : MonoBehaviour
     [SerializeField]
     private bool m_bShowFog = true;
     [SerializeField]
-    private bool m_bDebugHighlight = false;
+    private bool m_bDebugTileHighlight = false;
     [SerializeField]
     private bool m_bIgnoreTileRules = false;
     [SerializeField]
@@ -437,7 +437,7 @@ public class CGameManager : MonoBehaviour
         }
         else
         {
-            if (IsPreMovingState() || !m_bDebugHighlight)
+            if (IsPreMovingState() || !m_bDebugTileHighlight)
             {
                 return;
             }
@@ -452,7 +452,10 @@ public class CGameManager : MonoBehaviour
             }
         }
 
-        Debug.Log(cellPosition);
+        if (m_bDebugTileHighlight)
+        {
+            Debug.Log(cellPosition);
+        }
     }
 
     public void OnMouseOverGrid(InputAction.CallbackContext context)
