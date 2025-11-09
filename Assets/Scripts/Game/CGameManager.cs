@@ -47,9 +47,11 @@ public class CGameManager : MonoBehaviour
 
     [Header("Important values")]
     [SerializeField, Tooltip("Maximum stat value")]
-    private float m_MaxStatValue = 100f;
+    private int m_MaxStatValue = 100;
     [SerializeField, Tooltip("Days on island value to calculate character sanity debuff against (days / threshold)")]
     private float m_DaysOnIslandMaxValue = 1000f;
+    [SerializeField, Tooltip("Stat randomization range")]
+    private Vector2Int m_StatRandomizationRange;
 
     [Header("Debug")]
     [SerializeField]
@@ -109,7 +111,7 @@ public class CGameManager : MonoBehaviour
         get { return m_StepsInADay; }
     }
 
-    public float MaxStatValue
+    public int MaxStatValue
     {
         get { return m_MaxStatValue; }
     }
@@ -123,6 +125,12 @@ public class CGameManager : MonoBehaviour
     {
         get { return m_HungerRatePerTick; }
     }
+
+    public Vector2Int StatRandomizationRange
+    {
+        get { return m_StatRandomizationRange; }
+    }
+
     //--
 
     public static CGameManager Instance

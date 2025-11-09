@@ -1,5 +1,5 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" editor-extension-mode="False">
-    <ui:VisualElement name="ContinueMovementDialogeContainer" style="flex-grow: 1; background-color: rgba(0, 0, 0, 0.43); background-size: 100% 100%;">
+    <ui:VisualElement name="ContinueMovementDialogeContainer" style="flex-grow: 1; background-color: rgba(0, 0, 0, 0.7); background-size: 100% 100%;">
         <ui:Label text="The next tile is considerably harder to travel than our estimate! Continue?" name="ContinueMovementDialogueLabel" enable-rich-text="true" style="-unity-text-align: upper-center; white-space: normal; color: rgb(255, 255, 255);" />
         <ui:VisualElement name="ContinueMovementButtonPanel" style="flex-grow: 1; flex-direction: row; justify-content: center;">
             <ui:Button text="Yes" name="ContinueMovementButtonYes" style="position: relative; bottom: 0%; width: 40%; height: 10%;" />

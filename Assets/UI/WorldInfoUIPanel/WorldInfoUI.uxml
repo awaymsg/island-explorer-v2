@@ -1,5 +1,5 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" editor-extension-mode="False">
-    <ui:VisualElement name="WorldInfoPanel" style="flex-grow: 1; position: absolute; bottom: 0; right: 0; width: 20%; height: 25%; border-top-width: 2px; border-right-width: 2px; border-bottom-width: 2px; border-left-width: 2px; border-top-left-radius: 2px; border-top-right-radius: 2px; border-bottom-right-radius: 2px; border-bottom-left-radius: 2px; background-color: rgba(0, 0, 0, 0.43);">
+    <ui:VisualElement name="WorldInfoPanel" style="flex-grow: 1; position: absolute; bottom: 0; right: 0; width: 20%; height: 25%; border-top-width: 2px; border-right-width: 2px; border-bottom-width: 2px; border-left-width: 2px; border-top-left-radius: 2px; border-top-right-radius: 2px; border-bottom-right-radius: 2px; border-bottom-left-radius: 2px; background-color: rgba(0, 0, 0, 0.5);">
         <ui:Label text="Label" name="DayInfo" style="font-size: 18px; color: rgb(255, 255, 255); -unity-font-style: bold; border-top-width: 0; border-right-width: 0; border-bottom-width: 0; border-left-width: 0; border-top-left-radius: 0; border-top-right-radius: 0; border-bottom-right-radius: 0; border-bottom-left-radius: 0;" />
         <ui:Label text="Label" name="WorldInfo" style="font-size: 12px; color: rgb(255, 255, 255);" />
     </ui:VisualElement>

@@ -369,7 +369,7 @@ public class CPartyMemberRuntime : IDisposable
 
         foreach (SPartyMemberDefaultStat defaultStat in defaultStats)
         {
-            int randomVariation = UnityEngine.Random.Range(-10, 11);
+            int randomVariation = UnityEngine.Random.Range(CGameManager.Instance.StatRandomizationRange.x, CGameManager.Instance.StatRandomizationRange.y + 1);
             CPartyMemberStat stat = new CPartyMemberStat(defaultStat.Value + randomVariation);
 
             defaultStatsBook[defaultStat.StatType] = stat;

@@ -97,26 +97,20 @@ public struct SPartyMemberDefaultStat
 
 public class CPartyMemberStat
 {
-    private int m_Value;
+    private float m_Value;
     private readonly List<SPartyMemberStatModifier> m_CurrentModifiers;
 
     public event Action<int, int> OnStatChanged; // oldValue, newValue
 
     public int Value
     {
-        get { return m_Value; }
-        private set
-        {
-            if (m_Value != value)
-            {
-                int oldValue = m_Value;
-                m_Value = value;
-                OnStatChanged?.Invoke(oldValue, m_Value);
-            }
-        }
+        get { return (int)Math.Round(Math.Clamp(m_Value, 0, CGameManager.Instance.MaxStatValue), 0); }
     }
 
-    public IReadOnlyList<SPartyMemberStatModifier> CurrentModifiers => m_CurrentModifiers;
+    public IReadOnlyList<SPartyMemberStatModifier> CurrentModifiers
+    {
+        get { return m_CurrentModifiers; }
+    }
 
     public CPartyMemberStat(int value)
     {
@@ -126,31 +120,37 @@ public class CPartyMemberStat
 
     public void AddMod(SPartyMemberStatModifier modifier)
     {
+        int oldValue = Value;
+
         if (modifier.bMultiplicative)
         {
-            m_Value *= (int)modifier.ModAmount;
+            m_Value *= modifier.ModAmount;
         }
         else
         {
             // Don't go below 0
-            m_Value = (int)Math.Max(m_Value + modifier.ModAmount, 0f);
+            m_Value += modifier.ModAmount;
         }
 
         m_CurrentModifiers.Add(modifier);
+        OnStatChanged?.Invoke(oldValue, Value);
     }
 
     public void RemoveMod(SPartyMemberStatModifier modifier)
     {
+        int oldValue = Value;
+
         if (modifier.bMultiplicative)
         {
-            m_Value /= (int)modifier.ModAmount;
+            m_Value /= modifier.ModAmount;
         }
         else
         {
-            m_Value -= (int)modifier.ModAmount;
+            m_Value -= modifier.ModAmount;
         }
 
         m_CurrentModifiers.Remove(modifier);
+        OnStatChanged?.Invoke(oldValue, Value);
     }
 }
 
