@@ -18,8 +18,12 @@ public struct SEventOption
     public SEventModifiers ModifiersOnFailure;
     [Tooltip("Trigger another event on success")]
     public CLocalEvent SecondaryEventOnSuccess;
+    [Tooltip("SecondaryEventOnSuccess Chance (1-100)")]
+    public float SecondaryEventOnSuccessChance;
     [Tooltip("Trigger another event on failure")]
     public CLocalEvent SecondaryEventOnFailure;
+    [Tooltip("SecondaryEventOnFailure Chance (1-100)")]
+    public float SecondaryEventOnFailureChance;
 }
 
 [Serializable]
@@ -58,6 +62,13 @@ public enum EEventEntityType
     Human,
     Artifact,
     Paranormal
+}
+
+[Serializable]
+public struct SBiomeEventsPool
+{
+    public EBiomeType BiomeType;
+    public CLocalEvent[] LocalEvents;
 }
 
 public abstract class CEventEntity

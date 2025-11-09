@@ -1476,23 +1476,439 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 565fce51dafe8b34b94096c154f496e7, type: 2}
   - {fileID: 11400000, guid: cf482e73531af31468d019976736cbef, type: 2}
   m_DefaultBodyParts:
+  - BodyPart: 1
+    MaxHealth: 100
+    Health: 100
+    AffectedStats:
+    - StatType: 13
+      MaxEffect: 100
+    Modifications: []
+    bIsVital: 1
+    VitalEffects:
+    - VitalFunction: 3
+      MaxEffect: 50
+    Attached: 13000000
   - BodyPart: 2
     MaxHealth: 100
     Health: 100
-    StatModifiers:
-    - Stat: 10
-      ModAmount: 1
+    AffectedStats:
+    - StatType: 14
+      MaxEffect: 100
     Modifications: []
     bIsVital: 1
-    Attached: 
+    VitalEffects:
+    - VitalFunction: 1
+      MaxEffect: 50
+    Attached: 06000000
   - BodyPart: 3
     MaxHealth: 100
     Health: 100
-    StatModifiers:
-    - Stat: 11
-      ModAmount: 1
+    AffectedStats:
+    - StatType: 4
+      MaxEffect: 50
     Modifications: []
     bIsVital: 1
+    VitalEffects:
+    - VitalFunction: 5
+      MaxEffect: 100
+    - VitalFunction: 7
+      MaxEffect: 30
+    Attached: 17000000
+  - BodyPart: 4
+    MaxHealth: 100
+    Health: 100
+    AffectedStats:
+    - StatType: 6
+      MaxEffect: 50
+    Modifications: []
+    bIsVital: 0
+    VitalEffects:
+    - VitalFunction: 6
+      MaxEffect: 20
+    Attached: 
+  - BodyPart: 5
+    MaxHealth: 100
+    Health: 100
+    AffectedStats:
+    - StatType: 6
+      MaxEffect: 50
+    Modifications: []
+    bIsVital: 0
+    VitalEffects:
+    - VitalFunction: 6
+      MaxEffect: 20
+    Attached: 
+  - BodyPart: 6
+    MaxHealth: 100
+    Health: 100
+    AffectedStats: []
+    Modifications: []
+    bIsVital: 1
+    VitalEffects:
+    - VitalFunction: 1
+      MaxEffect: 50
+    Attached: 
+  - BodyPart: 7
+    MaxHealth: 100
+    Health: 100
+    AffectedStats: []
+    Modifications: []
+    bIsVital: 0
+    VitalEffects:
+    - VitalFunction: 2
+      MaxEffect: 20
+    - VitalFunction: 6
+      MaxEffect: 20
+    Attached: 
+  - BodyPart: 8
+    MaxHealth: 100
+    Health: 100
+    AffectedStats: []
+    Modifications: []
+    bIsVital: 0
+    VitalEffects:
+    - VitalFunction: 6
+      MaxEffect: 20
+    Attached: 
+  - BodyPart: 9
+    MaxHealth: 100
+    Health: 100
+    AffectedStats: []
+    Modifications: []
+    bIsVital: 0
+    VitalEffects:
+    - VitalFunction: 6
+      MaxEffect: 20
+    Attached: 
+  - BodyPart: 10
+    MaxHealth: 100
+    Health: 100
+    AffectedStats: []
+    Modifications: []
+    bIsVital: 1
+    VitalEffects:
+    - VitalFunction: 1
+      MaxEffect: 100
+    Attached: 040000000500000006000000070000000800000009000000
+  - BodyPart: 11
+    MaxHealth: 100
+    Health: 100
+    AffectedStats: []
+    Modifications: []
+    bIsVital: 1
+    VitalEffects: []
+    Attached: 
+  - BodyPart: 12
+    MaxHealth: 100
+    Health: 100
+    AffectedStats:
+    - StatType: 1
+      MaxEffect: 10
+    - StatType: 2
+      MaxEffect: 10
+    - StatType: 3
+      MaxEffect: 10
+    Modifications: []
+    bIsVital: 0
+    VitalEffects: []
+    Attached: 0e000000
+  - BodyPart: 13
+    MaxHealth: 100
+    Health: 100
+    AffectedStats:
+    - StatType: 1
+      MaxEffect: 10
+    - StatType: 2
+      MaxEffect: 10
+    - StatType: 3
+      MaxEffect: 10
+    Modifications: []
+    bIsVital: 0
+    VitalEffects: []
+    Attached: 0f000000
+  - BodyPart: 14
+    MaxHealth: 100
+    Health: 100
+    AffectedStats:
+    - StatType: 1
+      MaxEffect: 10
+    - StatType: 2
+      MaxEffect: 10
+    - StatType: 3
+      MaxEffect: 10
+    Modifications: []
+    bIsVital: 0
+    VitalEffects: []
+    Attached: 10000000
+  - BodyPart: 15
+    MaxHealth: 100
+    Health: 100
+    AffectedStats:
+    - StatType: 1
+      MaxEffect: 10
+    - StatType: 2
+      MaxEffect: 10
+    - StatType: 3
+      MaxEffect: 10
+    Modifications: []
+    bIsVital: 0
+    VitalEffects: []
+    Attached: 11000000
+  - BodyPart: 16
+    MaxHealth: 100
+    Health: 100
+    AffectedStats:
+    - StatType: 1
+      MaxEffect: 20
+    - StatType: 2
+      MaxEffect: 20
+    - StatType: 3
+      MaxEffect: 20
+    Modifications: []
+    bIsVital: 0
+    VitalEffects: []
+    Attached: 
+  - BodyPart: 17
+    MaxHealth: 100
+    Health: 100
+    AffectedStats:
+    - StatType: 1
+      MaxEffect: 20
+    - StatType: 2
+      MaxEffect: 20
+    - StatType: 3
+      MaxEffect: 20
+    Modifications: []
+    bIsVital: 0
+    VitalEffects: []
+    Attached: 
+  - BodyPart: 18
+    MaxHealth: 100
+    Health: 100
+    AffectedStats: []
+    Modifications: []
+    bIsVital: 0
+    VitalEffects: []
+    Attached: 130000001400000015000000
+  - BodyPart: 19
+    MaxHealth: 100
+    Health: 100
+    AffectedStats:
+    - StatType: 4
+      MaxEffect: 30
+    Modifications: []
+    bIsVital: 0
+    VitalEffects:
+    - VitalFunction: 3
+      MaxEffect: 50
+    Attached: 
+  - BodyPart: 20
+    MaxHealth: 100
+    Health: 100
+    AffectedStats:
+    - StatType: 4
+      MaxEffect: 35
+    Modifications: []
+    bIsVital: 0
+    VitalEffects:
+    - VitalFunction: 2
+      MaxEffect: 50
+    Attached: 
+  - BodyPart: 21
+    MaxHealth: 100
+    Health: 100
+    AffectedStats:
+    - StatType: 4
+      MaxEffect: 35
+    Modifications: []
+    bIsVital: 0
+    VitalEffects:
+    - VitalFunction: 2
+      MaxEffect: 50
+    Attached: 
+  - BodyPart: 22
+    MaxHealth: 100
+    Health: 100
+    AffectedStats: []
+    Modifications: []
+    bIsVital: 1
+    VitalEffects: []
+    Attached: 1700000018000000190000001a0000001b0000001c000000
+  - BodyPart: 23
+    MaxHealth: 100
+    Health: 100
+    AffectedStats:
+    - StatType: 5
+      MaxEffect: 50
+    Modifications: []
+    bIsVital: 1
+    VitalEffects:
+    - VitalFunction: 7
+      MaxEffect: 50
+    Attached: 
+  - BodyPart: 24
+    MaxHealth: 100
+    Health: 100
+    AffectedStats:
+    - StatType: 5
+      MaxEffect: 30
+    Modifications: []
+    bIsVital: 1
+    VitalEffects:
+    - VitalFunction: 7
+      MaxEffect: 30
+    Attached: 
+  - BodyPart: 25
+    MaxHealth: 100
+    Health: 100
+    AffectedStats:
+    - StatType: 5
+      MaxEffect: 30
+    Modifications: []
+    bIsVital: 1
+    VitalEffects:
+    - VitalFunction: 7
+      MaxEffect: 30
+    Attached: 
+  - BodyPart: 26
+    MaxHealth: 100
+    Health: 100
+    AffectedStats: []
+    Modifications: []
+    bIsVital: 0
+    VitalEffects:
+    - VitalFunction: 4
+      MaxEffect: 50
+    Attached: 
+  - BodyPart: 27
+    MaxHealth: 100
+    Health: 100
+    AffectedStats: []
+    Modifications: []
+    bIsVital: 0
+    VitalEffects:
+    - VitalFunction: 4
+      MaxEffect: 50
+    Attached: 
+  - BodyPart: 28
+    MaxHealth: 100
+    Health: 100
+    AffectedStats: []
+    Modifications: []
+    bIsVital: 1
+    VitalEffects:
+    - VitalFunction: 4
+      MaxEffect: 100
+    Attached: 
+  - BodyPart: 29
+    MaxHealth: 100
+    Health: 100
+    AffectedStats:
+    - StatType: 7
+      MaxEffect: 100
+    Modifications: []
+    bIsVital: 0
+    VitalEffects: []
+    Attached: 
+  - BodyPart: 30
+    MaxHealth: 100
+    Health: 100
+    AffectedStats:
+    - StatType: 7
+      MaxEffect: 50
+    Modifications: []
+    bIsVital: 0
+    VitalEffects: []
+    Attached: 20000000
+  - BodyPart: 31
+    MaxHealth: 100
+    Health: 100
+    AffectedStats:
+    - StatType: 7
+      MaxEffect: 50
+    Modifications: []
+    bIsVital: 0
+    VitalEffects: []
+    Attached: 21000000
+  - BodyPart: 32
+    MaxHealth: 100
+    Health: 100
+    AffectedStats:
+    - StatType: 7
+      MaxEffect: 30
+    Modifications: []
+    bIsVital: 0
+    VitalEffects: []
+    Attached: 22000000
+  - BodyPart: 33
+    MaxHealth: 100
+    Health: 100
+    AffectedStats:
+    - StatType: 7
+      MaxEffect: 30
+    Modifications: []
+    bIsVital: 0
+    VitalEffects: []
+    Attached: 23000000
+  - BodyPart: 34
+    MaxHealth: 100
+    Health: 100
+    AffectedStats:
+    - StatType: 7
+      MaxEffect: 30
+    Modifications: []
+    bIsVital: 0
+    VitalEffects: []
+    Attached: 24000000
+  - BodyPart: 35
+    MaxHealth: 100
+    Health: 100
+    AffectedStats:
+    - StatType: 7
+      MaxEffect: 30
+    Modifications: []
+    bIsVital: 0
+    VitalEffects: []
+    Attached: 25000000
+  - BodyPart: 36
+    MaxHealth: 100
+    Health: 100
+    AffectedStats:
+    - StatType: 7
+      MaxEffect: 30
+    Modifications: []
+    bIsVital: 0
+    VitalEffects: []
+    Attached: 26000000
+  - BodyPart: 37
+    MaxHealth: 100
+    Health: 100
+    AffectedStats:
+    - StatType: 7
+      MaxEffect: 30
+    Modifications: []
+    bIsVital: 0
+    VitalEffects: []
+    Attached: 27000000
+  - BodyPart: 38
+    MaxHealth: 100
+    Health: 100
+    AffectedStats:
+    - StatType: 7
+      MaxEffect: 30
+    Modifications: []
+    bIsVital: 0
+    VitalEffects: []
+    Attached: 
+  - BodyPart: 39
+    MaxHealth: 100
+    Health: 100
+    AffectedStats:
+    - StatType: 7
+      MaxEffect: 30
+    Modifications: []
+    bIsVital: 0
+    VitalEffects: []
     Attached: 
   m_TraitPool:
   - {fileID: 11400000, guid: 0c5eb64850f2bbb4fb58c688b89594cc, type: 2}

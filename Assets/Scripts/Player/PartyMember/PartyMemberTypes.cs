@@ -17,7 +17,6 @@ public enum EPartyMemberType
 public enum EPartyMemberSkillType
 {
     Invalid = 0,
-    None,
     Action,
     Buff,
     Event
@@ -26,7 +25,6 @@ public enum EPartyMemberSkillType
 public enum EPartyMemberTraitType
 {
     Invalid = 0,
-    None,
     Warrior,
     Social,
     Scientific,
@@ -76,7 +74,6 @@ public enum EPartyMemberStatType
     Fortitude,
     Vision,
     Mobility,
-    Nutrition,
     Science,
     History,
     Medicine,
@@ -86,6 +83,32 @@ public enum EPartyMemberStatType
     Serenity,
     Attractiveness,
     Gayness
+}
+
+public enum EVitalFunctions
+{
+    Invalid = 0,
+    Thinking,
+    Breathing,
+    BloodPumping,
+    BloodFiltration,
+    ImmuneSystem,
+    Sensing,
+    Nutrition
+}
+
+[Serializable]
+public struct SBodyPartVitalEffect
+{
+    public SBodyPartVitalEffect(SBodyPartVitalEffect other)
+    {
+        VitalFunction = other.VitalFunction;
+        MaxEffect = other.MaxEffect;
+    }
+
+    public EVitalFunctions VitalFunction;
+    [Tooltip("Maximum contribution (percentage) to vital function when at full health")]
+    public float MaxEffect;
 }
 
 [Serializable]
@@ -157,7 +180,6 @@ public class CPartyMemberStat
 public enum EBodyPart
 {
     Invalid = 0,
-    None,
     Soul,
     Mind,
     Spirit,
@@ -183,6 +205,9 @@ public enum EBodyPart
     Stomach,
     LargeIntestines,
     SmallIntestines,
+    LeftKidney,
+    RightKidney,
+    Liver,
     Pelvis,
     LeftThigh,
     RightThigh,
@@ -272,6 +297,20 @@ public struct SBodyPartStatModifier
 }
 
 [Serializable]
+public struct SBodyPartAffectedStat
+{
+    public SBodyPartAffectedStat(SBodyPartAffectedStat other)
+    {
+        StatType = other.StatType;
+        MaxEffect = other.MaxEffect;
+    }
+
+    public EPartyMemberStatType StatType;
+    [Tooltip("Maximum effect (percentage) at max health")]
+    public float MaxEffect;
+}
+
+[Serializable]
 public class CBodyPart
 {
     // copy constructor
@@ -288,8 +327,9 @@ public class CBodyPart
         bIsVital = other.bIsVital;
         
         Attached = other.Attached != null ? other.Attached?.ToArray() : null;
-        StatModifiers = other.StatModifiers?.Select(mod => new SBodyPartStatModifier(mod)).ToArray();
+        AffectedStats = other.AffectedStats?.Select(mod => new SBodyPartAffectedStat(mod)).ToArray();
         Modifications = other.Modifications?.Select(mod => new CBodyPartModification(mod)).ToList();
+        VitalEffects = other.VitalEffects?.Select(mod => new SBodyPartVitalEffect(mod)).ToArray();
     }
 
     [Header("Basic Info")]
@@ -297,11 +337,13 @@ public class CBodyPart
     public float MaxHealth = 100;
     public float Health = 100;
     [Tooltip("Party member stats this bodypart affects")]
-    public SBodyPartStatModifier[] StatModifiers;
+    public SBodyPartAffectedStat[] AffectedStats;
     [Tooltip("Modifications to this bodypart")]
     public List<CBodyPartModification> Modifications;
-    [Tooltip("If this is a vital body part, party member would die if it was destroyed")]
+    [Tooltip("If this is a vital body part, party member would automatically die if it was destroyed")]
     public bool bIsVital = false;
+    [Tooltip("What vital functions does this contribute to?")]
+    public SBodyPartVitalEffect[] VitalEffects;
     [Header("Attachment")]
     public EBodyPart[] Attached;
 }
@@ -327,7 +369,7 @@ public struct SPartyMemberAttitudeModifier
 
 public enum EMoodletType
 {
-    None = 0,
+    Invalid = 0,
     Happiness,
     Angst,
     Sanity

@@ -32,24 +32,22 @@ MonoBehaviour:
   - StatType: 7
     Value: 50
   - StatType: 8
-    Value: 60
+    Value: 10
   - StatType: 9
     Value: 10
   - StatType: 10
-    Value: 10
-  - StatType: 11
     Value: 20
-  - StatType: 12
+  - StatType: 11
     Value: 5
-  - StatType: 13
+  - StatType: 12
     Value: 0
+  - StatType: 13
+    Value: 30
   - StatType: 14
-    Value: 30
-  - StatType: 15
     Value: 40
-  - StatType: 16
+  - StatType: 15
     Value: 30
-  - StatType: 17
+  - StatType: 16
     Value: 10
   m_StartingItems:
   - {fileID: 11400000, guid: 366df77859acc914d8fe78e5fb642bdf, type: 2}
@@ -58,7 +56,7 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 366df77859acc914d8fe78e5fb642bdf, type: 2}
   - {fileID: 11400000, guid: 366df77859acc914d8fe78e5fb642bdf, type: 2}
   m_PartyMemberSkills: []
-  m_TraitTypeBias: 2
+  m_TraitTypeBias: 1
   m_TraitBiasAmount: 0
   m_DefaultAttitude: 0
   m_DefaultSelfAttitude: 0
