@@ -1,0 +1,8 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" editor-extension-mode="False">
+    <Style src="project://database/Assets/UI/CharacterUI/LeftUIPanelUSS.uss?fileID=7433441132597879392&amp;guid=d75b756bfe7586f4785d20f0a845828e&amp;type=3#LeftUIPanelUSS" />
+    <ui:VisualElement name="TabsPanel" style="flex-grow: 1; background-color: rgba(0, 0, 0, 0.7); height: auto; align-items: flex-start; flex-direction: row; min-width: 0; min-height: 0; width: auto;">
+        <ui:Button text="General" name="GeneralTabButton" class="ButtonSmallPadding" style="font-size: 12px; opacity: 1;" />
+        <ui:Button text="Inventory" name="InventoryTabButton" class="ButtonSmallPadding" style="font-size: 12px;" />
+        <ui:Button text="Health" name="HealthTabButton" tabindex="0" class="ButtonSmallPadding" style="font-size: 12px; height: auto; width: auto;" />
+    </ui:VisualElement>
+</ui:UXML>

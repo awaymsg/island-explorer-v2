@@ -52,11 +52,6 @@ public class CUIManager : MonoBehaviour
         m_PopupsUI = GetComponentInChildren<CPopupsUI>(true);
     }
 
-    public void ClearCharacterListUI()
-    {
-        m_CharacterListUI.RemoveAllElements();
-    }
-
     public void InitializeWorldInfoPanel()
     {
         m_WorldInfoUI.InitializeWorldInfoPanel();

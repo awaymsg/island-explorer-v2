@@ -22,12 +22,10 @@
     -unity-text-align: middle-center;
     font-size: 14px;
     padding: 2px;
-    margin: 0px;
+    margin: 0;
     width: auto;
     height: auto;
-
     background-color: rgba(0, 0, 0, 0);
-
     transform-origin: center;
     border-top-width: 1px;
     border-right-width: 1px;
@@ -42,11 +40,9 @@
 .characterShortInfoPanel {
     position: absolute;
     width: 200px;
-    background-color: rgba(0.1, 0.1, 0.1, 0.95);
-
+    background-color: rgba(0, 0, 0, 0.95);
     padding: 2px;
     display: flex;
-    
     border-top-width: 1px;
     border-right-width: 1px;
     border-bottom-width: 1px;
@@ -58,11 +54,16 @@
 }
 
 .white-text {
-    color: #ffffff;
+    color: rgb(255, 255, 255);
     font-size: 14px;
 }
 
 .white-text-small {
-    color: #ffffff;
+    color: rgb(255, 255, 255);
     font-size: 8px;
+}
+
+.ButtonSmallPadding {
+    padding: 2px;
+    margin: 0px;
 }
