@@ -1,3 +1,9 @@
+update: 11/10/25 fleshed out bodyparts system, added tabs to UI panel and tooltips for descriptions, added concept of "Vital Functions", added mood and concept of moodlets, added concept of hunger, added new tile art from jack & kayleigh
+-
+<img width="1116" height="611" alt="image" src="https://github.com/user-attachments/assets/71814e23-70ec-43e4-a561-b3377f1674ad" />
+<img width="1115" height="632" alt="image" src="https://github.com/user-attachments/assets/0411229f-d865-4169-9041-a9a8fe76b9b4" />
+next: EVENTS SYSTEM
+
 update: 11/5/25 added concept of inventory & items, cleaned up movement to be smoother, added popup to warn about dangerous unforeseen movement, added basic character full info UI
 -
 <img width="1112" height="626" alt="image" src="https://github.com/user-attachments/assets/20b66623-86fa-4078-84ad-65a202ffe65b" />
