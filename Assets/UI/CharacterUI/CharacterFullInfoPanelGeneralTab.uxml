@@ -1,15 +1,15 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" editor-extension-mode="False">
     <ui:VisualElement name="CharacterFullInfoGeneralPanel" style="flex-grow: 1; background-color: rgba(0, 0, 0, 0.7);">
         <ui:VisualElement name="PortraitAndStatsRowPanel" style="flex-grow: 1; flex-direction: row; min-width: auto; max-width: none; min-height: auto; max-height: none; height: auto;">
-            <ui:VisualElement name="PortraitPanel" style="flex-grow: 1; height: auto; max-width: 50%; min-width: 50%;">
+            <ui:VisualElement name="PortraitPanel" style="flex-grow: 1; height: auto; max-width: 50%; min-width: 50%; align-items: flex-start;">
                 <ui:VisualElement name="Portrait" style="width: auto; height: auto;" />
                 <ui:Label text="Label" name="NameInfo" style="color: rgb(255, 255, 255);" />
             </ui:VisualElement>
-            <ui:VisualElement name="StatsPanel" style="flex-grow: 1; position: relative; right: auto; min-width: 50%; max-width: 50%;">
+            <ui:VisualElement name="StatsPanel" style="flex-grow: 1; position: relative; right: auto; min-width: 50%; max-width: 50%; align-items: flex-start;">
                 <ui:Label text="Label" name="StatsInfo" style="color: rgb(255, 255, 255); position: relative;" />
             </ui:VisualElement>
         </ui:VisualElement>
-        <ui:VisualElement name="StatusPanel" style="flex-grow: 1;">
+        <ui:VisualElement name="StatusPanel" style="flex-grow: 1; align-items: flex-start;">
             <ui:Label text="Label" name="StatusInfo" style="color: rgb(255, 255, 255);" />
         </ui:VisualElement>
     </ui:VisualElement>

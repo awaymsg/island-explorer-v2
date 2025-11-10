@@ -148,8 +148,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 87dbdd667fdf99f448aeb1b19d697862, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::GameManager
-  m_bUseSeed: 0
-  m_RandomSeed: 1830096994
+  m_bUseSeed: 1
+  m_RandomSeed: 23
   m_Camera: {fileID: 519420031}
   m_PartyPlayerCharacterPrefab: {fileID: 234909392250611176, guid: 12f91a7f2fa6cb6488c98fc9c73f4519, type: 3}
   m_LocationSelectHighlightTile: {fileID: 11400000, guid: 2917f8a7507d5714d8fc823a59443571, type: 2}
@@ -2217,7 +2217,7 @@ MonoBehaviour:
   m_CharacterFullInfoPanelTabsTemplate: {fileID: 9197481963319205126, guid: 4c330cef95a706f4c9307f6d5666ec41, type: 3}
   m_CharacterFullInfoPanelGeneralTabTemplate: {fileID: 9197481963319205126, guid: 9d2abf1818882f74b8ca5beb351e1a99, type: 3}
   m_CharacterFullInfoPanelInventoryTabTemplate: {fileID: 0}
-  m_CharacterFullInfoPanelHealthTabTemplate: {fileID: 0}
+  m_CharacterFullInfoPanelHealthTabTemplate: {fileID: 9197481963319205126, guid: 0d18ba4ed47bffd40804bcbb99b6176b, type: 3}
   m_SmallTextPopupTemplate: {fileID: 9197481963319205126, guid: 93fa2a19969e5f140b392ebbb6de682d, type: 3}
 --- !u!1 &2112288919
 GameObject:

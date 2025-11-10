@@ -19,17 +19,17 @@ MonoBehaviour:
   m_InvalidatedTraits: []
   m_TraitEffect:
     BodyPartModifications:
-    - ModName: Affliction of the Soul
-      ModLocation: 2
+    - Name: Affliction of the Soul
+      ModLocation: 1
       InjuryType: 1
       bPermanent: 1
       HealTimeInDays: 0
       bMultiplicative: 1
       ModAmount: 0.9
       Cost: -5
-      ModificationContext: Anger and bitterness gnaw at their being
+      Description: Bitterness gnaws at their very being.
     StatModifiers:
-    - StatType: 9
+    - StatType: 8
       bMultiplicative: 0
       ModAmount: 10
       bIsPermanent: 0

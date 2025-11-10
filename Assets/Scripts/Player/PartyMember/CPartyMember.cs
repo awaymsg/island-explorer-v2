@@ -58,9 +58,9 @@ public class CPartyMemberRuntime : IDisposable
     protected CInventory m_ItemInventory;
 
     // Player-facing and also used for internal data / counts
-    private Dictionary<EBodyPart, List<string>> m_BodyPartConditions = new Dictionary<EBodyPart, List<string>>();
     private Dictionary<string, string> m_TraitDetails = new Dictionary<string, string>();
     private Dictionary<string, float> m_AttitudesBook = new Dictionary<string, float>();
+    private Dictionary<EVitalFunctions, int> m_VitalFunctionsValueBook = new Dictionary<EVitalFunctions, int>();
     private List<SPartyMemberMoodlet> m_Moodlets = new List<SPartyMemberMoodlet>();
     // TODO: Memories
     private Dictionary<string, string[]> m_BadMemories = new Dictionary<string, string[]>();
@@ -127,6 +127,21 @@ public class CPartyMemberRuntime : IDisposable
         get { return m_AttitudesBook; }
     }
 
+    public List<SPartyMemberMoodlet> Moodlets
+    {
+        get { return m_Moodlets; }
+    }
+
+    public CBodyPart[] BodyParts
+    {
+        get { return m_BodyParts; }
+    }
+
+    public Dictionary<EVitalFunctions, int> VitalFunctionsValueBook
+    {
+        get { return m_VitalFunctionsValueBook; }
+    }
+
     public CInventory ItemInventory
     {
         get { return m_ItemInventory; }
@@ -161,6 +176,7 @@ public class CPartyMemberRuntime : IDisposable
 
         // Initialize inventory
         m_ItemInventory = new CInventory();
+        InitializeVitalFunctions();
 
         // Set inventory max weight and add callback for when Fortitude changes
         if (m_PartyMemberStats.ContainsKey(EPartyMemberStatType.Fortitude))
@@ -312,6 +328,37 @@ public class CPartyMemberRuntime : IDisposable
         }
     }
 
+    private void InitializeVitalFunctions()
+    {
+        m_VitalFunctionsValueBook.Clear();
+
+        foreach (EVitalFunctions enumName in Enum.GetValues(typeof(EVitalFunctions)))
+        {
+            m_VitalFunctionsValueBook.Add(enumName, CGameManager.Instance.MaxStatValue);
+        }
+    }
+
+    private void RecalculateVitalFunctions()
+    {
+        InitializeVitalFunctions();
+
+        foreach (CBodyPart bodyPart in m_BodyParts)
+        {
+            foreach (SBodyPartVitalEffect vitalEffect in bodyPart.VitalEffects)
+            {
+                if (vitalEffect.VitalFunction == EVitalFunctions.Invalid)
+                {
+                    continue;
+                }
+
+                float healthPercentage = bodyPart.Health / Math.Max(bodyPart.MaxHealth, CGameManager.Instance.MaxStatValue);
+                float totalEffect = vitalEffect.MaxEffect - vitalEffect.MaxEffect * healthPercentage;
+
+                m_VitalFunctionsValueBook[vitalEffect.VitalFunction] -= (int)Math.Round(totalEffect);
+            }
+        }
+    }
+
     private void AddPartyMemberAttitude(CPartyMemberRuntime partyMember)
     {
         if (partyMember == null)
@@ -387,8 +434,6 @@ public class CPartyMemberRuntime : IDisposable
             return;
         }
 
-        bodyPart.Modifications.Add(bodyMod);
-
         if (bodyMod.bMultiplicative)
         {
             bodyPart.Health *= bodyMod.ModAmount;
@@ -408,13 +453,11 @@ public class CPartyMemberRuntime : IDisposable
             }
         }
 
-        // add player facing details
-        if (!m_BodyPartConditions.ContainsKey(bodyPart.BodyPart))
-        {
-            m_BodyPartConditions.Add(bodyPart.BodyPart, new List<string>());
-        }
+        bodyPart.Modifications.Add(bodyMod);
 
-        m_BodyPartConditions[bodyPart.BodyPart].Add(bodyMod.ModificationContext);
+        // Recalculate vital functions, to avoid floating point precision errors we might get from modding and unmodding
+        // TODO: maybe there is a better way?
+        RecalculateVitalFunctions();
     }
 
     public void RemoveBodyMod(CBodyPartModification bodyMod)
@@ -451,13 +494,9 @@ public class CPartyMemberRuntime : IDisposable
             }
         }
 
-        // remove player facing details
-        m_BodyPartConditions[bodyPart.BodyPart].Remove(bodyMod.ModificationContext);
-
-        if (m_BodyPartConditions[bodyPart.BodyPart].Count() == 0)
-        {
-            m_BodyPartConditions.Remove(bodyPart.BodyPart);
-        }
+        // Recalculate vital functions, to avoid floating point precision errors we might get from modding and unmodding
+        // TODO: maybe there is a better way?
+        RecalculateVitalFunctions();
     }
 
     public void AddTrait(CPartyMemberTrait trait)

@@ -1,0 +1,8 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" editor-extension-mode="False">
+    <ui:VisualElement name="HealthTabPanel" style="flex-grow: 1; color: rgb(255, 255, 255); background-color: rgba(0, 0, 0, 0.7);">
+        <ui:VisualElement name="VitalFunctionsPanel" style="flex-grow: 1; align-items: flex-start;">
+            <ui:Label text="Vital Functions" name="VitalFunctionsLabel" />
+        </ui:VisualElement>
+        <ui:VisualElement name="NeedsPanel" style="flex-grow: 1; align-items: flex-start;" />
+    </ui:VisualElement>
+</ui:UXML>

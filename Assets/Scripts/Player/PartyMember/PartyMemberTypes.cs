@@ -118,6 +118,7 @@ public struct SPartyMemberDefaultStat
     public int Value;
 }
 
+[Serializable]
 public class CPartyMemberStat
 {
     private float m_Value;
@@ -247,7 +248,7 @@ public class CBodyPartModification
             return;
         }
 
-        ModName = other.ModName;
+        Name = other.Name;
         ModLocation = other.ModLocation;
         InjuryType = other.InjuryType;
         bPermanent = other.bPermanent;
@@ -255,11 +256,11 @@ public class CBodyPartModification
         bMultiplicative = other.bMultiplicative;
         ModAmount = other.ModAmount;
         Cost = other.Cost;
-        ModificationContext = other.ModificationContext;
+        Description = other.Description;
     }
 
     [Tooltip("Player-facing name")]
-    public string ModName;
+    public string Name;
     public EBodyPart ModLocation;
     public EBodyPartModification InjuryType;
     [Tooltip("Is this modification permanent?")]
@@ -274,12 +275,25 @@ public class CBodyPartModification
     public int Cost;
 
     [Tooltip("Player facing description of this modification")]
-    public string ModificationContext;
+    public string Description;
 
     public float CalculateCost()
     {
         return Cost;
     }
+}
+
+[Serializable]
+public struct SBodyPartModificationInfo
+{
+    public SBodyPartModificationInfo(string name, string description)
+    {
+        Name = name;
+        Description = description;
+    }
+
+    public string Name;
+    public string Description;
 }
 
 [Serializable]

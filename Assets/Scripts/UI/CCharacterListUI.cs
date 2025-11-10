@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.InputSystem;
 using UnityEngine.UIElements;
 
 public class STraitLabelData
@@ -40,7 +39,7 @@ public class CCharacterListUI : MonoBehaviour
 
     private VisualElement m_CurrentSmallPopup;
 
-    private List<Label> m_AddedTraitLabels = new List<Label>();
+    private List<Label> m_AddedBoundLabels = new List<Label>();
 
     private void OnEnable()
     {
@@ -67,12 +66,12 @@ public class CCharacterListUI : MonoBehaviour
         CPartyManager.Instance.m_OnCharacterAdded -= AddCharacterButton;
         CPartyManager.Instance.m_OnCharacterRemoved -= RemoveCharacterButton;
 
-        foreach (Label traitLabel in m_AddedTraitLabels)
+        foreach (Label traitLabel in m_AddedBoundLabels)
         {
             if (traitLabel != null)
             {
                 traitLabel.UnregisterCallback<MouseEnterEvent>(OnMouseEnterCreateDescriptionLabel);
-                traitLabel.UnregisterCallback<MouseLeaveEvent>(OnMouseLeaveTraitLabel);
+                traitLabel.UnregisterCallback<MouseLeaveEvent>(OnMouseLeavePopupSource);
                 traitLabel.UnregisterCallback<MouseMoveEvent>(OnMouseMoveUpdateSmallPopupPosition);
             }
         }
@@ -246,8 +245,8 @@ public class CCharacterListUI : MonoBehaviour
 
         if (m_CharacterFullInfoPanelTabs == null)
         {
-            TemplateContainer characterFullStatsContainer = m_CharacterFullInfoPanelTabsTemplate.Instantiate();
-            m_CharacterFullInfoPanelTabs = characterFullStatsContainer.Q<VisualElement>("TabsPanel");
+            m_CharacterFullInfoTemplateContainer = m_CharacterFullInfoPanelTabsTemplate.Instantiate();
+            m_CharacterFullInfoPanelTabs = m_CharacterFullInfoTemplateContainer.Q<VisualElement>("TabsPanel");
         }
 
         if (m_CharacterFullInfoPanelTabs == null)
@@ -256,14 +255,27 @@ public class CCharacterListUI : MonoBehaviour
             return;
         }
 
-        if (m_CharacterFullInfoTemplateContainer == null)
+        if (m_CharacterFullInfoPanelGeneralTabTemplate != null)
         {
-            m_CharacterFullInfoTemplateContainer = m_CharacterFullInfoPanelGeneralTabTemplate.Instantiate();
+            TemplateContainer container = m_CharacterFullInfoPanelGeneralTabTemplate.Instantiate();
+            m_CharacterFullInfoGeneralTabPanel = container.Q<VisualElement>("CharacterFullInfoGeneralPanel");
         }
 
-        if (m_CharacterFullInfoTemplateContainer == null)
+        if (m_CharacterFullInfoGeneralTabPanel == null)
         {
-            Debug.Log("CharacterFullStatsGeneralTabContainer is null!");
+            Debug.Log("CharacterFullInfoGeneralTabPanel is null!");
+            return;
+        }
+
+        if (m_CharacterFullInfoPanelHealthTabTemplate != null)
+        {
+            TemplateContainer container = m_CharacterFullInfoPanelHealthTabTemplate.Instantiate();
+            m_CharacterFullInfoHealthTabPanel = container.Q<VisualElement>("HealthTabPanel");
+        }
+
+        if (m_CharacterFullInfoHealthTabPanel == null)
+        {
+            Debug.Log("CharacterFullInfoHealthTabPanel is null!");
             return;
         }
 
@@ -294,27 +306,50 @@ public class CCharacterListUI : MonoBehaviour
             return;
         }
 
-        m_CharacterFullInfoTemplateContainer.Add(m_CharacterFullInfoPanelTabs);
         m_CharacterListUI.rootVisualElement.Add(m_CharacterFullInfoTemplateContainer);
 
         // Setup the tabs
-        CreateGeneralInfoPanelTab(partyMember);
+        InitializeGeneralInfoPanelTab(partyMember);
+        InitializeHealthPanelTab(partyMember);
 
         generalTabButton.clicked += AddGeneralInfoTab;
+        healthTabButton.clicked += AddHealthInfoTab;
 
         AddGeneralInfoTab();
     }
 
-    private void CreateGeneralInfoPanelTab(CPartyMemberRuntime partyMember)
+    private void InitializeHealthPanelTab(CPartyMemberRuntime partyMember)
+    {
+        if (m_CharacterFullInfoHealthTabPanel == null)
+        {
+            Debug.Log("CharacterFullInfoHealthTabPanel is null!");
+            return;
+        }
+
+        VisualElement vitalFunctionsPanel = m_CharacterFullInfoHealthTabPanel.Q<VisualElement>("VitalFunctionsPanel");
+        if (vitalFunctionsPanel == null)
+        {
+            Debug.Log("VitalFunctionsPanel is null");
+        }
+
+        foreach (EVitalFunctions vitalFunction in Enum.GetValues(typeof(EVitalFunctions)))
+        {
+            if (vitalFunction == EVitalFunctions.Invalid)
+            {
+                continue;
+            }
+
+            Label vitalFunctionLabel = CreateDefaultLabel();
+            vitalFunctionLabel.text = vitalFunction.ToString() + ": " + partyMember.VitalFunctionsValueBook[vitalFunction];
+            vitalFunctionsPanel.Add(vitalFunctionLabel);
+        }
+    }
+
+    private void InitializeGeneralInfoPanelTab(CPartyMemberRuntime partyMember)
     {
         if (m_CharacterFullInfoGeneralTabPanel == null)
         {
-            m_CharacterFullInfoGeneralTabPanel = m_CharacterFullInfoTemplateContainer.Q<VisualElement>("CharacterFullInfoGeneralPanel");
-        }
-
-        if (m_CharacterFullInfoGeneralTabPanel == null)
-        {
-            Debug.Log("CharacterFullInfoGeneralPanel is null!");
+            Debug.Log("CharacterFullInfoGeneralTabPanel is null!");
             return;
         }
 
@@ -347,16 +382,14 @@ public class CCharacterListUI : MonoBehaviour
 
         foreach (var trait in partyMember.TraitDetails)
         {
-            Label traitLabel = new Label();
-            portraitPanel.Add(traitLabel);
-            traitLabel.style.color = Color.white;
-            traitLabel.style.fontSize = 12;
+            Label traitLabel = CreateDefaultLabel();
             traitLabel.text = trait.Key;
             traitLabel.userData = trait.Value;
             traitLabel.RegisterCallback<MouseEnterEvent>(OnMouseEnterCreateDescriptionLabel);
-            traitLabel.RegisterCallback<MouseLeaveEvent>(OnMouseLeaveTraitLabel);
+            traitLabel.RegisterCallback<MouseLeaveEvent>(OnMouseLeavePopupSource);
+            portraitPanel.Add(traitLabel);
 
-            m_AddedTraitLabels.Add(traitLabel);
+            m_AddedBoundLabels.Add(traitLabel);
         }
 
         Label statsInfo = m_CharacterFullInfoGeneralTabPanel.Q<Label>("StatsInfo");
@@ -375,15 +408,50 @@ public class CCharacterListUI : MonoBehaviour
 
         statsInfo.text = statsString;
 
-        // TODO: change to show status conditions
+        VisualElement statusPanel = m_CharacterFullInfoGeneralTabPanel.Q<VisualElement>("StatusPanel");
+        if (statusPanel == null)
+        {
+            Debug.Log("statusPanel is null!");
+            return;
+        }
+
         Label statusInfo = m_CharacterFullInfoGeneralTabPanel.Q<Label>("StatusInfo");
         if (statusInfo == null)
         {
             Debug.Log("statusInfo is null!");
             return;
         }
-        statusInfo.style.fontSize = 12;
+        statusInfo.style.fontSize = 14;
+        statusInfo.text = "Statuses";
 
+        foreach (SPartyMemberMoodlet moodlet in partyMember.Moodlets)
+        {
+            Label moodletLabel = CreateDefaultLabel();
+            moodletLabel.text = moodlet.Name;
+            moodletLabel.userData = moodlet.Description;
+            moodletLabel.RegisterCallback<MouseEnterEvent>(OnMouseEnterCreateDescriptionLabel);
+            moodletLabel.RegisterCallback<MouseLeaveEvent>(OnMouseLeavePopupSource);
+            statusPanel.Add(moodletLabel);
+
+            m_AddedBoundLabels.Add(moodletLabel);
+        }
+
+        foreach (CBodyPart bodyPart in partyMember.BodyParts)
+        {
+            foreach (CBodyPartModification bodyMod in bodyPart.Modifications)
+            {
+                Label bodyPartConditionLabel = CreateDefaultLabel();
+                bodyPartConditionLabel.text = bodyMod.Name;
+                bodyPartConditionLabel.userData = bodyMod.Description;
+                bodyPartConditionLabel.RegisterCallback<MouseEnterEvent>(OnMouseEnterCreateDescriptionLabel);
+                bodyPartConditionLabel.RegisterCallback<MouseLeaveEvent>(OnMouseLeavePopupSource);
+                statusPanel.Add(bodyPartConditionLabel);
+
+                m_AddedBoundLabels.Add(bodyPartConditionLabel);
+            }
+        }
+
+        /**
         string inventoryString = string.Format("Inventory: {0}/{1}\n", partyMember.ItemInventory.CurrentWeight, partyMember.ItemInventory.MaxWeight);
         Dictionary<CInventoryItemRuntime, int> items = partyMember.ItemInventory.GetItemsWithCounts();
         foreach (var item in items)
@@ -396,6 +464,21 @@ public class CCharacterListUI : MonoBehaviour
         }
 
         statusInfo.text = inventoryString;
+        */
+    }
+
+    private Label CreateDefaultLabel()
+    {
+        // TODO: just add to style sheet
+        Label label = new Label();
+        label.style.color = Color.white;
+        label.style.fontSize = 12;
+        label.style.marginBottom = 0;
+        label.style.marginTop = 0;
+        label.style.paddingBottom = 0;
+        label.style.paddingTop = 0;
+
+        return label;
     }
 
     private void AddGeneralInfoTab()
@@ -408,11 +491,26 @@ public class CCharacterListUI : MonoBehaviour
         }
     }
 
+    private void AddHealthInfoTab()
+    {
+        RemoveFullInfoTabs();
+
+        if (m_CharacterFullInfoTemplateContainer != null && m_CharacterFullInfoGeneralTabPanel != null)
+        {
+            m_CharacterFullInfoTemplateContainer.Add(m_CharacterFullInfoHealthTabPanel);
+        }
+    }
+
     private void RemoveFullInfoTabs()
     {
         if (m_CharacterFullInfoGeneralTabPanel != null)
         {
             m_CharacterFullInfoGeneralTabPanel.RemoveFromHierarchy();
+        }
+
+        if (m_CharacterFullInfoHealthTabPanel != null)
+        {
+            m_CharacterFullInfoHealthTabPanel.RemoveFromHierarchy();
         }
     }
 
@@ -430,13 +528,20 @@ public class CCharacterListUI : MonoBehaviour
             {
                 generalTabButton.clicked -= AddGeneralInfoTab;
             }
+
+            Button healthTabButton = m_CharacterFullInfoPanelTabs.Q<Button>("HealthTabButton");
+
+            if (healthTabButton != null)
+            {
+                healthTabButton.clicked -= AddHealthInfoTab;
+            }
         }
 
         if (m_CharacterFullInfoTemplateContainer != null)
         {
             m_CharacterFullInfoTemplateContainer.RemoveFromHierarchy();
 
-            foreach (Label traitLabel in m_AddedTraitLabels)
+            foreach (Label traitLabel in m_AddedBoundLabels)
             {
                 if (traitLabel == null)
                 {
@@ -444,10 +549,10 @@ public class CCharacterListUI : MonoBehaviour
                 }
 
                 traitLabel.UnregisterCallback<MouseEnterEvent>(OnMouseEnterCreateDescriptionLabel);
-                traitLabel.UnregisterCallback<MouseLeaveEvent>(OnMouseLeaveTraitLabel);
+                traitLabel.UnregisterCallback<MouseLeaveEvent>(OnMouseLeavePopupSource);
             }
 
-            m_AddedTraitLabels.Clear();
+            m_AddedBoundLabels.Clear();
         }
         
         m_CharacterFullInfoGeneralTabPanel = null;
@@ -524,7 +629,7 @@ public class CCharacterListUI : MonoBehaviour
         m_CurrentSmallPopup.style.top = position.y + CUIManager.Instance.PopupMouseOffset.y;
     }
 
-    private void OnMouseLeaveTraitLabel(MouseLeaveEvent mouseLeaveEvent)
+    private void OnMouseLeavePopupSource(MouseLeaveEvent mouseLeaveEvent)
     {
         VisualElement currentMousedOverElement = mouseLeaveEvent.currentTarget as VisualElement;
         if (currentMousedOverElement == null)
