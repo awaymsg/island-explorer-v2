@@ -220,6 +220,14 @@ public class CPartyMemberRuntime : IDisposable
 
     public void Dispose()
     {
+        if (m_PartyMemberStats != null)
+        {
+            if (m_PartyMemberStats.TryGetValue(EPartyMemberStatType.Fortitude, out var fortitudeStat))
+            {
+                fortitudeStat.OnStatChanged -= UpdateInventoryMaxWeight;
+            }
+        }
+
         if (CPartyManager.Instance != null)
         {
             CPartyManager.Instance.m_OnCharacterAdded -= AddPartyMemberAttitude;

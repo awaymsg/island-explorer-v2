@@ -4,6 +4,7 @@ using UnityEngine;
 public class CPathFinder
 {
     private CTerrainTile[,] m_TileGrid;
+    private TileNode[,] m_CachedNodes;
     bool m_Diagonals;
     int m_MaxX, m_MaxY;
     bool m_bHasFog = true;
@@ -17,6 +18,8 @@ public class CPathFinder
         m_MaxX = m_TileGrid.GetLength(0);
         m_MaxY = m_TileGrid.GetLength(1);
         m_bHasFog = bHasFog;
+
+        m_CachedNodes = new TileNode[m_MaxX, m_MaxY];
     }
 
     public void SetHasFog(bool bHasFog)
@@ -25,20 +28,23 @@ public class CPathFinder
     }
 
     // Assigns creates tileNodes 2D array
-    private TileNode[,] AssignNodes()
+    private void AssignNodes()
     {
-        TileNode[,] tileNodes = new TileNode[m_MaxX, m_MaxY];
-
         for (int i = 0; i < m_MaxX; i++)
         {
             for (int j = 0; j < m_MaxY; j++)
             {
+                if (m_CachedNodes[i, j] == null)
+                {
+                    m_CachedNodes[i, j] = new TileNode(/*bWalkable*/ m_TileGrid[i, j].BiomeType != EBiomeType.Invalid, i, j);
+                    continue;
+                }
+
+                m_CachedNodes[i, j].Reset();
                 // for now all tiles are walkable
-                tileNodes[i, j] = new TileNode(/*bIsWalkable*/ m_TileGrid[i, j].BiomeType != EBiomeType.Invalid, i, j);
+                m_CachedNodes[i, j].Walkable = m_TileGrid[i, j].BiomeType != EBiomeType.Invalid;
             }
         }
-
-        return tileNodes;
     }
 
     // Creates path from one tile to another
@@ -49,9 +55,9 @@ public class CPathFinder
         int targetXPos = to.x;
         int targetYPos = to.y;
 
-        TileNode[,] tileNodes = AssignNodes();
-        TileNode start = tileNodes[xPos, yPos];
-        TileNode target = tileNodes[targetXPos, targetYPos];
+        AssignNodes();
+        TileNode start = m_CachedNodes[xPos, yPos];
+        TileNode target = m_CachedNodes[targetXPos, targetYPos];
 
         // Use the current location traversal rate for fog
         float currentTraversalRate = m_TileGrid[from.x, from.y].TraversalRate;
@@ -79,7 +85,7 @@ public class CPathFinder
                 return RetracePath(start, target); ;
             }
 
-            foreach (TileNode neighbor in GetNeighbors(tileNodes, current))
+            foreach (TileNode neighbor in GetNeighbors(m_CachedNodes, current))
             {
                 if (!neighbor.Walkable || closed.Contains(neighbor))
                 {
@@ -207,6 +213,14 @@ public class CPathFinder
         public TileNode Parent;
         public int X;
         public int Y;
+
+        public void Reset()
+        {
+            Walkable = false;
+            gCost = 0f;
+            hCost = 0f;
+            Parent = null;
+        }
 
         public TileNode(bool walk, int posX, int posY)
         {

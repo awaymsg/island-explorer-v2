@@ -155,6 +155,7 @@ public class CPartyManager : MonoBehaviour
         if (partyLeader == null)
         {
             Debug.Log("CreatePartyPlayerCharacter - partyLeader is null!");
+            return null;
         }
 
         defaultPlayerCharacter.InitializePartyPlayerCharacter(partyLeader, partyMembers);
@@ -193,7 +194,11 @@ public class CPartyManager : MonoBehaviour
         }
 
         m_PartyPlayerCharacter.RemovePartyMember(partyMember);
-        m_ExistingNames.Remove(partyMember.CharacterName);
+
+        if (!string.IsNullOrEmpty(partyMember.CharacterName))
+        {
+            m_ExistingNames.Remove(partyMember.CharacterName);
+        }
 
         m_OnCharacterRemoved?.Invoke(partyMember);
     }

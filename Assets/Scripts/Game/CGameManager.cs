@@ -397,13 +397,6 @@ public class CGameManager : MonoBehaviour
         return result;
     }
 
-    private async Task DispatchToMainThread(SynchronizationContext context)
-    {
-        TaskCompletionSource<bool> tcs = new TaskCompletionSource<bool>();
-        context.Post(p => tcs.SetResult(true), null);
-        await tcs.Task;
-    }
-
     private void CancelMove()
     {
         m_EffectsMap.ClearAllTiles();
