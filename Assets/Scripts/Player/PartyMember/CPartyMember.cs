@@ -506,7 +506,6 @@ public class CPartyMemberRuntime : IDisposable
         bodyPart.Modifications.Add(bodyMod);
 
         // Recalculate health and vital functions, to avoid floating point precision errors we might get from modding and unmodding
-        // TODO: maybe there is a better way?
         RecalculateBodyPartHealth();
         RecalculateVitalFunctions();
     }
@@ -529,7 +528,6 @@ public class CPartyMemberRuntime : IDisposable
         bodyPart.Modifications.Remove(bodyMod);
 
         // Recalculate vital functions, to avoid floating point precision errors we might get from modding and unmodding
-        // TODO: maybe there is a better way?
         RecalculateBodyPartHealth();
         RecalculateVitalFunctions();
     }
@@ -605,7 +603,7 @@ public class CPartyMemberRuntime : IDisposable
         CalculateHungerRateScalar();
     }
 
-    // TEMP: happiness and hunger rate calculations should be reworked
+    // TEMP: happiness and hunger rate calculations can be reworked
     private void CalculateHappiness()
     {
         // For now, relationshipSatisfaction is simply the average of all attitudes toward other party members
