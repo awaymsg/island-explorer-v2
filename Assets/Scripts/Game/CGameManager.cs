@@ -15,6 +15,7 @@ public enum EGameState
     Moving
 }
 
+// TODO: this is handling too much logic- should split into separate systems, at least movement
 public class CGameManager : MonoBehaviour
 {
     private static CGameManager m_Instance;
@@ -279,7 +280,7 @@ public class CGameManager : MonoBehaviour
         m_CameraManager.TargetPlayer = m_PartyPlayerGameObject;
     }
 
-    private async void MoveCharacterAsync()
+    private async Task MoveCharacterAsync()
     {
         // If we do not have a target cell, try to obtain one. If there are no cells left, we're done moving!
         if (m_TargetCell == Vector3Int.zero)
