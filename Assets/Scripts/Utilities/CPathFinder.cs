@@ -3,13 +3,13 @@ using UnityEngine;
 
 public class CPathFinder
 {
-    private STerrainTile[,] m_TileGrid;
+    private CTerrainTile[,] m_TileGrid;
     bool m_Diagonals;
     int m_MaxX, m_MaxY;
     bool m_bHasFog = true;
 
     // Constructor takes in tilegrid and allow diagonal
-    public CPathFinder(bool diag, STerrainTile[,] tileGrid, bool bHasFog)
+    public CPathFinder(bool diag, CTerrainTile[,] tileGrid, bool bHasFog)
     {
         m_TileGrid = tileGrid;
         m_Diagonals = diag;
@@ -34,7 +34,7 @@ public class CPathFinder
             for (int j = 0; j < m_MaxY; j++)
             {
                 // for now all tiles are walkable
-                tileNodes[i, j] = new TileNode(/*bIsWalkable*/ m_TileGrid[i, j].GetBiomeType() != EBiomeType.Invalid, i, j);
+                tileNodes[i, j] = new TileNode(/*bIsWalkable*/ m_TileGrid[i, j].BiomeType != EBiomeType.Invalid, i, j);
             }
         }
 
@@ -54,7 +54,7 @@ public class CPathFinder
         TileNode target = tileNodes[targetXPos, targetYPos];
 
         // Use the current location traversal rate for fog
-        float currentTraversalRate = m_TileGrid[from.x, from.y].GetTraversalRate();
+        float currentTraversalRate = m_TileGrid[from.x, from.y].TraversalRate;
 
         List<TileNode> open = new List<TileNode>();
         HashSet<TileNode> closed = new HashSet<TileNode>();
@@ -87,8 +87,8 @@ public class CPathFinder
                 }
 
                 // Only use movement mod if the tile has already been seen, if we have fog on
-                STerrainTile terrainTile = m_TileGrid[neighbor.X, neighbor.Y];
-                float mod = (!m_bHasFog || terrainTile.IsSeen()) ? terrainTile.GetTraversalRate() : currentTraversalRate;
+                CTerrainTile terrainTile = m_TileGrid[neighbor.X, neighbor.Y];
+                float mod = (!m_bHasFog || terrainTile.IsSeen) ? terrainTile.TraversalRate : currentTraversalRate;
 
                 float newMovementCost = current.gCost + GetDistance(current, neighbor) * mod;
                 if (newMovementCost < neighbor.gCost || !open.Contains(neighbor))

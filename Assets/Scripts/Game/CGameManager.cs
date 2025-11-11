@@ -66,7 +66,7 @@ public class CGameManager : MonoBehaviour
     private CMapGenerator m_MapGenerator;
     private CPartyManager m_PartyManager;
 
-    private STerrainTile[,] m_TerrainTileMap;
+    private CTerrainTile[,] m_TerrainTileMap;
     private Grid m_WorldGrid;
     private Tilemap m_FogMap;
     private Tilemap m_EffectsMap;
@@ -336,7 +336,7 @@ public class CGameManager : MonoBehaviour
             }
         }
 
-        STerrainTile currentTile = m_TerrainTileMap[m_PartyPlayerCharacter.CurrentLocation.x, m_PartyPlayerCharacter.CurrentLocation.y];
+        CTerrainTile currentTile = m_TerrainTileMap[m_PartyPlayerCharacter.CurrentLocation.x, m_PartyPlayerCharacter.CurrentLocation.y];
 
         // Find increment to move
         if (m_MovementPerTick == Vector3.zero)
@@ -442,8 +442,8 @@ public class CGameManager : MonoBehaviour
             return;
         }
 
-        STerrainTile selectedTile = m_TerrainTileMap[cellPosition.x, cellPosition.y];
-        if (selectedTile.IsPlayerOccupied())
+        CTerrainTile selectedTile = m_TerrainTileMap[cellPosition.x, cellPosition.y];
+        if (selectedTile.IsPlayerOccupied)
         {
             m_EffectsMap.ClearAllTiles();
             m_EffectsMap.SetTile(cellPosition, m_PlayerSelectHighlightTile);
@@ -524,14 +524,14 @@ public class CGameManager : MonoBehaviour
             }
 
             // Set default fog traversal rate as value previous tile
-            float fogTraversalRate = m_TerrainTileMap[previous.x, previous.y].GetTraversalRate();
+            float fogTraversalRate = m_TerrainTileMap[previous.x, previous.y].TraversalRate;
 
             bool bIsFogged = m_FogMap.HasTile(node) && m_bShowFog;
 
-            float trueTraversalRate = m_TerrainTileMap[node.x, node.y].GetTraversalRate();
+            float trueTraversalRate = m_TerrainTileMap[node.x, node.y].TraversalRate;
 
-            float displayTraversalRate = bIsFogged ? fogTraversalRate : m_TerrainTileMap[node.x, node.y].GetTraversalRate();
-            float displayForageAmount = bIsFogged ? 0f : m_TerrainTileMap[node.x, node.y].GetForageAmount();
+            float displayTraversalRate = bIsFogged ? fogTraversalRate : m_TerrainTileMap[node.x, node.y].TraversalRate;
+            float displayForageAmount = bIsFogged ? 0f : m_TerrainTileMap[node.x, node.y].ForageAmount;
 
             // If this is a diagonal, multiply movement cost by multiplier
             if (Mathf.Abs(node.x - previous.x) == 1 && Mathf.Abs(node.y - previous.y) == 1)
@@ -568,9 +568,9 @@ public class CGameManager : MonoBehaviour
             return;
         }
 
-        STerrainTile currentTile = m_TerrainTileMap[cellPosition.x, cellPosition.y];
+        CTerrainTile currentTile = m_TerrainTileMap[cellPosition.x, cellPosition.y];
 
-        m_OnWorldInfoChanged?.Invoke(string.Format("Biome: {0}\nTraversal Time: {1}d\nEstimated Forage Amount: {2}", currentTile.GetBiomeType().ToString(), currentTile.GetTraversalRate(), currentTile.GetForageAmount()));
+        m_OnWorldInfoChanged?.Invoke(string.Format("Biome: {0}\nTraversal Time: {1}d\nEstimated Forage Amount: {2}", currentTile.BiomeType.ToString(), currentTile.TraversalRate, currentTile.ForageAmount));
     }
 
     public void OnRightClick(InputAction.CallbackContext context)
@@ -608,7 +608,7 @@ public class CGameManager : MonoBehaviour
         Vector3Int prevCell = m_PartyPlayerCharacter.CurrentLocation;
         if (IsCellValid(prevCell))
         {
-            m_TerrainTileMap[prevCell.x, prevCell.y].SetPlayerOccupied(false);
+            m_TerrainTileMap[prevCell.x, prevCell.y].IsPlayerOccupied = false;
         }
 
         Vector3 worldPosition = m_WorldGrid.GetCellCenterWorld(cell);
@@ -617,7 +617,7 @@ public class CGameManager : MonoBehaviour
         m_PartyPlayerGameObject.transform.position = worldPosition;
         m_PartyPlayerCharacter.CurrentLocation = cell;
 
-        m_TerrainTileMap[cell.x, cell.y].SetPlayerOccupied(true);
+        m_TerrainTileMap[cell.x, cell.y].IsPlayerOccupied = true;
 
         // Update seen tiles (TEMP, no vision stat adjustments yet)
         for (int x = -1; x <= 1; ++x)
@@ -628,7 +628,7 @@ public class CGameManager : MonoBehaviour
                 int newY = Mathf.Clamp(cell.y + y, 0, m_TerrainTileMap.GetLength(1) - 1);
                 Vector3Int newLocation = new Vector3Int(newX, newY, 0);
 
-                m_TerrainTileMap[newX, newY].SetIsSeen(true);
+                m_TerrainTileMap[newX, newY].IsSeen =true;
 
                 m_FogMap.SetTile(newLocation, null);
             }
@@ -690,7 +690,7 @@ public class CGameManager : MonoBehaviour
             {
                 for (int i = 0; i < m_MapGenerator.MapSize.x; ++i)
                 {
-                    if (m_TerrainTileMap[i, y].GetBiomeType() == EBiomeType.Beach)
+                    if (m_TerrainTileMap[i, y].BiomeType == EBiomeType.Beach)
                     {
                         return new Vector3Int(i, y);
                     }
@@ -700,7 +700,7 @@ public class CGameManager : MonoBehaviour
             {
                 for (int i = m_MapGenerator.MapSize.y - 1; i >= 0; --i)
                 {
-                    if (m_TerrainTileMap[i, y].GetBiomeType() == EBiomeType.Beach)
+                    if (m_TerrainTileMap[i, y].BiomeType == EBiomeType.Beach)
                     {
                         return new Vector3Int(i, y);
                     }
@@ -715,7 +715,7 @@ public class CGameManager : MonoBehaviour
             {
                 for (int i = 0; i < m_MapGenerator.MapSize.x; ++i)
                 {
-                    if (m_TerrainTileMap[x, i].GetBiomeType() == EBiomeType.Beach)
+                    if (m_TerrainTileMap[x, i].BiomeType == EBiomeType.Beach)
                     {
                         return new Vector3Int(x, i);
                     }
@@ -725,7 +725,7 @@ public class CGameManager : MonoBehaviour
             {
                 for (int i = m_MapGenerator.MapSize.x - 1; i >= 0; --i)
                 {
-                    if (m_TerrainTileMap[x, i].GetBiomeType() == EBiomeType.Beach)
+                    if (m_TerrainTileMap[x, i].BiomeType == EBiomeType.Beach)
                     {
                         return new Vector3Int(x, i);
                     }

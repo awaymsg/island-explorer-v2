@@ -2,63 +2,71 @@ using System;
 using System.Collections.Generic;
 using UnityEngine.Tilemaps;
 
-public struct STerrainTile
+public class CTerrainTile
 {
-    private float Elevation;
-    private bool bSeen;
-    private EBiomeType BiomeType;
-    private float TraversalRate;
-    private float ForageAmount;
-    private bool bPlayerOccupied;
+    private float m_Elevation;
+    private bool m_bSeen;
+    private EBiomeType m_BiomeType;
+    private float m_TraversalRate;
+    private float m_ForageAmount;
+    private List<CLocalEvent> m_LocalEvents;
+    private bool m_bPlayerOccupied;
 
-    public STerrainTile(float elevation, bool _bExplored, EBiomeType biomeType, float traversalRate, float forageAmount, bool _bPlayerOccupied = false)
+    public CTerrainTile(float elevation, bool _bExplored, EBiomeType biomeType, float traversalRate, float forageAmount, List<CLocalEvent> localEvents, bool bPlayerOccupied = false)
     {
-        Elevation = elevation;
-        bSeen = _bExplored;
-        BiomeType = biomeType;
-        TraversalRate = traversalRate;
-        ForageAmount = forageAmount;
-        bPlayerOccupied = _bPlayerOccupied;
+        m_Elevation = elevation;
+        m_bSeen = _bExplored;
+        m_BiomeType = biomeType;
+        m_TraversalRate = traversalRate;
+        m_ForageAmount = forageAmount;
+        m_LocalEvents = localEvents;
+        m_bPlayerOccupied = bPlayerOccupied;
     }
 
-    public float GetElevation()
+    public float Elevation
     {
-        return Elevation;
+        get { return m_Elevation; }
     }
 
-    public bool IsSeen()
+    public bool IsSeen
     {
-        return bSeen;
+        get { return m_bSeen; }
+        set { m_bSeen = value; }
     }
 
-    public void SetIsSeen(bool bIsSeen)
+    public EBiomeType BiomeType
     {
-        bSeen = bIsSeen;
+        get { return m_BiomeType; }
     }
 
-    public EBiomeType GetBiomeType()
+    public float TraversalRate
     {
-        return BiomeType;
+        get { return m_TraversalRate; }
     }
 
-    public float GetTraversalRate()
+    public bool IsPlayerOccupied
     {
-        return TraversalRate;
+        get { return m_bPlayerOccupied; }
+        set { m_bPlayerOccupied = value; }
     }
 
-    public bool IsPlayerOccupied()
+    public float ForageAmount
     {
-        return bPlayerOccupied;
+        get { return m_ForageAmount; }
     }
 
-    public void SetPlayerOccupied(bool _bPlayerOccupied)
+    public CLocalEvent GetLocalEvent()
     {
-        bPlayerOccupied = _bPlayerOccupied;
-    }
+        if (m_LocalEvents.Count == 0)
+        {
+            return null;
+        }
 
-    public float GetForageAmount()
-    {
-        return ForageAmount;
+        int index = UnityEngine.Random.Range(0, m_LocalEvents.Count);
+        CLocalEvent localEvent = m_LocalEvents[index];
+        m_LocalEvents.RemoveAt(index);
+
+        return localEvent;
     }
 }
 

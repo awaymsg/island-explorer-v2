@@ -5,7 +5,7 @@ public class CEventManager : MonoBehaviour
 {
     private static CEventManager m_Instance;
 
-    [SerializeField, Tooltip("Pool of local events")]
+    [SerializeField, Tooltip("Pool of random local events")]
     private SBiomeEventsPool[] m_LocalEventsPool;
 
     public static CEventManager Instance

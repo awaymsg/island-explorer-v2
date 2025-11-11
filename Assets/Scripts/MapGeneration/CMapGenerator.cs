@@ -69,9 +69,15 @@ public class CMapGenerator : MonoBehaviour
     [SerializeField]
     private SPOIMapping[] m_POIMappings;
 
+    // For quicker lookups
+    private Dictionary<EBiomeType, TileBase> m_DefaultTileBook;
+    private Dictionary<EBiomeType, SPOISettings[]> m_POIMappingBook;
+    private Dictionary<EBiomeType, SBiomeSettings> m_BiomeSettingsBook;
+    private Dictionary<EBiomeType, string> m_EnumMappingBook;
+
     private static int[] m_Permutation;
 
-    private static bool m_bIsTileBookInitialized = false;
+    private static bool m_bIsLookupBooksInitialized = false;
     private static bool m_bIsPermutionTableInitialized = false;
     private static bool m_bIsBiomeTypesInitialized = false;
 
@@ -83,7 +89,7 @@ public class CMapGenerator : MonoBehaviour
 
     private static List<CTileRule> m_TileRules = new List<CTileRule>();
     private static Dictionary<string, TileBase> m_TileBook;
-    private static STerrainTile[,] m_TerrainTiles;
+    private static CTerrainTile[,] m_TerrainTiles;
 
     // quick lookup
     private static readonly Matrix4x4[] RotationTable = new Matrix4x4[]
@@ -180,8 +186,16 @@ public class CMapGenerator : MonoBehaviour
         return allowed.Contains("*") || allowed.Contains(actual);
     }
 
-    public void InitializeTileBook()
+    public void InitializeLookupBooks()
     {
+        // Cache data driven arrays to dictionaries for lookup efficiency
+
+        if (m_TileMappings == null || m_TileMappings.Length == 0)
+        {
+            Debug.Log("InitializeTileBooks - TileMappings are not set up!");
+            return;
+        }
+
         m_TileBook = new Dictionary<string, TileBase>();
 
         foreach (STileMapping tilemapping in m_TileMappings)
@@ -189,13 +203,65 @@ public class CMapGenerator : MonoBehaviour
             m_TileBook[tilemapping.Name] = tilemapping.Tile;
         }
 
-        m_bIsTileBookInitialized = true;
+        if (m_DefaultTiles == null || m_DefaultTiles.Length == 0)
+        {
+            Debug.Log("InitializeTileBooks - DefaultTiles are not set up!");
+            return;
+        }
+
+        m_DefaultTileBook = new Dictionary<EBiomeType, TileBase>();
+
+        foreach (SDefaultTile defaultTile in m_DefaultTiles)
+        {
+            m_DefaultTileBook[defaultTile.BiomeType] = defaultTile.Tile;
+        }
+
+        if (m_POIMappings == null || m_POIMappings.Length == 0)
+        {
+            Debug.Log("InitializeTileBooks - POIMappings are not setup!");
+            return;
+        }
+
+        m_POIMappingBook = new Dictionary<EBiomeType, SPOISettings[]>();
+
+        foreach (SPOIMapping poiMapping in m_POIMappings)
+        {
+            m_POIMappingBook[poiMapping.BiomeType] = poiMapping.POISettings;
+        }
+
+        if (m_BiomeSettings == null || m_BiomeSettings.Length == 0)
+        {
+            Debug.Log("InitializeTileBooks - m_BiomeSettings are not setup!");
+            return;
+        }
+
+        m_BiomeSettingsBook = new Dictionary<EBiomeType, SBiomeSettings>();
+
+        foreach (SBiomeSettings biomeSettings in m_BiomeSettings)
+        {
+            m_BiomeSettingsBook[biomeSettings.BiomeType] = biomeSettings;
+        }
+
+        if (m_EnumMappings == null || m_EnumMappings.Length == 0)
+        {
+            Debug.Log("InitializeTileBooks - EnumMappings are not setup!");
+            return;
+        }
+
+        m_EnumMappingBook = new Dictionary<EBiomeType, string>();
+
+        foreach (SEnumMapping enumMapping in m_EnumMappings)
+        {
+            m_EnumMappingBook[enumMapping.BiomeType] = enumMapping.Name;
+        }
+
+        m_bIsLookupBooksInitialized = true;
     }
 
-    public STerrainTile[,] GenerateMap()
+    public CTerrainTile[,] GenerateMap()
     {
         LoadRulesFromJson();
-        InitializeTileBook();
+        InitializeLookupBooks();
 
         InitializePermutationTable();
         GenerateHeightMap();
@@ -204,25 +270,32 @@ public class CMapGenerator : MonoBehaviour
         {
             for (int y = 0; y < m_MapSize.y; ++y)
             {
-                EBiomeType currentBiome = m_TerrainTiles[x, y].GetBiomeType();
+                EBiomeType currentBiome = m_TerrainTiles[x, y].BiomeType;
                 SRuleResult result = GetTile(currentBiome, x, y);
-                TileBase tile;
+                TileBase tile = null;
 
                 // if result is "empty", just place the base biome tile for now- rules may not yet be set up
                 if (result.Result == "Empty" || string.IsNullOrEmpty(result.Result))
                 {
-                    tile = Array.Find<SDefaultTile>(m_DefaultTiles, p => p.BiomeType == currentBiome).Tile;
+                    if (m_DefaultTileBook.TryGetValue(currentBiome, out TileBase foundTile))
+                    {
+                        tile = foundTile;
+                    }
                 }
                 else
                 {
-                    if (m_TileBook.ContainsKey(result.Result))
+                    if (m_TileBook.TryGetValue(result.Result, out TileBase ruleTile))
                     {
-                        tile = m_TileBook[result.Result];
+                        tile = ruleTile;
                     }
                     else
                     {
                         Debug.Log(string.Format("Missing tile from result: {0}", result.Result));
-                        tile = Array.Find<SDefaultTile>(m_DefaultTiles, p => p.BiomeType == currentBiome).Tile;
+
+                        if (m_DefaultTileBook.TryGetValue(currentBiome, out TileBase foundTile))
+                        {
+                            tile = foundTile;
+                        }
                     }
                 }
 
@@ -249,39 +322,49 @@ public class CMapGenerator : MonoBehaviour
         return m_TerrainTiles;
     }
 
-    private TileBase AddPOI(STerrainTile terrainTile)
+    private TileBase AddPOI(CTerrainTile terrainTile)
     {
         TileBase selectedPOITile = null;
 
-        if (terrainTile.GetBiomeType() != EBiomeType.Invalid)
+        if (terrainTile.BiomeType == EBiomeType.Invalid)
         {
-            SPOIMapping poiMapping = Array.Find(m_POIMappings, p => p.BiomeType == terrainTile.GetBiomeType());
+            Debug.Log("AddPOI - terrainTile.BiomeType is Invalid!");
+            return null;
+        }
 
-            // TODO: make likelihood rolls more accurate / better (currently takes lowest likelihood success)
-            float minLikelihood = 100f;
+        SPOISettings[] poiSettings = null;
 
-            if (poiMapping.BiomeType != EBiomeType.Invalid)
+        if (m_POIMappingBook.TryGetValue(terrainTile.BiomeType, out SPOISettings[] foundSettings))
+        {
+            poiSettings = foundSettings;
+        }
+        else
+        {
+            Debug.Log(string.Format("AddPOI - m_POIMappingBook does not contain key: {0}", terrainTile.BiomeType.ToString()));
+            return null;
+        }
+
+        // TODO: make likelihood rolls more accurate / better (currently takes lowest likelihood success)
+        float minLikelihood = 100f;
+
+        float random = UnityEngine.Random.Range(0f, 100f);
+
+        foreach (SPOISettings poiSetting in poiSettings)
+        {
+            if (random < poiSetting.Likelihood)
             {
-                float random = UnityEngine.Random.Range(0f, 100f);
-
-                foreach (SPOISettings poiSetting in poiMapping.POISettings)
+                // TODO: set POI settings on tile
+                if (poiSetting.Likelihood < minLikelihood)
                 {
-                    if (random < poiSetting.Likelihood)
+                    minLikelihood = poiSetting.Likelihood;
+                    selectedPOITile = poiSetting.Tile;
+                }
+                else if (poiSetting.Likelihood == minLikelihood)
+                {
+                    // If chances are the same, roll for stomping
+                    if (UnityEngine.Random.Range(0, 2) == 0)
                     {
-                        // TODO: set POI settings on tile
-                        if (poiSetting.Likelihood < minLikelihood)
-                        {
-                            minLikelihood = poiSetting.Likelihood;
-                            selectedPOITile = poiSetting.Tile;
-                        }
-                        else if (poiSetting.Likelihood == minLikelihood)
-                        {
-                            // If chances are the same, roll for stomping
-                            if (UnityEngine.Random.Range(0, 2) == 0)
-                            {
-                                selectedPOITile = poiSetting.Tile;
-                            }
-                        }
+                        selectedPOITile = poiSetting.Tile;
                     }
                 }
             }
@@ -292,7 +375,7 @@ public class CMapGenerator : MonoBehaviour
 
     private void GenerateHeightMap()
     {
-        m_TerrainTiles = new STerrainTile[m_MapSize.x, m_MapSize.y];
+        m_TerrainTiles = new CTerrainTile[m_MapSize.x, m_MapSize.y];
 
         Vector2Int center = GetCenterPoint();
         float maxDistance = center.magnitude;
@@ -347,13 +430,14 @@ public class CMapGenerator : MonoBehaviour
 
                 EBiomeType biomeType = GetBiomeType(weightedNoise);
 
-                SBiomeSettings biomeMovement = Array.Find(m_BiomeSettings, p => p.BiomeType == biomeType);
-                m_TerrainTiles[x, y] = new STerrainTile(
+                m_BiomeSettingsBook.TryGetValue(biomeType, out SBiomeSettings biomeMovement);
+                m_TerrainTiles[x, y] = new CTerrainTile(
                     weightedNoise,
                     /*bExplored*/ false,
                     biomeType,
                     (biomeMovement.BiomeType == EBiomeType.Invalid) ? 1f : biomeMovement.MovementTime,
-                    (biomeMovement.BiomeType == EBiomeType.Invalid) ? 1f : biomeMovement.ForageAmount
+                    (biomeMovement.BiomeType == EBiomeType.Invalid) ? 1f : biomeMovement.ForageAmount,
+                    new List<CLocalEvent>()
                 );
             }
         }
@@ -518,14 +602,14 @@ public class CMapGenerator : MonoBehaviour
 
     private string GetBiomeString(EBiomeType biomeType)
     {
-        SEnumMapping mapping = Array.Find<SEnumMapping>(m_EnumMappings, p => p.BiomeType == biomeType);
+        m_EnumMappingBook.TryGetValue(biomeType, out string name);
 
-        if (string.IsNullOrEmpty(mapping.Name))
+        if (string.IsNullOrEmpty(name))
         {
             return "Empty";
         }
 
-        return mapping.Name;
+        return name;
     }
 
     private string GetNeighborBiome(int x, int y)
@@ -533,7 +617,7 @@ public class CMapGenerator : MonoBehaviour
         int clampedX = Mathf.Clamp(x, 0, m_MapSize.x - 1);
         int clampedY = Mathf.Clamp(y, 0, m_MapSize.y - 1);
 
-        return GetBiomeString(m_TerrainTiles[clampedX, clampedY].GetBiomeType());
+        return GetBiomeString(m_TerrainTiles[clampedX, clampedY].BiomeType);
     }
 
     private SRuleResult GetTile(EBiomeType biomeType, int x, int y)
@@ -544,7 +628,7 @@ public class CMapGenerator : MonoBehaviour
             return new SRuleResult("Empty", 0);
         }
 
-        if (!m_bIsTileBookInitialized)
+        if (!m_bIsLookupBooksInitialized)
         {
             Debug.Log("GetTile - TileBook has not been initialized!");
             return new SRuleResult("Empty", 0);
@@ -570,7 +654,7 @@ public class CMapGenerator : MonoBehaviour
         {
             for (int y = 0; y < m_MapSize.y; ++y)
             {
-                if (!m_TerrainTiles[x, y].IsSeen())
+                if (!m_TerrainTiles[x, y].IsSeen)
                 {
                     m_FogMap.SetTile(new Vector3Int(x, y), m_FogTile);
                 }
