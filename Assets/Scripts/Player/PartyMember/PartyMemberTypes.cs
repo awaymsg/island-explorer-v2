@@ -121,6 +121,7 @@ public struct SPartyMemberDefaultStat
 [Serializable]
 public class CPartyMemberStat
 {
+    private float m_BaseValue;
     private float m_Value;
     private readonly List<SPartyMemberStatModifier> m_CurrentModifiers;
 
@@ -128,7 +129,7 @@ public class CPartyMemberStat
 
     public int Value
     {
-        get { return (int)Math.Round(Math.Clamp(m_Value, 0, CGameManager.Instance.MaxStatValue), 0); }
+        get { return (int)m_Value; }
     }
 
     public IReadOnlyList<SPartyMemberStatModifier> CurrentModifiers
@@ -138,43 +139,50 @@ public class CPartyMemberStat
 
     public CPartyMemberStat(int value)
     {
+        value = Math.Clamp(value, 0, CGameManager.Instance.MaxStatValue);
+        m_BaseValue = value;
         m_Value = value;
         m_CurrentModifiers = new List<SPartyMemberStatModifier>();
     }
 
+    private void RecalculateStat()
+    {
+        // The constructor initializes this, but yknow better safe than sorry
+        if (m_CurrentModifiers == null)
+        {
+            Debug.Log("RecalculateStat - m_CurrentModifiers is null!");
+            return;
+        }
+
+        int oldValue = Value;
+        m_Value = m_BaseValue;
+
+        foreach (SPartyMemberStatModifier statMod in m_CurrentModifiers)
+        {
+            if (statMod.bMultiplicative)
+            {
+                m_Value *= statMod.ModAmount;
+            }
+            else
+            {
+                m_Value += statMod.ModAmount;
+            }
+        }
+
+        m_Value = (float)Math.Round(Math.Clamp(m_Value, 0, CGameManager.Instance.MaxStatValue), 0);
+        OnStatChanged?.Invoke(oldValue, Value);
+    }
+
     public void AddMod(SPartyMemberStatModifier modifier)
     {
-        int oldValue = Value;
-
-        if (modifier.bMultiplicative)
-        {
-            m_Value *= modifier.ModAmount;
-        }
-        else
-        {
-            // Don't go below 0
-            m_Value += modifier.ModAmount;
-        }
-
         m_CurrentModifiers.Add(modifier);
-        OnStatChanged?.Invoke(oldValue, Value);
+        RecalculateStat();
     }
 
     public void RemoveMod(SPartyMemberStatModifier modifier)
     {
-        int oldValue = Value;
-
-        if (modifier.bMultiplicative)
-        {
-            m_Value /= modifier.ModAmount;
-        }
-        else
-        {
-            m_Value -= modifier.ModAmount;
-        }
-
         m_CurrentModifiers.Remove(modifier);
-        OnStatChanged?.Invoke(oldValue, Value);
+        RecalculateStat();
     }
 }
 
@@ -336,6 +344,7 @@ public class CBodyPart
         }
 
         BodyPart = other.BodyPart;
+        BaseMaxHealth = other.BaseMaxHealth;
         MaxHealth = other.MaxHealth;
         Health = other.Health;
         bIsVital = other.bIsVital;
@@ -348,8 +357,10 @@ public class CBodyPart
 
     [Header("Basic Info")]
     public EBodyPart BodyPart;
-    public float MaxHealth = 100;
-    public float Health = 100;
+    [NonSerialized]
+    public float BaseMaxHealth = 100f;
+    public float MaxHealth = 100f;
+    public float Health = 100f;
     [Tooltip("Party member stats this bodypart affects")]
     public SBodyPartAffectedStat[] AffectedStats;
     [Tooltip("Modifications to this bodypart")]

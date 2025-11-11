@@ -191,8 +191,7 @@ public class CPartyMemberRuntime : IDisposable
 
         AddDefaultItems();
 
-        // make a deep copy of this array
-        m_BodyParts = m_PartyManager.DefaultBodyParts?.Select(bodyPart => new CBodyPart(bodyPart)).ToArray() ?? Array.Empty<CBodyPart>();
+        InitializeBodyParts();
 
         GenerateName();
         GeneratePortrait();
@@ -200,7 +199,7 @@ public class CPartyMemberRuntime : IDisposable
         CPartyMemberTrait[] traitPool = m_PartyManager.TraitPool;
 
         // for now just add randomly
-        // todo: selectively add a number of traits
+        // todo: selectively add a number of traits based on cost and affinity
         if (traitPool != null && traitPool.Length > 0)
         {
             int index = UnityEngine.Random.Range(0, traitPool.Length);
@@ -238,7 +237,22 @@ public class CPartyMemberRuntime : IDisposable
         {
             CGameManager.Instance.m_OnTick -= OnTick;
         }
+    }
 
+    private void InitializeBodyParts()
+    {
+        // make a deep copy of this array
+        m_BodyParts = m_PartyManager.DefaultBodyParts?.Select(bodyPart => new CBodyPart(bodyPart)).ToArray() ?? Array.Empty<CBodyPart>();
+        if (m_BodyParts == null ||  m_BodyParts.Length == 0)
+        {
+            Debug.Log("InitializeBodyParts - m_BodyParts is null or empty!");
+            return;
+        }
+
+        foreach (CBodyPart bodyPart in m_BodyParts)
+        {
+            bodyPart.BaseMaxHealth = bodyPart.MaxHealth;
+        }
     }
 
     private void GenerateName()
@@ -359,11 +373,52 @@ public class CPartyMemberRuntime : IDisposable
                     continue;
                 }
 
-                float healthPercentage = bodyPart.Health / Math.Max(bodyPart.MaxHealth, CGameManager.Instance.MaxStatValue);
+                // Prevent divide by 0, but this should never happen otherwise it would break the system
+                float denominator = Math.Max(bodyPart.MaxHealth, bodyPart.BaseMaxHealth);
+                float healthPercentage = bodyPart.Health / denominator != 0 ? denominator : 100f;
                 float totalEffect = vitalEffect.MaxEffect - vitalEffect.MaxEffect * healthPercentage;
 
                 m_VitalFunctionsValueBook[vitalEffect.VitalFunction] -= (int)Math.Round(totalEffect);
             }
+        }
+    }
+
+    private void RecalculateBodyPartHealth()
+    {
+        foreach (CBodyPart bodyPart in m_BodyParts)
+        {
+            // Reset values
+            float baseHealth = bodyPart.BaseMaxHealth;
+            float currentHealth = baseHealth;
+            float currentMaxHealth = baseHealth;
+
+            // Apply mods
+            foreach (CBodyPartModification bodyMod in bodyPart.Modifications)
+            {
+                if (bodyMod.bMultiplicative)
+                {
+                    currentHealth = Math.Clamp(bodyPart.Health * bodyMod.ModAmount, 0f, bodyPart.MaxHealth);
+
+                    if (bodyMod.bPermanent)
+                    {
+                        currentMaxHealth *= bodyMod.ModAmount;
+                        currentHealth *= bodyMod.ModAmount;
+                    }
+                }
+                else
+                {
+                    currentHealth = Math.Clamp(bodyPart.Health + bodyMod.ModAmount, 0f, bodyPart.MaxHealth);
+
+                    if (bodyMod.bPermanent)
+                    {
+                        currentMaxHealth += bodyMod.ModAmount;
+                        currentHealth += bodyMod.ModAmount;
+                    }
+                }
+            }
+
+            bodyPart.Health = currentHealth;
+            bodyPart.MaxHealth = currentMaxHealth;
         }
     }
 
@@ -435,6 +490,12 @@ public class CPartyMemberRuntime : IDisposable
 
     public void AddBodyMod(CBodyPartModification bodyMod)
     {
+        if (bodyMod == null)
+        {
+            Debug.Log("AddBodyMod - bodyMod is null!");
+            return;
+        }
+
         CBodyPart bodyPart = Array.Find<CBodyPart>(m_BodyParts, p => p.BodyPart == bodyMod.ModLocation);
         if (bodyPart == null)
         {
@@ -442,29 +503,11 @@ public class CPartyMemberRuntime : IDisposable
             return;
         }
 
-        if (bodyMod.bMultiplicative)
-        {
-            bodyPart.Health *= bodyMod.ModAmount;
-
-            if (bodyMod.bPermanent)
-            {
-                bodyPart.MaxHealth *= bodyMod.ModAmount;
-            }
-        }
-        else
-        {
-            bodyPart.Health += bodyMod.ModAmount;
-
-            if (bodyMod.bPermanent)
-            {
-                bodyPart.MaxHealth += bodyMod.ModAmount;
-            }
-        }
-
         bodyPart.Modifications.Add(bodyMod);
 
-        // Recalculate vital functions, to avoid floating point precision errors we might get from modding and unmodding
+        // Recalculate health and vital functions, to avoid floating point precision errors we might get from modding and unmodding
         // TODO: maybe there is a better way?
+        RecalculateBodyPartHealth();
         RecalculateVitalFunctions();
     }
 
@@ -483,27 +526,11 @@ public class CPartyMemberRuntime : IDisposable
             return;
         }
 
-        if (bodyMod.bMultiplicative)
-        {
-            bodyPart.Health /= bodyMod.ModAmount;
-
-            if (bodyMod.bPermanent)
-            {
-                bodyPart.MaxHealth /= bodyMod.ModAmount;
-            }
-        }
-        else
-        {
-            bodyPart.Health -= bodyMod.ModAmount;
-
-            if (bodyMod.bPermanent)
-            {
-                bodyPart.MaxHealth -= bodyMod.ModAmount;
-            }
-        }
+        bodyPart.Modifications.Remove(bodyMod);
 
         // Recalculate vital functions, to avoid floating point precision errors we might get from modding and unmodding
         // TODO: maybe there is a better way?
+        RecalculateBodyPartHealth();
         RecalculateVitalFunctions();
     }
 

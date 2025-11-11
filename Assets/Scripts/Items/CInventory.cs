@@ -102,7 +102,7 @@ public class CInventory
         {
             if (owner == null)
             {
-                Debug.Log("TryRemoveItemToInventory - owner is null!");
+                Debug.Log("TryRemoveItemFromInventory - owner is null!");
             }
 
             owner.RemoveStatModifiers(item.StatModifiers);
