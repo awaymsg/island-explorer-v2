@@ -42,6 +42,8 @@ public class CPartyMember : ScriptableObject
 
 public class CPartyMemberRuntime : IDisposable
 {
+    private const float FALLBACK_MAX_STAT_VALUE = 100f;
+
     protected readonly CPartyMember m_PartyMemberSO;
     protected CPartyManager m_PartyManager;
 
@@ -168,6 +170,7 @@ public class CPartyMemberRuntime : IDisposable
         if (m_PartyManager == null)
         {
             Debug.Log("InitializePartyMember - PartyManager is null!");
+            return;
         }
 
         m_PartyMemberStats = SetBaseStats();
@@ -618,6 +621,12 @@ public class CPartyMemberRuntime : IDisposable
 
         // Happiness is max at 100, affected by moodlets, reduced by hunger, but helped by relationship satisfaction and serenity stat
         float maxStatValue = CGameManager.Instance.MaxStatValue;
+        if (maxStatValue <= 0)
+        {
+            Debug.Log(string.Format("CalculateHappiness - MaxStatValue is 0 or less! Defaulting to {0} to avoid division by 0. Please set a non-zero positive value in inspector.", FALLBACK_MAX_STAT_VALUE));
+            maxStatValue = FALLBACK_MAX_STAT_VALUE;
+        }
+
         m_Happiness = maxStatValue * 0.5f;
 
         foreach (SPartyMemberMoodlet moodlet in m_Moodlets)
