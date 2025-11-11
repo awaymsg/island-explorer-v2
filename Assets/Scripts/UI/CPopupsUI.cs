@@ -5,7 +5,7 @@ using UnityEngine.UIElements;
 public class CPopupsUI : MonoBehaviour
 {
     [SerializeField]
-    private VisualTreeAsset m_ContinueMovementDialogueTemplate;
+    private VisualTreeAsset m_GenericDialoguePopupTemplate;
 
     private UIDocument m_BlankCanvasUI;
 
@@ -14,20 +14,19 @@ public class CPopupsUI : MonoBehaviour
         m_BlankCanvasUI = GetComponent<UIDocument>();
     }
 
-    // TODO: we can make this generic actually, in retrospect
-    public void CreateContinueMovementDialogue(float actual, Action<bool> bOnResponse)
+    public void CreateConfirmationDialogue(float actual, Action<bool> bOnResponse)
     {
         // Create a new popup
-        TemplateContainer continueDialogueInstance = m_ContinueMovementDialogueTemplate.Instantiate();
+        TemplateContainer continueDialogueInstance = m_GenericDialoguePopupTemplate.Instantiate();
         if (continueDialogueInstance == null)
         {
             bOnResponse?.Invoke(false);
             return;
         }
 
-        Label continueMovementLabel = continueDialogueInstance.Q<Label>("ContinueMovementDialogueLabel");
-        Button yesButton = continueDialogueInstance.Q<Button>("ContinueMovementButtonYes");
-        Button noButton = continueDialogueInstance.Q<Button>("ContinueMovementButtonNo");
+        Label continueMovementLabel = continueDialogueInstance.Q<Label>("GenericDialogueBoxLabel");
+        Button yesButton = continueDialogueInstance.Q<Button>("GenericDialogueBoxButtonYes");
+        Button noButton = continueDialogueInstance.Q<Button>("GenericDialogueBoxButtonNo");
 
         if (yesButton == null || noButton == null || continueMovementLabel == null)
         {

@@ -148,8 +148,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 87dbdd667fdf99f448aeb1b19d697862, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::GameManager
-  m_bUseSeed: 1
-  m_RandomSeed: 23
+  m_bUseSeed: 0
+  m_RandomSeed: 25
   m_Camera: {fileID: 519420031}
   m_PartyPlayerCharacterPrefab: {fileID: 234909392250611176, guid: 12f91a7f2fa6cb6488c98fc9c73f4519, type: 3}
   m_LocationSelectHighlightTile: {fileID: 11400000, guid: 2917f8a7507d5714d8fc823a59443571, type: 2}
@@ -536,7 +536,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2da87a946cc879741bfa677e7da18b97, type: 3}
   m_Name: 
   m_EditorClassIdentifier: '::'
-  m_ContinueMovementDialogueTemplate: {fileID: 9197481963319205126, guid: b60eda173111e0143afbc98886be4854, type: 3}
+  m_GenericDialoguePopupTemplate: {fileID: 9197481963319205126, guid: 33dd57f42f327ef488fad666ad85827d, type: 3}
 --- !u!1 &951938870
 GameObject:
   m_ObjectHideFlags: 0

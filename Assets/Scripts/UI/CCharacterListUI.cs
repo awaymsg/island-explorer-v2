@@ -423,6 +423,7 @@ public class CCharacterListUI : MonoBehaviour
         }
         statusInfo.style.fontSize = 14;
         statusInfo.text = "Statuses";
+        bool bHasStatus = false;
 
         foreach (SPartyMemberMoodlet moodlet in partyMember.Moodlets)
         {
@@ -434,6 +435,8 @@ public class CCharacterListUI : MonoBehaviour
             statusPanel.Add(moodletLabel);
 
             m_AddedBoundLabels.Add(moodletLabel);
+
+            bHasStatus = true;
         }
 
         foreach (CBodyPart bodyPart in partyMember.BodyParts)
@@ -448,8 +451,12 @@ public class CCharacterListUI : MonoBehaviour
                 statusPanel.Add(bodyPartConditionLabel);
 
                 m_AddedBoundLabels.Add(bodyPartConditionLabel);
+
+                bHasStatus = true;
             }
         }
+
+        statusInfo.visible = bHasStatus;
 
         /**
         string inventoryString = string.Format("Inventory: {0}/{1}\n", partyMember.ItemInventory.CurrentWeight, partyMember.ItemInventory.MaxWeight);

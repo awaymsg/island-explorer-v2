@@ -208,6 +208,12 @@ public class CGameManager : MonoBehaviour
         return IsMovingState() && !IsPausedState();
     }
 
+    public bool TryEnterGameState(EGameState gameState)
+    {
+        m_GameState = gameState;
+        return true;
+    }
+
     private void Update()
     {
         if (!CanMove() || m_PartyPlayerGameObject == null)
@@ -380,7 +386,7 @@ public class CGameManager : MonoBehaviour
         TaskCompletionSource<bool> completionSource = new TaskCompletionSource<bool>();
 
         // UI callbacks should always execute on main thread in unity allegedly
-        m_UIManager.PopupsUI.CreateContinueMovementDialogue(actual, (response) =>
+        m_UIManager.PopupsUI.CreateConfirmationDialogue(actual, (response) =>
         {
             completionSource.SetResult(response);
         });
