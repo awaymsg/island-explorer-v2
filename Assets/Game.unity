@@ -1246,7 +1246,7 @@ MonoBehaviour:
       Tile: {fileID: 11400000, guid: 10cef82410a12d14cb3203757231c273, type: 2}
       Likelihood: 5
     - Name: Goodie Hut
-      Tile: {fileID: 11400000, guid: d27041000df17af4e8e8be0c75479877, type: 2}
+      Tile: {fileID: 11400000, guid: da73c4d198eb56c44b98fdbbffdc84f6, type: 2}
       Likelihood: 5
     - Name: Black Monolith
       Tile: {fileID: 11400000, guid: 256f0aa7eec8d00479d1e8bc9b98188d, type: 2}
@@ -1262,8 +1262,8 @@ MonoBehaviour:
       Likelihood: 0.1
   - BiomeType: 5
     POISettings:
-    - Name: Mysterious Mushroom
-      Tile: {fileID: 11400000, guid: da73c4d198eb56c44b98fdbbffdc84f6, type: 2}
+    - Name: Fallen Log
+      Tile: {fileID: 11400000, guid: 7e01664b93b141445acb91b05c0503e8, type: 2}
       Likelihood: 5
     - Name: Fairy Circle
       Tile: {fileID: 11400000, guid: 10cef82410a12d14cb3203757231c273, type: 2}
@@ -1286,8 +1286,8 @@ MonoBehaviour:
     - Name: Flower Patch
       Tile: {fileID: 11400000, guid: 37ad7d73ae19f434db52ef7505688f23, type: 2}
       Likelihood: 30
-    - Name: Flower Patch
-      Tile: {fileID: 11400000, guid: 37ad7d73ae19f434db52ef7505688f23, type: 2}
+    - Name: Flower Patch 2
+      Tile: {fileID: 11400000, guid: b56cc3d550fa34e4c9425ed48688a83f, type: 2}
       Likelihood: 30
   - BiomeType: 6
     POISettings:
@@ -1304,11 +1304,14 @@ MonoBehaviour:
       Tile: {fileID: 11400000, guid: 17f118d818134bb41b0d626d9b717322, type: 2}
       Likelihood: 5
     - Name: Mountain
-      Tile: {fileID: 11400000, guid: 86034a902ff619e4db4f584185243ea2, type: 2}
+      Tile: {fileID: 11400000, guid: abea98d1bc0cdb64a9ee832b8092dd4d, type: 2}
       Likelihood: 70
     - Name: Bottomless Pit
       Tile: {fileID: 11400000, guid: 907ef8555447b924d8f46065285498e0, type: 2}
       Likelihood: 0.5
+    - Name: Tall Mountain
+      Tile: {fileID: 11400000, guid: 86034a902ff619e4db4f584185243ea2, type: 2}
+      Likelihood: 70
   - BiomeType: 2
     POISettings:
     - Name: Ship Wreck
@@ -2261,7 +2264,7 @@ MonoBehaviour:
   m_CharacterShortInfoPanelTemplate: {fileID: 9197481963319205126, guid: 31b1a569527c971409023a1438032774, type: 3}
   m_CharacterFullInfoPanelTabsTemplate: {fileID: 9197481963319205126, guid: 4c330cef95a706f4c9307f6d5666ec41, type: 3}
   m_CharacterFullInfoPanelGeneralTabTemplate: {fileID: 9197481963319205126, guid: 9d2abf1818882f74b8ca5beb351e1a99, type: 3}
-  m_CharacterFullInfoPanelInventoryTabTemplate: {fileID: 0}
+  m_CharacterFullInfoPanelInventoryTabTemplate: {fileID: 9197481963319205126, guid: 093610d33f043914cb3b6a72084310ef, type: 3}
   m_CharacterFullInfoPanelHealthTabTemplate: {fileID: 9197481963319205126, guid: 0d18ba4ed47bffd40804bcbb99b6176b, type: 3}
   m_SmallTextPopupTemplate: {fileID: 9197481963319205126, guid: 93fa2a19969e5f140b392ebbb6de682d, type: 3}
 --- !u!1 &2112288919

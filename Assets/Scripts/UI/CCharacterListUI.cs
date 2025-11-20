@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.InputSystem;
 using UnityEngine.UIElements;
 
 public class STraitLabelData
@@ -40,6 +41,10 @@ public class CCharacterListUI : MonoBehaviour
     private VisualElement m_CurrentSmallPopup;
 
     private List<Label> m_AddedBoundLabels = new List<Label>();
+    private List<Button> m_BoundConsumeButtons = new List<Button>();
+    private List<Button> m_BoundUseButtons = new List<Button>();
+    private List<Button> m_BoundEquipButtons = new List<Button>();
+    private List<Button> m_BoundDropButtons = new List<Button>();
 
     private void OnEnable()
     {
@@ -279,6 +284,18 @@ public class CCharacterListUI : MonoBehaviour
             return;
         }
 
+        if (m_CharacterFullInfoPanelInventoryTabTemplate != null)
+        {
+            TemplateContainer container = m_CharacterFullInfoPanelInventoryTabTemplate.Instantiate();
+            m_CharacterFullInfoInventoryTabPanel = container.Q<VisualElement>("InventoryTabPanel");
+        }
+
+        if (m_CharacterFullInfoInventoryTabPanel == null)
+        {
+            Debug.Log("CharacterFullInfoPanelInventoryTabPanel is null!");
+            return;
+        }
+
         m_CharacterFullInfoTemplateContainer.style.alignSelf = Align.FlexEnd;
         m_CharacterFullInfoTemplateContainer.style.position = Position.Absolute;
         m_CharacterFullInfoTemplateContainer.style.right = 0;
@@ -311,9 +328,11 @@ public class CCharacterListUI : MonoBehaviour
         // Setup the tabs
         InitializeGeneralInfoPanelTab(partyMember);
         InitializeHealthPanelTab(partyMember);
+        InitializeInventoryTab(partyMember);
 
         generalTabButton.clicked += AddGeneralInfoTab;
         healthTabButton.clicked += AddHealthInfoTab;
+        inventoryTabButton.clicked += AddInventoryInfoTab;
 
         AddGeneralInfoTab();
     }
@@ -457,21 +476,68 @@ public class CCharacterListUI : MonoBehaviour
         }
 
         statusInfo.visible = bHasStatus;
+    }
 
-        /**
-        string inventoryString = string.Format("Inventory: {0}/{1}\n", partyMember.ItemInventory.CurrentWeight, partyMember.ItemInventory.MaxWeight);
+    private void InitializeInventoryTab(CPartyMemberRuntime partyMember)
+    {
+        if (m_CharacterFullInfoInventoryTabPanel == null)
+        {
+            Debug.Log("CharacterFullInfoInventoryTabPanel is null!");
+            return;
+        }
+
+        Label weightCapacityLabel = m_CharacterFullInfoInventoryTabPanel.Q<Label>("WeightCapacityLabel");
+        weightCapacityLabel.text = string.Format("Inventory: {0}/{1}\n", partyMember.ItemInventory.CurrentWeight, partyMember.ItemInventory.MaxWeight);
+        VisualElement itemsPanel = m_CharacterFullInfoInventoryTabPanel.Q<VisualElement>("ItemsPanel");
+        if (itemsPanel == null)
+        {
+            Debug.Log("itemInventoryPanel is null!");
+            return;
+        }
+
+        VisualElement itemActionsPanel = m_CharacterFullInfoInventoryTabPanel.Q<VisualElement>("ItemActionsPanel");
+        if (itemActionsPanel == null)
+        {
+            Debug.Log("itemActionsPanel is null!");
+            return;
+        }
+
         Dictionary<CInventoryItemRuntime, int> items = partyMember.ItemInventory.GetItemsWithCounts();
         foreach (var item in items)
         {
-            inventoryString += item.Key.ItemName;
-            if (item.Value > 1)
-            {
-                inventoryString += string.Format(" ({0})\n", item.Value);
-            }
-        }
+            VisualElement actionsPanel = new VisualElement();
+            actionsPanel.style.flexDirection = FlexDirection.Row;
+            itemActionsPanel.Add(actionsPanel);
 
-        statusInfo.text = inventoryString;
-        */
+            Label itemLabel = CreateDefaultLabel();
+            itemLabel.text = item.Key.ItemName + string.Format(" ({0})", item.Value);
+            itemLabel.userData = item.Key.ItemDescription;
+            itemLabel.RegisterCallback<MouseEnterEvent>(OnMouseEnterCreateDescriptionLabel);
+            itemLabel.RegisterCallback<MouseLeaveEvent>(OnMouseLeavePopupSource);
+            itemsPanel.Add(itemLabel);
+
+            if ((item.Key.ItemType & EItemType.Consumable) != 0)
+            {
+                Label newLabel = CreateDefaultLabel();
+                newLabel.text = "Consume";
+
+                actionsPanel.Add(newLabel);
+            }
+            if ((item.Key.ItemType & EItemType.Equippable) != 0)
+            {
+                Label newLabel = CreateDefaultLabel();
+                newLabel.text = "Equip";
+
+                actionsPanel.Add(newLabel);
+            }
+
+            Label dropLabel = CreateDefaultLabel();
+            dropLabel.text = "Drop";
+
+            actionsPanel.Add(dropLabel);
+
+            m_AddedBoundLabels.Add(itemLabel);
+        }
     }
 
     private Label CreateDefaultLabel()
@@ -502,9 +568,19 @@ public class CCharacterListUI : MonoBehaviour
     {
         RemoveFullInfoTabs();
 
-        if (m_CharacterFullInfoTemplateContainer != null && m_CharacterFullInfoGeneralTabPanel != null)
+        if (m_CharacterFullInfoTemplateContainer != null && m_CharacterFullInfoHealthTabPanel != null)
         {
             m_CharacterFullInfoTemplateContainer.Add(m_CharacterFullInfoHealthTabPanel);
+        }
+    }
+
+    private void AddInventoryInfoTab()
+    {
+        RemoveFullInfoTabs();
+
+        if (m_CharacterFullInfoTemplateContainer != null && m_CharacterFullInfoInventoryTabPanel != null)
+        {
+            m_CharacterFullInfoTemplateContainer.Add(m_CharacterFullInfoInventoryTabPanel);
         }
     }
 
@@ -518,6 +594,11 @@ public class CCharacterListUI : MonoBehaviour
         if (m_CharacterFullInfoHealthTabPanel != null)
         {
             m_CharacterFullInfoHealthTabPanel.RemoveFromHierarchy();
+        }
+
+        if (m_CharacterFullInfoInventoryTabPanel != null)
+        {
+            m_CharacterFullInfoInventoryTabPanel.RemoveFromHierarchy();
         }
     }
 
@@ -541,6 +622,13 @@ public class CCharacterListUI : MonoBehaviour
             if (healthTabButton != null)
             {
                 healthTabButton.clicked -= AddHealthInfoTab;
+            }
+
+            Button inventoryTabButton = m_CharacterFullInfoPanelTabs.Q<Button>("InventoryTabButton");
+
+            if (inventoryTabButton != null)
+            {
+                inventoryTabButton.clicked -= AddInventoryInfoTab;
             }
         }
 

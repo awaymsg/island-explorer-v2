@@ -538,6 +538,50 @@ TextureImporter:
       indices: 
       edges: []
       weights: []
+    - serializedVersion: 2
+      name: POIsAndFlavor_18
+      rect:
+        serializedVersion: 2
+        x: 64
+        y: 32
+        width: 32
+        height: 32
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: c050c0542e018804997b4c9dca7efd9d
+      internalID: -1449597985
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: POIsAndFlavor_19
+      rect:
+        serializedVersion: 2
+        x: 96
+        y: 32
+        width: 32
+        height: 32
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 52cbadb5e0373924c941c873450846ad
+      internalID: -757363097
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
     outline: []
     customData: 
     physicsShape: []
@@ -566,6 +610,8 @@ TextureImporter:
       POIsAndFlavor_15: 840265904
       POIsAndFlavor_16: 1686368830
       POIsAndFlavor_17: 204095035
+      POIsAndFlavor_18: -1449597985
+      POIsAndFlavor_19: -757363097
       POIsAndFlavor_2: 8273184959742511880
       POIsAndFlavor_3: 952300667142043008
       POIsAndFlavor_4: -1547635154973014620

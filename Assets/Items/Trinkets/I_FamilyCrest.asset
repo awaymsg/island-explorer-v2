@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::CInventoryItem
   m_ItemName: Family Crest
   m_ItemDescription: A mysterious crest passed down from ancient times.
-  m_ItemType: 8
+  m_ItemType: 12
   m_ItemCategory: 5
   m_StatModifiers:
   - StatType: 13

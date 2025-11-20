@@ -1,0 +1,13 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" editor-extension-mode="False">
+    <ui:VisualElement name="InventoryTabPanel" style="flex-grow: 1; background-color: rgba(0, 0, 0, 0.7) height auto;">
+        <ui:VisualElement name="ItemInventoryPanel" style="flex-grow: 1; flex-direction: row;">
+            <ui:VisualElement name="ItemsPanel" style="flex-grow: 1; min-width: 50%; max-width: 50%;">
+                <ui:Label text="Label" name="WeightCapacityLabel" style="color: rgb(255, 255, 255);" />
+            </ui:VisualElement>
+            <ui:VisualElement name="ItemActionsPanel" style="flex-grow: 1; width: auto; min-width: 50%; max-width: 50%;">
+                <ui:Label text="Actions" name="ActionsLabel" style="color: rgb(255, 255, 255);" />
+            </ui:VisualElement>
+        </ui:VisualElement>
+        <ui:VisualElement name="EquippedItemsPanel" style="flex-grow: 1;" />
+    </ui:VisualElement>
+</ui:UXML>
